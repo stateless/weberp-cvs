@@ -1,12 +1,11 @@
 <?php
-/* $Revision: 1.9 $ */
+/* $Revision: 1.9.2.1 $ */
 
 $PageSecurity = 2;
 
 include('includes/session.inc');
 $title = _('Customer Transactions Inquiry');
 include('includes/header.inc');
-include('includes/DateFunctions.inc');
 
 
 echo "<FORM ACTION='" . $_SERVER['PHP_SELF'] . "' METHOD=POST>";

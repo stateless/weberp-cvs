@@ -1,11 +1,10 @@
 <?php
-/* $Revision: 1.5 $ */
+/* $Revision: 1.5.2.1 $ */
 $PageSecurity = 2;
 
 include('includes/session.inc');
 $title = _('Stock Movements');
 include('includes/header.inc');
-include('includes/DateFunctions.inc');
 
 
 if (isset($_GET['StockID'])){

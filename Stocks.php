@@ -1,13 +1,12 @@
 <?php
+/* $Revision: 1.16.2.4 $ */
 
-/* $Revision: 1.16.2.3 $ */
 
 $PageSecurity = 11;
 
 include('includes/session.inc');
 $title = _('Item Maintenance');
 include('includes/header.inc');
-include('includes/DateFunctions.inc');
 
 /*If this form is called with the StockID then it is assumed that the stock item is to be modified */
 
@@ -664,7 +663,8 @@ if (function_exists('imagecreatefrompng')){
 	}
 }
 
-echo '</TABLE></TD><TD><CENTER>' . $StockImgLink . '</CENTER></TD></TR></TABLE>';
+echo '</TABLE></TD><TD><CENTER>' . _('Image') . '<BR>'.$StockImgLink . '</CENTER></TD></TR></TABLE>';
+
 
 if (isset($_POST['New']) OR $_POST['New']!="") {
 	echo '<input type="Submit" name="submit" value="' . _('Insert New Item') . '">';

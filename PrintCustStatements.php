@@ -1,12 +1,9 @@
 <?php
-/* $Revision: 1.5 $ */
+/* $Revision: 1.5.2.1 $ */
 $PageSecurity = 2;
 
 include('includes/session.inc');
 include('includes/SQL_CommonFunctions.inc');
-include('includes/DateFunctions.inc');
-//include('includes/class.pdf.php');
-
 
 If (isset($_POST['PrintPDF']) && isset($_POST['FromCust']) && $_POST['FromCust']!=''){
 

@@ -1,5 +1,6 @@
 <?php
-/* $Revision: 1.3.2.2 $ */
+/* $Revision: 1.3.2.3 $ */
+
 $PageSecurity =15;
 
 include('includes/session.inc');
@@ -7,8 +8,6 @@ include('includes/session.inc');
 $title = _('System Configuration');
 
 include('includes/header.inc');
-include('includes/DateFunctions.inc');
-
 
 if (isset($_POST['submit'])) {
 
@@ -183,6 +182,15 @@ if (isset($_POST['submit'])) {
 		if ($_SESSION['reports_dir'] != $_POST['X_reports_dir'] ) {
 			$sql[] = "UPDATE config SET confvalue = '".DB_escape_string($_POST['X_reports_dir'])."' WHERE confname = 'reports_dir'";
 		}
+		if ($_SESSION['AutoDebtorNo'] != $_POST['X_AutoDebtorNo'] ) {
+			$sql[] = "UPDATE config SET confvalue = '". ($_POST['X_AutoDebtorNo'])."' WHERE confname = 'AutoDebtorNo'";
+		}
+		if ($_SESSION['HTTPS_Only'] != $_POST['X_HTTPS_Only'] ) {
+			$sql[] = "UPDATE config SET confvalue = '". ($_POST['X_HTTPS_Only'])."' WHERE confname = 'HTTPS_Only'";
+		}
+		if ($_SESSION['DB_Maintenance'] != $_POST['DB_Maintenance'] ) {
+			$sql[] = "UPDATE config SET confvalue = '". ($_POST['X_DB_Maintenance'])."' WHERE confname = 'DB_Maintenance'";
+		}
 		
 		$ErrMsg =  _('The system configuration could not be updated because');
 		if (sizeof($sql) > 0 ) {
@@ -345,6 +353,21 @@ echo '<TR><TD>' . _('Apply freight charges if an order is less than') . ':</TD>
 	<TD><input type="Text" Name="X_FreightChargeAppliesIfLessThan" SIZE=6 MAXLENGTH=12 value="' . $_SESSION['FreightChargeAppliesIfLessThan'] . '"></TD>
 	<TD>' . ('This parameter is only effective if Do Freight Calculation is set to Yes. If it is set to 0 then freight is always charged. The total order value is compared to this value in deciding whether or not to charge freight') .'</TD></TR>';
 
+	
+// AutoDebtorNo
+echo '<TR><TD>' . _('Create Debtor Codes Automatically') . ':</TD>
+	<TD><SELECT Name="X_AutoDebtorNo">';
+	 
+if ($_SESSION['AutoDebtorNo']==0) {
+	echo '<OPTION SELECTED Value=0>' . _('Manual Entry');
+	echo '<OPTION Value=1>' . _('Automatic');
+} else {
+	echo '<OPTION SELECTED Value=1>' . _('Automatic');
+	echo '<OPTION Value=0>' . _('Manual Entry');
+}
+echo '</SELECT></TD>
+	<TD>' . ('Set to Automatic - customer codes are automatically created - as a sequential number') .'</TD></TR>';
+
 //DefaultTaxLevel
 echo '<TR><TD>' . _('Default Tax Level') . ':</TD>
 	<TD><input type="Text" Name="X_DefaultTaxLevel" SIZE=2 MAXLENGTH=1 value="' . $_SESSION['DefaultTaxLevel'] . '"></TD>
@@ -353,7 +376,7 @@ echo '<TR><TD>' . _('Default Tax Level') . ':</TD>
 //TaxAuthorityReferenceName
 echo '<TR><TD>' . _('TaxAuthorityReferenceName') . ':</TD>
 	<TD><input type="Text" Name="X_TaxAuthorityReferenceName" SIZE=16 MAXLENGTH=25 value="' . $_SESSION['TaxAuthorityReferenceName'] . '"></TD>
-	<TD>' . ('This parameter is what is displayed on tax invoices and credits for the tax authority of the company eg. in Australian this would by A.B.N.: - in NZ it would be GST No:') .'</TD></TR>';
+	<TD>' . ('This parameter is what is displayed on tax invoices and credits for the tax authority of the company eg. in Australian this would by A.B.N.: - in NZ it would be GST No: in the UK it would be VAT Regn. No') .'</TD></TR>';
 
 // CountryOfOperation
 $sql = 'SELECT currabrev, country FROM currencies ORDER BY country';
@@ -530,6 +553,44 @@ echo '</SELECT></TD>
 	</TR>';
 
 
+// HTTPS_Only
+echo '<TR><TD>' . _('Only allow secure socket connections') . ':</TD>
+	<TD><SELECT Name="X_HTTPS_Only">
+	<OPTION '.($_SESSION['HTTPS_Only']?'SELECTED ':'').'VALUE="1">'._('Yes').'
+	<OPTION '.(!$_SESSION['HTTPS_Only']?'SELECTED ':'').'VALUE="0">'._('No').'
+	</SELECT></TD>
+	<TD>' . _('Force connections to be only over secure sockets - ie encrypted data only') . '</TD>
+	</TR>';
+
+/*Perform Database maintenance DB_Maintenance*/
+echo '<TR><TD>' . _('Perform Database Maintenance At Logon') . ':</TD>
+	<TD><SELECT Name="X_DB_Maintenance">';
+	if ($_SESSION['DB_Maintenance']=='1'){
+		echo '<OPTION SELECTED VALUE="1">'._('Daily');
+	} else {
+		echo '<OPTION VALUE="1">'._('Daily');
+	}
+	if ($_SESSION['DB_Maintenance']=='7'){
+		echo '<OPTION SELECTED VALUE="7">'._('Weekly');
+	} else {
+		echo '<OPTION VALUE="7">'._('Weekly');
+	}
+	if ($_SESSION['DB_Maintenance']=='30'){
+		echo '<OPTION SELECTED VALUE="30">'._('Monthly');
+	} else {
+		echo '<OPTION VALUE="30">'._('Monthly');
+	}
+	if ($_SESSION['DB_Maintenance']=='0'){
+		echo '<OPTION SELECTED VALUE="0">'._('Never');
+	} else {
+		echo '<OPTION VALUE="0">'._('Never');
+	}
+	
+	echo '</SELECT></TD>
+	<TD>' . _('Uses the function DB_Maintenance defined in ConnectDB_XXXX.inc to perform database maintenance tasks, to run at regular intervals - checked at each and every user login') . '</TD>
+	</TR>';
+	
+	
 echo '</TABLE><input type="Submit" Name="submit" value="' . _('Update') . '"></CENTER></FORM>';
 
 include('includes/footer.inc');

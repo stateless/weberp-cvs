@@ -1,11 +1,10 @@
 <?php
-/* $Revision: 1.6 $ */
+/* $Revision: 1.6.2.1 $ */
 $PageSecurity = 2;
 
 include('includes/session.inc');
 $title = _('Search Outstanding Sales Orders');
 include('includes/header.inc');
-include('includes/DateFunctions.inc');
 
 echo '<FORM ACTION=' . $_SERVER['PHP_SELF'] .'?' .SID . ' METHOD=POST>';
 
@@ -261,7 +260,8 @@ If (isset($StockItemsResult)) {
 					salesorders.customerref,
 					salesorders.orddate,
 					salesorders.deliverydate,
-					salesorders.deliverto";
+					salesorders.deliverto
+				ORDER BY salesorders.orderno";
 	} else {
 	      /* $DateAfterCriteria = FormatDateforSQL($OrdersAfterDate); */
 
@@ -319,7 +319,8 @@ If (isset($StockItemsResult)) {
 						salesorders.customerref,
 						salesorders.orddate,
 						salesorders.deliverto,
-						salesorders.deliverydate";
+						salesorders.deliverydate
+					ORDER BY salesorders.orderno";
 
 			}
 		} else { //no customer selected
@@ -349,7 +350,8 @@ If (isset($StockItemsResult)) {
 						salesorders.customerref,
 						salesorders.orddate,
 						salesorders.deliverto,
-						salesorders.deliverydate";
+						salesorders.deliverydate
+					ORDER BY salesorders.orderno";
 			} else {
 				$SQL = "SELECT salesorders.orderno,
 						debtorsmaster.name,
@@ -376,7 +378,8 @@ If (isset($StockItemsResult)) {
 						salesorders.customerref,
 						salesorders.orddate,
 						salesorders.deliverto,
-						salesorders.deliverydate";
+						salesorders.deliverydate
+					ORDER BY salesorders.orderno";
 			}
 
 		} //end selected customer

@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.6 $ */
+/* $Revision: 1.6.2.1 $ */
 $PageSecurity =10;
 
 include('includes/session.inc');
@@ -7,8 +7,6 @@ include('includes/session.inc');
 $title = _('Company Preferences');
 
 include('includes/header.inc');
-include('includes/DateFunctions.inc');
-
 
 if (isset($_POST['submit'])) {
 

@@ -1,5 +1,6 @@
 <?php
-/* $Revision: 1.9.2.1 $ */
+
+/* $Revision: 1.9.2.2 $ */
 
 $PageSecurity = 3;
 
@@ -8,7 +9,7 @@ include('includes/session.inc');
 $title = _('Customer Maintenance');
 
 include('includes/header.inc');
-include('includes/DateFunctions.inc');
+include('includes/SQL_CommonFunctions.inc');
 
 
 if ($_POST['submit']) {
@@ -18,7 +19,7 @@ if ($_POST['submit']) {
 
 	/* actions to take once the user has clicked the submit button
 	ie the page has called itself with some user input */
-
+ 	
 	//first off validate inputs sensible
 
 	$_POST['DebtorNo'] = strtoupper($_POST['DebtorNo']);
@@ -26,15 +27,15 @@ if ($_POST['submit']) {
 	if (strlen($_POST['CustName']) > 40 OR strlen($_POST['CustName'])==0) {
 		$InputError = 1;
 		prnMsg( _('The customer name must be entered and be forty characters or less long'),'error');
-	} elseif (strlen($_POST['DebtorNo']) ==0) {
+	} elseif ($_SESSION['AutoDebtorNo']==0 AND strlen($_POST['DebtorNo']) ==0) {
 		$InputError = 1;
 		prnMsg( _('The debtor code cannot be empty'),'error');
-	} elseif (strstr($_POST['DebtorNo'],"'") OR strstr($_POST['DebtorNo'],'+') OR strstr($_POST['DebtorNo'],"\"") OR strstr($_POST['DebtorNo'],'&') OR strstr($_POST['DebtorNo'],' ') OR strstr($_POST['DebtorNo'],"\\") OR strstr($_POST['DebtorNo'],'.') OR strstr($_POST['DebtorNo'],'"')) {
+	} elseif ($_SESSION['AutoDebtorNo']==0 AND ContainsIllegalCharacters($_POST['DebtorNo'])) {
 		$InputError = 1;
 		prnMsg( _('The customer code cannot contain any of the following characters') . " . - ' & + \" " . _('or a space'),'error');
-	} elseif (strstr($_POST['Address1'],"'") OR strstr($_POST['Address2'],"'") OR strstr($_POST['Address3'],"'") OR strstr($_POST['Address4'],"'")) {
+	} elseif (ContainsIllegalCharacters($_POST['Address1']) OR ContainsIllegalCharacters($_POST['Address2'])) {
 		$InputError = 1;
-		prnMsg( _('No lines of the address must not contain the') . " ' " . _('character'),'error');
+		prnMsg( _('Lines of the address  must not contain illegal characters'),'error');
 	} elseif (strlen($_POST['Address1']) >40) {
 		$InputError = 1;
 		prnMsg( _('The Line 1 of the address must be forty characters or less long'),'error');
@@ -68,7 +69,7 @@ if ($_POST['submit']) {
 	} elseif (((double) $_POST['Discount']> 100) OR ((double) $_POST['Discount'] <0)) {
 		$InputError = 1;
 		prnMsg( _('The discount is expected to be less than 100% and greater than or equal to 0'),'error');
-	} // Sherifoz 22.06.03 change discount to be real percent 0-100 instead of 0.0-1.0
+	} 
 
 	if ($_POST['CreditLimit']==0) {
 		$_POST['CreditLimit']= $_SESSION['DefaultCreditLimit'];
@@ -107,7 +108,15 @@ if ($_POST['submit']) {
 			prnMsg( _('Customer updated'),'success');
 
 		} else { //it is a new customer
-
+			/* set the DebtorNo if $AutoDebtorNo in config.php has been set to
+			something greater 0 */
+			if ($_SESSION['AutoDebtorNo'] > 0) {
+				/* system assigned, sequential, numeric */
+				if ($_SESSION['AutoDebtorNo']== 1) {
+					$_POST['DebtorNo'] = GetNextTransNo(500, $db);
+				}
+			}
+			
 			$sql = "INSERT INTO debtorsmaster (
 							debtorno,
 							name,
@@ -252,10 +261,14 @@ if (!isset($DebtorNo)) {
 	
 	$DataError =0;  
 	
-	echo '<CENTER><TABLE>
-		<TR>
-		<TD>' . _('Customer Code') . ":</TD>
-		<TD><input type='Text' name='DebtorNo' SIZE=11 MAXLENGTH=10></TD></TR>";
+	echo '<CENTER><TABLE>';
+		
+	/* if $AutoDebtorNo in config.php has not been set or if it has been set to a number less than one,
+	then provide an input box for the DebtorNo to manually assigned */
+	if ($_SESSION['AutoDebtorNo']==0)  {
+		echo '<TR><TD>' . _('Customer Code') . ":</TD><TD><input type='Text' name='DebtorNo' SIZE=11 MAXLENGTH=10></TD></TR>";
+	}
+	
 	echo '<TR><TD>' . _('Customer Name') . ":</TD>
 		<TD><input type='Text' name='CustName' SIZE=42 MAXLENGTH=40></TD></TR>";
 	echo '<TR><TD>' . _('Address Line 1') . ":</TD>
@@ -272,7 +285,7 @@ if (!isset($DebtorNo)) {
 		$DataError =1;
 		echo '<TR><TD COLSPAN=2>' . prnMsg(_('There are no sales types/price lists currently defined - go to the setup tab of the main menu and set at least one up first'),'error') . '</TD></TR>';
 	} else {
-		echo '<TR><TD>' . _('Sales Type') . '/' . _('Price List') . ":</TD>
+		echo '<TR><TD>' . _('Sales Type/Price List') . ":</TD>
 			<TD><SELECT name='SalesType'>";
 
 		while ($myrow = DB_fetch_array($result)) {
@@ -414,8 +427,13 @@ if (!isset($DebtorNo)) {
 	} else {
 	// its a new customer being added
 		echo "<INPUT TYPE=HIDDEN NAME='New' VALUE='Yes'>";
-		echo '<TR><TD>' . _('Customer Code') . ":</TD>
-			<TD><input type='Text' name='DebtorNo' value='" . $DebtorNo . "' SIZE=12 MAXLENGTH=10></TD></TR>";
+		
+		/* if $AutoDebtorNo in config.php has not been set or if it has been set to a number less than one,
+		then provide an input box for the DebtorNo to manually assigned */
+		if ($_SESSION['AutoDebtorNo']== 0 )  {
+			echo '<TR><TD>' . _('Customer Code') . ":</TD>
+				<TD><input type='Text' name='DebtorNo' value='" . $DebtorNo . "' SIZE=12 MAXLENGTH=10></TD></TR>";
+		}
 	}
 
 	echo '<TR><TD>' . _('Customer Name') . ":</TD>

@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.8.2.1 $ */
+/* $Revision: 1.8.2.2 $ */
 
 $PageSecurity = 2;
 
@@ -429,8 +429,6 @@ If (isset($_POST['PrintPDF']) AND isset($_POST['NoOfPeriods']) AND isset($_POST[
 	include('includes/session.inc');
 	$title=_('Tax Reporting');
 	include('includes/header.inc');
-	include('includes/DateFunctions.inc');
-	
 
 	echo '<FORM ACTION=' . $_SERVER['PHP_SELF'] . " METHOD='POST'><CENTER><TABLE>";
 

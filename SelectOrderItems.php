@@ -1,5 +1,6 @@
 <?php
-/* $Revision: 1.22.2.3 $ */
+
+/* $Revision: 1.22.2.4 $ */
 
 require('includes/DefineCartClass.php');
 
@@ -16,7 +17,6 @@ if (isset($_GET['ModifyOrderNumber'])) {
 }
 
 include('includes/header.inc');
-include('includes/DateFunctions.inc');
 include('includes/GetPrice.inc');
 
 if (isset($_POST['QuickEntry'])){
@@ -708,11 +708,14 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 	/*Process Quick Entry */
 
 	 If (isset($_POST['QuickEntry'])){
-/* get the item details from the database and hold them in the cart object */
+	     /* get the item details from the database and hold them in the cart object */
+	     
+	     /*Discount can only be set later on  -- after quick entry -- so default discount to 0 in the first place */
+	     $Discount = 0;			
+	     
 	     $i=1;
 	     do {
-
-	    		$QuickEntryCode = 'part_' . $i;
+			$QuickEntryCode = 'part_' . $i;
 			$QuickEntryQty = 'qty_' . $i;
 			$i++;
 		   
@@ -758,6 +761,7 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 					include('includes/SelectOrderItems_IntoCart.inc');
 				}
 			}
+
 	     } while ($i<=$_SESSION['QuickEntries']); /*loop to the next quick entry record */
 
 	     unset($NewItem);
@@ -829,6 +833,8 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 		$KitResult = DB_query($sql, $db,$ErrMsg);
 
 		$NewItemQty = 1; /*By Default */
+		$Discount = 0; /*By default - can change later or discount category overide */
+		
 		if ($myrow=DB_fetch_array($KitResult)){
 		   	if ($myrow['mbflag']=='K'){	/*It is a kit set item */
 				$sql = "SELECT bom.component,

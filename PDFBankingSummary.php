@@ -1,9 +1,8 @@
 <?php
-/* $Revision: 1.5 $ */
+/* $Revision: 1.5.2.1 $ */
 $PageSecurity = 3;
 include ('includes/session.inc');
 include('includes/SQL_CommonFunctions.inc');
-include('includes/DateFunctions.inc');
  
 if (isset($_GET['BatchNo'])){
 	$_POST['BatchNo'] = $_GET['BatchNo'];

@@ -995,6 +995,31 @@ CREATE TABLE `salesanalysis` (
 ) TYPE=InnoDB;
 
 --
+-- Table structure for table `salescat`
+--
+
+CREATE TABLE `salescat` (
+  `salescatid` tinyint(4) NOT NULL auto_increment,
+  `parentcatid` tinyint(4) default NULL,
+  `salescatname` varchar(20) default NULL,
+  PRIMARY KEY  (`salescatid`)
+) TYPE=InnoDB;
+
+--
+-- Table structure for table `salescatprod`
+--
+
+CREATE TABLE `salescatprod` (
+  `salescatid` tinyint(4) NOT NULL default '0',
+  `stockid` varchar(20) NOT NULL default '',
+  PRIMARY KEY  (`salescatid`,`stockid`),
+  KEY `salescatid` (`salescatid`),
+  KEY `stockid` (`stockid`),
+  CONSTRAINT `salescatprod_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `salescatprod_ibfk_2` FOREIGN KEY (`salescatid`) REFERENCES `salescat` (`salescatid`)
+) TYPE=InnoDB;
+
+--
 -- Table structure for table `salesglpostings`
 --
 
@@ -1965,12 +1990,12 @@ INSERT INTO `systypes` VALUES (0,'Journal - GL',10);
 INSERT INTO `systypes` VALUES (1,'Payment - GL',19);
 INSERT INTO `systypes` VALUES (2,'Receipt - GL',3);
 INSERT INTO `systypes` VALUES (3,'Standing Journal',0);
-INSERT INTO `systypes` VALUES (10,'Sales Invoice',13);
+INSERT INTO `systypes` VALUES (10,'Sales Invoice',14);
 INSERT INTO `systypes` VALUES (11,'Credit Note',11);
 INSERT INTO `systypes` VALUES (12,'Receipt',4);
 INSERT INTO `systypes` VALUES (15,'Journal - Debtors',0);
 INSERT INTO `systypes` VALUES (16,'Location Transfer',8);
-INSERT INTO `systypes` VALUES (17,'Stock Adjustment',6);
+INSERT INTO `systypes` VALUES (17,'Stock Adjustment',8);
 INSERT INTO `systypes` VALUES (18,'Purchase Order',0);
 INSERT INTO `systypes` VALUES (20,'Purchase Invoice',17);
 INSERT INTO `systypes` VALUES (21,'Debit Note',8);
@@ -1981,9 +2006,10 @@ INSERT INTO `systypes` VALUES (26,'Work Order Receipt',0);
 INSERT INTO `systypes` VALUES (28,'Work Order Issue',0);
 INSERT INTO `systypes` VALUES (29,'Work Order Variance',0);
 INSERT INTO `systypes` VALUES (30,'Sales Order',0);
-INSERT INTO `systypes` VALUES (31,'Shipment Close',9);
+INSERT INTO `systypes` VALUES (31,'Shipment Close',12);
 INSERT INTO `systypes` VALUES (35,'Cost Update',6);
 INSERT INTO `systypes` VALUES (50,'Opening Balance',0);
+INSERT INTO `systypes` VALUES (500,'Auto Debtor Number',10000);
 
 --
 -- Dumping data for table `taxauthorities`
@@ -2023,7 +2049,7 @@ INSERT INTO `taxauthlevels` VALUES (6,6,2,0);
 -- Dumping data for table `www_users`
 --
 
-INSERT INTO `www_users` VALUES ('demo','f0f77a7f88e7c1e93ab4e316b4574c7843b00ea4','Demonstration user','','','','DEN',8,'2005-02-20 19:49:30','','A4','1,1,1,1,1,1,1,1,',0,50,'professional','fr_FR');
+INSERT INTO `www_users` VALUES ('demo','f0f77a7f88e7c1e93ab4e316b4574c7843b00ea4','Demonstration user','','','','DEN',8,'2005-03-27 11:09:00','','A4','1,1,1,1,1,1,1,1,',0,50,'professional','en_GB');
 INSERT INTO `www_users` VALUES ('testy','f0f77a7f88e7c1e93ab4e316b4574c7843b00ea4','Test Remote User','GRANHR','','','DEN',7,'2005-02-10 21:11:20','GRAN','A4','0,0,0,0,0,0,0,0,',0,50,'fresh','pt_PT');
 
 --
@@ -2174,8 +2200,8 @@ INSERT INTO `edi_orders_seg_groups` VALUES (50,1,0);
 --
 
 INSERT INTO `config` VALUES ('DefaultLanguage','en_GB');
-INSERT INTO `config` VALUES ('DefaultDateFormat','d/m/Y');
-INSERT INTO `config` VALUES ('DefaultTheme','fresh');
+INSERT INTO `config` VALUES ('DefaultDateFormat','m/d/Y');
+INSERT INTO `config` VALUES ('DefaultTheme','professional');
 INSERT INTO `config` VALUES ('PastDueDays1','30');
 INSERT INTO `config` VALUES ('PastDueDays2','60');
 INSERT INTO `config` VALUES ('DefaultCreditLimit','1000');
@@ -2216,6 +2242,10 @@ INSERT INTO `config` VALUES ('RadioBreaconFilePrefix','ORDXX');
 INSERT INTO `config` VALUES ('RadioBraconFTP_server','192.168.2.2');
 INSERT INTO `config` VALUES ('RadioBeaconFTP_user_name','RadioBeacon ftp server user name');
 INSERT INTO `config` VALUES ('RadionBeaconFTP_user_pass','Radio Beacon remote ftp server password');
+INSERT INTO `config` VALUES ('AutoDebtorNo','0');
+INSERT INTO `config` VALUES ('HTTPS_Only','0');
+INSERT INTO `config` VALUES ('DB_Maintenance','1');
+INSERT INTO `config` VALUES ('DB_Maintenance_LastRun','2005-03-27');
 
 --
 -- Dumping data for table `unitsofmeasure`

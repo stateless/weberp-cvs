@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.9 $ */
+/* $Revision: 1.9.2.1 $ */
 include('includes/DefineStockAdjustment.php');
 include('includes/DefineSerialItems.php');
 
@@ -8,7 +8,6 @@ include('includes/session.inc');
 $title = _('Stock Adjustments');
 
 include('includes/header.inc');
-include('includes/DateFunctions.inc');
 include('includes/SQL_CommonFunctions.inc');
 
 if (isset($_GET['NewAdjustment'])){
@@ -64,7 +63,6 @@ if ($NewAdjustment){
 		$_SESSION['Adjustment']->Serialised = $myrow[5];
 		$_SESSION['Adjustment']->DecimalPlaces = $myrow[6];
 		$_SESSION['Adjustment']->SerialItems = array();
-		$_SESSION['Adjustment']->Quantity =0;
 
 		if ($myrow[2]=='D' OR $myrow[2]=='A' OR $myrow[2]=='K'){
 			prnMsg( _('The part entered is either or a dummy part or an assembly or kit-set part') . '. ' . _('These parts are not physical parts and no stock holding is maintained for them') . '. ' . _('Stock adjustments are therefore not possible'),'error');

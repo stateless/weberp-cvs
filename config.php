@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.49.2.1 $ */
+/* $Revision: 1.49.2.2 $ */
 	/*--------------------------------------------------\
 	| 		|               | config.php        |
 	|---------------------------------------------------|
@@ -19,7 +19,8 @@ $DefaultLanguage ='en_GB';
 $allow_demo_mode = True;
 
 // Application version
-$Version = '2.9c_tax';
+
+$Version = '3.0rc1';
 
 // The timezone of the business - this allows the possibility of having
 // the web-server on a overseas machine but record local time
@@ -62,7 +63,13 @@ $MaximumExecutionTime =120;
 //$CryptFunction = "md5"; // MD5 Hash
 $CryptFunction = "sha1"; // SHA1 Hash
 //$CryptFunction = ""; // Plain Text
+
+
+
 // END OF USER CONFIGURABLE VARIABLES
+
+
+
 
 /*The $rootpath is used in most scripts to tell the script the installation details of the files.
 
