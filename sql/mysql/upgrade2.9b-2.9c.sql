@@ -956,9 +956,11 @@ PRIMARY KEY ( taxprovinceid )
 
 ALTER TABLE `locations` CHANGE `taxauthority` `taxprovinceid` TINYINT( 4 ) DEFAULT '1' NOT NULL;
 ALTER TABLE `locations` ADD INDEX ( `taxprovinceid` );
+
 UPDATE locations SET taxprovinceid=1;
 INSERT INTO `taxprovinces` ( `taxprovinceid` , `taxprovincename` ) VALUES ('1', 'Default Tax province');
 ALTER TABLE locations ADD FOREIGN KEY (taxprovinceid) REFERENCES taxprovinces (taxprovinceid);
+
 
 CREATE TABLE taxgroups (
   taxgroupid tinyint(4) auto_increment NOT NULL,
@@ -986,3 +988,13 @@ ALTER TABLE `custbranch` DROP INDEX `taxauthority` , ADD INDEX `taxgroupid` ( `t
 UPDATE custbranch SET taxgroupid=1;
 INSERT INTO taxgroups (taxgroupid, taxgroupdescription) VALUES (1,'Default tax group');
 ALTER TABLE custbranch ADD FOREIGN KEY (taxgroupid) REFERENCES taxgroups (taxgroupid);
+
+ALTER TABLE `taxauthlevels` RENAME `taxauthrates`;
+ALTER TABLE taxauthrates ADD FOREIGN KEY (dispatchtaxprovince) REFERENCES taxprovinces (taxprovinceid);
+
+ALTER TABLE `stockmaster` CHANGE `taxlevel` `taxcatid` TINYINT( 4 ) DEFAULT '1' NOT NULL;
+ALTER TABLE `stockmaster` ADD INDEX ( `taxcatid` );
+
+UPDATE stockmaster SET taxcatid=3 WHERE taxcatid>3;
+
+ALTER TABLE stockmaster ADD FOREIGN KEY (taxcatid) REFERENCES taxcategories (taxcatid);

@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.16 $ */
+/* $Revision: 1.16.2.1 $ */
 
 $PageSecurity = 11;
 
@@ -97,9 +97,6 @@ if (isset($_POST['submit'])) {
 	} elseif ($_POST['EOQ'] <0) {
 		$InputError = 1;
 		prnMsg (_('The economic order quantity must be a positive number'),'error');
-	} elseif (! is_numeric($_POST['TaxLevel'])){
-		$InputError = 1;
-		prnMsg(_('The tax level determines the rate of tax in conjunction with the tax authority of the branch where the item is sold to') . '. ' . _('The tax level must be a number between 0 and 9'),'error');
 	}elseif ($_POST['Controlled']==0 AND $_POST['Serialised']==1){
 		$InputError = 1;
 		prnMsg(_('The item can only be serialised if there is lot control enabled already') . '. ' . _('Batch control') . ' - ' . _('with any number of items in a lot/bundle/roll is enabled when controlled is enabled') . '. ' . _('Serialised control requires that only one item is in the batch') . '. ' . _('For serialised control') . ', ' . _('both controlled and serialised must be enabled'),'error');
@@ -224,7 +221,7 @@ if (isset($_POST['submit'])) {
 							kgs=" . $_POST['KGS'] . ",
 							barcode='" . $_POST['BarCode'] . "',
 							discountcategory='" . $_POST['DiscountCategory'] . "',
-							taxlevel=" . $_POST['TaxLevel'] . ",
+							taxcatid=" . $_POST['TaxCat'] . ",
 							decimalplaces=" . $_POST['DecimalPlaces'] . "
 					WHERE stockid='$StockID'";
 
@@ -253,7 +250,7 @@ if (isset($_POST['submit'])) {
 						kgs,
 						barcode,
 						discountcategory,
-						taxlevel,
+						taxcatid,
 						decimalplaces)
 					VALUES ('$StockID',
 						'" . DB_escape_string($_POST['Description']) . "',
@@ -269,7 +266,7 @@ if (isset($_POST['submit'])) {
 						" . $_POST['KGS'] . ",
 						'" . $_POST['BarCode'] . "',
 						'" . $_POST['DiscountCategory'] . "',
-						" . $_POST['TaxLevel'] . ",
+						" . $_POST['TaxCat'] . ",
 						" . $_POST['DecimalPlaces']. "
 						)";
 
@@ -307,24 +304,6 @@ if (isset($_POST['submit'])) {
 					unset($_POST['DecimalPlaces']);
 					unset($StockID);
 				}
-			}
-		}
-		/*Check for a new TaxLevel and insert new records in TaxAuthLevels as necessary */
-
-		$result = DB_query("SELECT taxauthority FROM taxauthlevels WHERE level=" . $_POST['TaxLevel'] ,$db);
-		if (DB_num_rows($result)==0){ /*need to add the new level accross all TaxAuthorities */
-
-			$DispTaxAuthResult = DB_query('SELECT DISTINCT taxauthority FROM locations',$db);
-
-			while ($DispTaxAuthRow = DB_fetch_row($DispTaxAuthResult)){
-				$sql = 'INSERT INTO taxauthlevels (taxauthority, 
-								dispatchtaxauthority, 
-								level) 
-						SELECT taxid,
-							 ' . $DispTaxAuthRow[0] . ', 
-							 ' . $_POST['TaxLevel'] . ' 
-						FROM taxauthorities';
-				$InsertResult = DB_query($sql,$db);
 			}
 		}
 
@@ -430,7 +409,7 @@ if (isset($_POST['submit'])) {
 		unset($_POST['BarCode']);
 		unset($_POST['ReorderLevel']);
 		unset($_POST['DiscountCategory']);
-		unset($_POST['TaxLevel']);
+		unset($_POST['TaxCat']);
 		unset($_POST['DecimalPlaces']);
 		unset($StockID);
 		unset($_SESSION['SelectedStockItem']);
@@ -468,7 +447,7 @@ if (!isset($StockID) OR isset($_POST['New'])) {
 			kgs,
 			barcode,
 			discountcategory,
-			taxlevel,
+			taxcatid,
 			decimalplaces
 		FROM stockmaster
 		WHERE stockid = '$StockID'";
@@ -488,9 +467,9 @@ if (!isset($StockID) OR isset($_POST['New'])) {
 	$_POST['Volume']  = $myrow['volume'];
 	$_POST['KGS']  = $myrow['kgs'];
 	$_POST['BarCode']  = $myrow['barcode'];
-	$_POST['ReorderLevel']  = $myrow['reorderlevel'];
+//	$_POST['ReorderLevel']  = $myrow['reorderlevel'];
 	$_POST['DiscountCategory']  = $myrow['discountcategory'];
-	$_POST['TaxLevel'] = $myrow['taxlevel'];
+	$_POST['TaxCat'] = $myrow['taxcatid'];
 	$_POST['DecimalPlaces'] = $myrow['decimalplaces'];
 
 	echo '<TR><TD>' . _('Item Code') . ':</TD><TD>'.$StockID.'</TD></TR>';
@@ -651,13 +630,29 @@ echo '<TR><TD>' . _('Bar Code') . ':</TD><TD><input type="Text" name="BarCode" S
 
 echo '<TR><TD>' . _('Discount Category') . ':</TD><TD><input type="Text" name="DiscountCategory" SIZE=2 MAXLENGTH=2 value="' . $_POST['DiscountCategory'] . '"></TD></TR>';
 
-if (!isset($_POST['TaxLevel'])){
-	$_POST['TaxLevel']=1;
+echo '<TR><TD>' . _('Tax Category') . ':</TD><TD><SELECT NAME="TaxCat">';
+	$sql = 'SELECT taxcatid, taxcatname FROM taxcategories ORDER BY taxcatname';
+	$result = DB_query($sql, $db);
+
+	while ($myrow = DB_fetch_array($result)) {
+		if ($_POST['TaxCat'] == $myrow['taxcatid']){
+			echo '<OPTION SELECTED VALUE=' . $myrow['taxcatid'] . '>' . $myrow['taxcatname'];
+		} else {
+			echo '<OPTION VALUE=' . $myrow['taxcatid'] . '>' . $myrow['taxcatname'];
+		}
+	} //end while loop
+
+echo '</SELECT></TD></TR>';
+
+$html_imagefile = $rootpath . '/' . $_SESSION['part_pics_dir'] . '/' . $StockID . '.jpg';
+$dir_imagefile = './' . $_SESSION['part_pics_dir'] . '/' . $StockID . '.jpg';
+echo '</TABLE></TD><TD><CENTER>';
+if ( file_exists($dir_imagefile) ) {
+	echo _('Image') . '<BR>' . '<img src=' . $html_imagefile . '>'; 
+} else {
+	echo _('No image'); 
 }
-
-echo '<TR><TD>' . _('Tax Level') . ':</TD><TD><input type="Text" name="TaxLevel" SIZE=1 MAXLENGTH=1 value="' . $_POST['TaxLevel'] . '"></TD></TR>';
-
-echo '</TABLE></TD><TD><CENTER>' . _('Image') . '<BR><img src=' . $rootpath . '/' . $_SESSION['part_pics_dir'] . '/' . $StockID . '.jpg' . '>' . '</CENTER></TD></TR></TABLE>';
+echo '</CENTER></TD></TR></TABLE>';
 
 if (isset($_POST['New']) OR $_POST['New']!="") {
 	echo '<input type="Submit" name="submit" value="' . _('Insert New Item') . '">';
