@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.1.2.1 $ */
+/* $Revision: 1.1.2.2 $ */
 $PageSecurity=15;
 
 include('includes/session.inc');
@@ -29,7 +29,7 @@ if (isset($_POST['submit']) OR isset($_GET['remove']) OR isset($_GET['add']) ) {
 	}
 	
 	// if $_POST['GroupName'] then it is a modification of a tax group name
-	// else it is either an add or remove of a page token 
+	// else it is either an add or remove of taxgroup 
 	unset($sql);
 	if (isset($_POST['GroupName']) ){ // Update or Add a tax group
 		if(isset($SelectedGroup)) { // Update a tax group
@@ -72,31 +72,42 @@ if (isset($_POST['submit']) OR isset($_GET['remove']) OR isset($_GET['add']) ) {
 			prnMsg( $SuccessMsg,'success');
 		}
 	}
-} elseif (isset($_POST['updateorder'])) {
+} elseif (isset($_POST['UpdateOrder'])) {
 	//A calculation order update
-	foreach ( $_POST as $name => $value ) {
-		if (strpos($name,'NEW_') === 0 ) {
-			$key = substr($name, 4, strlen($name));
-			if ( isset($_POST['OLD_'.$key]) && isset($_POST['NEW_'.$key]) &&
-				$_POST['OLD_'.$key] != $_POST['NEW_'.$key] ) {
-				$i = strpos($key, '_');
-				if ( $i !== false ) {
-					$tmpTaxAuth = substr($key,0,$i);
-			
-					$sql = "UPDATE taxgrouptaxes 
-						SET taxcalculationorder=".$_POST['NEW_'.$key]."
-						WHERE taxgroupid=" . $SelectedGroup . "
-						AND taxauthid=".$tmpTaxAuth;
+	$sql = 'SELECT taxauthid FROM taxgrouptaxes WHERE taxgroupid=' . $SelectedGroup;
+	$Result = DB_query($sql,$db,_('Could not get tax authorities in the selected tax group'));
+	
+	while ($myrow=DB_fetch_row($Result)){
+		
+		if (is_numeric($_POST['CalcOrder_' . $myrow[0]]) AND $_POST['CalcOrder_' . $myrow[0]] <5){
+		
+			$sql = 'UPDATE taxgrouptaxes 
+				SET calculationorder=' . $_POST['CalcOrder_' . $myrow[0]] . ',
+					taxontax=' . $_POST['TaxOnTax_' . $myrow[0]] . '
+				WHERE taxgroupid=' . $SelectedGroup . '
+				AND taxauthid=' . $myrow[0];
 						
-					$result = DB_query($sql,$db);
-					if( $result ) {
-						DB_free_result($result);
-					}
-				}
-			}
+			$result = DB_query($sql,$db);
 		}
 	}
-} elseif (isset($_GET['delete'])) { 
+	
+	//need to do a reality check to ensure that taxontax is relevant only for taxes after the first tax
+	$sql = 'SELECT taxauthid, 
+			taxontax 
+		FROM taxgrouptaxes 
+		WHERE taxgroupid=' . $SelectedGroup . '
+		ORDER BY calculationorder';
+		
+	$Result = DB_query($sql,$db,_('Could not get tax authorities in the selected tax group'));
+	
+	if (DB_num_rows($Result)>0){
+		$myrow=DB_fetch_array($Result);
+		if ($myrow['taxontax']==1){
+			prnMsg(_('It is inappropriate to set tax on tax where the tax is the first in the calculation order. The system has changed it back to no tax on tax for this tax authority'),'warning');
+			$Result = DB_query('UPDATE taxgrouptaxes SET taxontax=0 WHERE taxgroupid=' . $SelectedGroup . ' AND taxauthid=' . $myrow['taxauthid'],$db);
+		}
+	}
+} elseif (isset($_GET['Delete'])) { 
 	
 	/* PREVENT DELETES IF DEPENDENT RECORDS IN 'custbranch, suppliers */
 	
@@ -157,7 +168,7 @@ if (!isset($SelectedGroup)) {
 			printf("<td>%s</td>
 				<td>%s</td>
 				<td><a href=\"%s&SelectedGroup=%s\">" . _('Edit') . "</A></TD>
-				<TD><A HREF=\"%s&SelectedGroup=%s&delete=1&GroupID=%s\">" . _('Delete') . "</A></TD>
+				<TD><A HREF=\"%s&SelectedGroup=%s&Delete=1&GroupID=%s\">" . _('Delete') . "</A></TD>
 				</tr>",
 				$myrow['taxgroupid'],
 				$myrow['taxgroupdescription'],
@@ -205,15 +216,18 @@ echo "</TABLE>
 	<CENTER><input type='Submit' name='submit' value='" . _('Enter Group') . "'></CENTER></FORM>";
 
 if (isset($SelectedGroup)) {
+
 	$sql = 'SELECT taxid, 
 			description as taxname 
 			FROM taxauthorities
 		ORDER BY taxid';
 	
-	$sqlUsed = "SELECT taxauthid, 
+	$sqlUsed = "SELECT taxauthid,
+				description AS taxname,
 				calculationorder, 
 				taxontax 
-			FROM taxgrouptaxes 
+			FROM taxgrouptaxes INNER JOIN taxauthorities
+				ON taxgrouptaxes.taxauthid=taxauthorities.taxid
 			WHERE taxgroupid=". $SelectedGroup . ' 
 			ORDER BY calculationorder';
 	
@@ -221,15 +235,15 @@ if (isset($SelectedGroup)) {
 	
 	/*Make an array of the used tax authorities in calculation order */
 	$UsedResult = DB_query($sqlUsed, $db);
-	$TaxAuthsUsed = array();
-	$TaxAuthRow = array();
-	$i=0;
-	while ($myrow=DB_fetch_row($UsedResult)){
-		$TaxAuthsUsed[$i] = $myrow[0];
+	$TaxAuthsUsed = array(); //this array just holds the taxauthid of all authorities in the group
+	$TaxAuthRow = array(); //this array holds all the details of the tax authorities in the group
+	$i=1;
+	while ($myrow=DB_fetch_array($UsedResult)){
+		$TaxAuthsUsed[$i] = $myrow['taxauthid'];
 		$TaxAuthRow[$i] = $myrow;
 		$i++;
 	}
-	
+		
 	if (DB_num_rows($Result)>0 ) {
 		echo '<BR>';
 		echo '<CENTER><TABLE><TR>';
@@ -262,11 +276,11 @@ if (isset($SelectedGroup)) {
 			echo "<TR bgcolor='#EEEEEE'>";
 			$k=1;
 		}
-		$TaxAuthUsedPointer = array_search($AvailRow['taxauthid'],$TaxAuthsUsed);
+		$TaxAuthUsedPointer = array_search($AvailRow['taxid'],$TaxAuthsUsed);
 		
 		if ($TaxAuthUsedPointer){
 			
-			if ($TaxAuthsUsed[$TaxAuthUsedPointer]['taxontax'] ==1){
+			if ($TaxAuthRow[$TaxAuthUsedPointer]['taxontax'] ==1){
 				$TaxOnTax = _('Yes');
 			} else {
 				$TaxOnTax = _('No');
@@ -281,7 +295,7 @@ if (isset($SelectedGroup)) {
 				<TD>&nbsp;</TD>",
 				$AvailRow['taxid'],
 				$AvailRow['taxname'],
-				$TaxAuthsUsed[$TaxAuthUsedPointer]['calculationorder'],
+				$TaxAuthRow[$TaxAuthUsedPointer]['calculationorder'],
 				$TaxOnTax,
 				$_SERVER['PHP_SELF']  . "?" . SID,
 				$SelectedGroup,
@@ -310,7 +324,7 @@ if (isset($SelectedGroup)) {
 	
 	/* the order and tax on tax will only be an issue if more than one tax authority in the group */
 	if (count($TaxAuthsUsed)>1) { 
-		echo '<BR><CENTER>'._('Calculation Order').'</CENTER><BR>';
+		echo '<BR><CENTER><FONT SIZE=3 COLOR=BLUE>'._('Calculation Order').'</FONT></CENTER>';
 		echo '<FORM METHOD="post" action="' . $_SERVER['PHP_SELF'] . '?' . SID .'">';
 		echo '<INPUT TYPE=HIDDEN NAME="SelectedGroup" VALUE="' . $SelectedGroup .'">';
 		echo '<CENTER><TABLE>';
@@ -319,7 +333,7 @@ if (isset($SelectedGroup)) {
 			<TD class="tableheader">'._('Order').'</TD>
 			<TD class="tableheader">'._('Tax on Prior Taxes').'</TD></TR>';
 		$k=0; //row colour counter
-		foreach ($TaxAuthsUsed as $TaxAuth ) {
+		for ($i=1;$i < count($TaxAuthRow)+1;$i++) {
 			if ($k==1){
 				echo "<TR BGCOLOR='#CCCCCC'>";
 				$k=0;
@@ -327,10 +341,10 @@ if (isset($SelectedGroup)) {
 				echo "<TR BGCOLOR='#EEEEEE'>";
 				$k=1;
 			}
-			echo '<TD>' . $TaxAuth['taxname'] . '</TD><TD>'.
-				'<INPUT TYPE="Text" NAME="CalcOrder_' . $TaxAuth['taxauthid'] . '" VALUE="'.$TaxAuth['calculationorder'].'" size=2 maxlength=2></TD>';
-			echo '<TD><SELECT NAME="TaxOnTax_' . $TaxAuth['taxauthid'] . '">';
-			if ($TaxAuth['taxontax']==1){
+			echo '<TD>' . $TaxAuthRow[$i]['taxname'] . '</TD><TD>'.
+				'<INPUT TYPE="Text" NAME="CalcOrder_' . $TaxAuthRow[$i]['taxauthid'] . '" VALUE="' . $TaxAuthRow[$i]['calculationorder'] . '" size=2 maxlength=2></TD>';
+			echo '<TD><SELECT NAME="TaxOnTax_' . $TaxAuthRow[$i]['taxauthid'] . '">';
+			if ($TaxAuthRow[$i]['taxontax']==1){
 				echo '<OPTION SELECTED VALUE=1>' . _('Yes');
 				echo '<OPTION VALUE=0>' . _('No');
 			} else {
@@ -341,7 +355,7 @@ if (isset($SelectedGroup)) {
 			
 		}
 		echo '</TABLE></CENTER>';
-		echo '<CENTER><input type="Submit" name="updateorder" value="' . _('Update Order') . '"></CENTER>';
+		echo '<CENTER><input type="Submit" name="UpdateOrder" value="' . _('Update Order') . '"></CENTER>';
 	}
 	
 	echo '</FORM>';
