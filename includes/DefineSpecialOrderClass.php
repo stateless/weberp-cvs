@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.2 $ */
+/* $Revision: 1.2.2.1 $ */
 /* Definition of the SpecialOrder class to hold all the information for a special quote/order and delivery
 */
 

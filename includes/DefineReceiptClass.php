@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.2 $ */
+/* $Revision: 1.2.2.1 $ */
 /* definition of the ReceiptBatch class */
 
 Class Receipt_Batch {
