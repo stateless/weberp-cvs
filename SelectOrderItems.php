@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.22 $ */
+/* $Revision: 1.22.2.1 $ */
 
 require('includes/DefineCartClass.php');
 
@@ -318,7 +318,12 @@ if (isset($_POST['Select']) AND $_POST['Select']!='') {
 	$result =DB_query($sql,$db,$ErrMsg,$DbgMsg);
 
 	$myrow = DB_fetch_row($result);
-	if ($myrow[1] == 0){
+	if ($myrow[1] != 1){
+		
+		if ($myrow[1]==2){
+			prnMsg(_('The') . ' ' . $myrow[0] . ' ' . _('account is currently flagged as an account that needs to be watched please contact the credit control personnel to discuss'),'warn');
+		}
+		
 		$_SESSION['Items']->DebtorNo=$_POST['Select'];
 		$_SESSION['RequireCustomerSelection']=0;
 		$_SESSION['Items']->CustomerName = $myrow[0];
@@ -434,7 +439,7 @@ if (isset($_POST['Select']) AND $_POST['Select']!='') {
 		$_SESSION['Items']->Location = $myrow[7];
 
 	} else {
-		prnMsg(_('The') . ' ' . $myrow[0] . ' ' . _('account is') . ' <B>' . _('currently on hold') . ' </B>' . _('please contact the credit control personnel to discuss this account'),'warn');
+		prnMsg(_('Sorry, your account has been put on hold for some reason, please contact the credit control personnel.'),'warn');
 		include('includes/footer.inc');
 		exit;
 	}
@@ -774,28 +779,28 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 
 		foreach ($_SESSION['Items']->LineItems as $StockItem) {
 
-			if (isset($_POST['Quantity_' . $StockItem->StockID])){
-				$Quantity = $_POST['Quantity_' . $StockItem->StockID];
-				$Price = $_POST['Price_' . $StockItem->StockID];
-				$DiscountPercentage = $_POST['Discount_' . $StockItem->StockID];
-				$Narrative = $_POST['Narrative_' . $StockItem->StockID];
+			if (isset($_POST['Quantity_' . $StockItem->LineNumber])){
+				$Quantity = $_POST['Quantity_' . $StockItem->LineNumber];
+				$Price = $_POST['Price_' . $StockItem->LineNumber];
+				$DiscountPercentage = $_POST['Discount_' . $StockItem->LineNumber];
+				$Narrative = $_POST['Narrative_' . $StockItem->LineNumber];
 
 				If ($Quantity<0 OR $Price <0 OR $DiscountPercentage >100 OR $DiscountPercentage <0){
 					prnMsg(_('The item could not be updated because you are attempting to set the quantity ordered to less than 0 or the price less than 0 or the discount more than 100% or less than 0%'),'warn');
 
-				} elseif($_SESSION['Items']->Some_Already_Delivered($StockItem->StockID)!=0 AND $_SESSION['Items']->LineItems[$StockItem->StockID]->Price != $Price) {
+				} elseif($_SESSION['Items']->Some_Already_Delivered($StockItem->LineNumber)!=0 AND $_SESSION['Items']->LineItems[$StockItem->LineNumber]->Price != $Price) {
 
 					prnMsg(_('The item you attempting to modify the price for has already had some quantity invoiced at the old price the items unit price cannot be modified retrospectively'),'warn');
 
-				} elseif($_SESSION['Items']->Some_Already_Delivered($StockItem->StockID)!=0 AND $_SESSION['Items']->LineItems[$StockItem->StockID]->DiscountPercent != ($DiscountPercentage/100)) {
+				} elseif($_SESSION['Items']->Some_Already_Delivered($StockItem->LineNumber)!=0 AND $_SESSION['Items']->LineItems[$StockItem->LineNumber]->DiscountPercent != ($DiscountPercentage/100)) {
 
 					prnMsg(_('The item you attempting to modify has had some quantity invoiced at the old discount percent the items discount cannot be modified retrospectively'),'warn');
 
-				} elseif ($_SESSION['Items']->LineItems[$StockItem->StockID]->QtyInv > $Quantity){
+				} elseif ($_SESSION['Items']->LineItems[$StockItem->LineNumber]->QtyInv > $Quantity){
 					prnMsg( _('You are attempting to make the quantity ordered a quantity less than has already been invoiced') . '. ' . _('The quantity delivered and invoiced cannot be modified retrospectively'),'warn');
 				} elseif ($StockItem->Quantity !=$Quantity OR $StockItem->Price != $Price OR ABS($StockItem->Disc -$DiscountPercentage/100) >0.001 OR $StockItem->Narrative != $Narrative) {
 
-					$_SESSION['Items']->update_cart_item($StockItem->StockID,
+					$_SESSION['Items']->update_cart_item($StockItem->LineNumber,
 										$Quantity,
 										$Price,
 										($DiscountPercentage/100),
@@ -908,7 +913,7 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 		$k =0;  //row colour counter
 		foreach ($_SESSION['Items']->LineItems as $StockItem) {
 
-			$LineTotal =	$StockItem->Quantity * $StockItem->Price * (1 - $StockItem->DiscountPercent);
+			$LineTotal = $StockItem->Quantity * $StockItem->Price * (1 - $StockItem->DiscountPercent);
 			$DisplayLineTotal = number_format($LineTotal,2);
 			$DisplayDiscount = number_format(($StockItem->DiscountPercent * 100),2);
 
@@ -928,24 +933,24 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 
 			echo '<TD><A target="_blank" HREF="' . $rootpath . '/StockStatus.php?' . SID . 'StockID=' . $StockItem->StockID . '">' . $StockItem->StockID . '</A></TD>
 				<TD>' . $StockItem->ItemDescription . '</TD>
-				<TD><INPUT TYPE=TEXT NAME="Quantity_' . $StockItem->StockID . '" SIZE=6 MAXLENGTH=6 VALUE=' . $StockItem->Quantity . '></TD>
+				<TD><INPUT TYPE=TEXT NAME="Quantity_' . $StockItem->LineNumber . '" SIZE=6 MAXLENGTH=6 VALUE=' . $StockItem->Quantity . '></TD>
 				<TD>' . $StockItem->Units . '</TD>';
 
 			if (in_array(2,$_SESSION['AllowedPageSecurityTokens'])){
 				/*OK to display with discount if it is an internal user with appropriate permissions */
 
-				echo '<TD><INPUT TYPE=TEXT NAME="Price_' . $StockItem->StockID . '" SIZE=16 MAXLENGTH=16 VALUE=' . $StockItem->Price . '></TD>
-					<TD><INPUT TYPE=TEXT NAME="Discount_' . $StockItem->StockID . '" SIZE=5 MAXLENGTH=4 VALUE=' . ($StockItem->DiscountPercent * 100) . '>%</TD>';
+				echo '<TD><INPUT TYPE=TEXT NAME="Price_' . $StockItem->LineNumber . '" SIZE=16 MAXLENGTH=16 VALUE=' . $StockItem->Price . '></TD>
+					<TD><INPUT TYPE=TEXT NAME="Discount_' . $StockItem->LineNumber . '" SIZE=5 MAXLENGTH=4 VALUE=' . ($StockItem->DiscountPercent * 100) . '>%</TD>';
 
 			} else {
 				echo '<TD ALIGN=RIGHT>' . number_format($StockItem->Price,2) . '</TD><TD></TD>';
-				echo '<INPUT TYPE=HIDDEN NAME="Price_' . $StockItem->StockID . '" VALUE=' . $StockItem->Price . '>';
+				echo '<INPUT TYPE=HIDDEN NAME="Price_' . $StockItem->LineNumber . '" VALUE=' . $StockItem->Price . '>';
 			}
 
-			echo '<TD ALIGN=RIGHT>' . $DisplayLineTotal . '</FONT></TD><TD><A HREF="' . $_SERVER['PHP_SELF'] . '?' . SID . '&Delete=' . $StockItem->StockID . '">' . _('Delete') . '</A></TD></TR>';
+			echo '<TD ALIGN=RIGHT>' . $DisplayLineTotal . '</FONT></TD><TD><A HREF="' . $_SERVER['PHP_SELF'] . '?' . SID . '&Delete=' . $StockItem->LineNumber . '">' . _('Delete') . '</A></TD></TR>';
 
 			echo $RowStarter;
-			echo '<TD COLSPAN=7><TEXTAREA  NAME="Narrative_' . $StockItem->StockID . '" cols=100% rows=1>' . $StockItem->Narrative . '</TEXTAREA><BR><HR></TD></TR>';
+			echo '<TD COLSPAN=7><TEXTAREA  NAME="Narrative_' . $StockItem->LineNumber . '" cols=100% rows=1>' . $StockItem->Narrative . '</TEXTAREA><BR><HR></TD></TR>';
 
 			$_SESSION['Items']->total = $_SESSION['Items']->total + $LineTotal;
 			$_SESSION['Items']->totalVolume = $_SESSION['Items']->totalVolume + $StockItem->Quantity * $StockItem->Volume;

@@ -1,5 +1,6 @@
 <P>webERP Change Log
 
+<P>5/3/05 Danie - TaxAuthorities.php now with Bank details account etc
 <P>5/3/05 Danie - changes to Stock.php to use the image manipulation features and changed Z_GetStockImage.php to GetStockImage.php
 <P>5/3/05 Danie - Added SalesCategories.php also table salescat and salescatprod for POS/Shopping integration
 <P>2/3/05 Danie - Stocks.php updated for taxcategories not levels

@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.13 $ */
+/* $Revision: 1.13.2.1 $ */
 /*SelectOrderItems_IntoCart.inc
 
 This snippet is used to enter order line items into the cart object:
@@ -12,7 +12,7 @@ items into the cart as well as plain vanilla items outside of the kitset loop
 
 $AlreadyOnThisOrder =0;
 
-if (count($_SESSION['Items']->LineItems)>0){
+if (count($_SESSION['Items']->LineItems)>0 AND $_SESSION['SO_AllowSameItemMultipleTimes']!=0){
 
 	foreach ($_SESSION['Items']->LineItems AS $OrderItem) {
 
@@ -112,7 +112,7 @@ if ($AlreadyOnThisOrder!=1){
 							$UpdateDB
 							)==1){
 
-		      		$_SESSION['Items']->LineItems[$NewItem]->StandardCost = $myrow['standardcost'];
+		      		$_SESSION['Items']->LineItems[($_SESSION['Items']->LineCounter -1)]->StandardCost = $myrow['standardcost'];
 			}
              } else {
 			echo '<BR><FONT COLOR=RED SIZE=3><B>' . _('Warning') . ': </FONT></B>' . _('the item code') . ' ' . $NewItem . ' ' . _('does not have a cost set up and order entry is set up to prohibit sales of items with no cost data entered');

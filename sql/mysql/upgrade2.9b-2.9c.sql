@@ -899,6 +899,7 @@ INSERT INTO config VALUES('Check_Price_Charged_vs_Order_Price','1');
 INSERT INTO config VALUES('OverChargeProportion','30');
 INSERT INTO config VALUES('OverReceiveProportion','20');
 INSERT INTO config VALUES('PO_AllowSameItemMultipleTimes','1');
+INSERT INTO config VALUES('SO_AllowSameItemMultipleTimes','1');
 INSERT INTO config VALUES('YearEnd','3');
 INSERT INTO config VALUES('PageLength','48');
 INSERT INTO config VALUES('part_pics_dir','part_pics');
@@ -979,6 +980,22 @@ ALTER TABLE `taxgrouptaxes` ADD INDEX ( `taxauthid` );
 ALTER TABLE taxgrouptaxes ADD FOREIGN KEY (taxgroupid) REFERENCES taxgroups (taxgroupid);
 ALTER TABLE taxgrouptaxes ADD FOREIGN KEY (taxauthid) REFERENCES taxauthorities (taxid);
 
+CREATE TABLE stockmovestaxes (
+	stkmoveno int NOT NULL,
+	taxauthid tinyint NOT NULL,
+	taxrate double DEFAULT 0 NOT NULL,
+	PRIMARY KEY (stockmoveno,taxauthid),
+	KEY (taxauthid)
+) ENGINE=InnoDB;
+
+ALTER TABLE stockmovestaxes ADD FOREIGN KEY (taxauthid) REFERENCES taxauthorities (taxid);
+
+INSERT INTO stockmovestaxes (stkmoveno, taxauthid, taxrate)
+	SELECT stockmoves.stkmoveno, custbranch.taxauthority, stockmoves.taxrate FROM stockmoves INNER JOIN custbranch 
+		ON stockmoves.debtorno=custbranch.debtorno AND stockmoves.branchcode=custbranch.branchcode;
+
+ALTER TABLE stockmoves DROP COLUMN taxrate;
+		
 ALTER TABLE custbranch DROP FOREIGN KEY custbranch_ibfk_5;
 ALTER TABLE `custbranch` CHANGE `taxauthority` `taxgroupid` TINYINT( 4 ) DEFAULT '1' NOT NULL;
 ALTER TABLE `custbranch` DROP INDEX `area_2` ;
@@ -1055,3 +1072,6 @@ ALTER TABLE salescatprod ADD INDEX (stockid);
 ALTER TABLE salescatprod ADD FOREIGN KEY (stockid) REFERENCES stockmaster (stockid);
 ALTER TABLE salescatprod ADD FOREIGN KEY (salescatid) REFERENCES salescat (salescatid);
 
+ALTER TABLE `salesorderdetails` ADD `orderlineno` INT DEFAULT '0' NOT NULL FIRST ;
+ALTER TABLE `salesorderdetails` DROP PRIMARY KEY 
+ALTER TABLE salesorderdetails ADD PRIMARY KEY (orderlineno,orderno);

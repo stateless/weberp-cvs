@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.12 $ */
+/* $Revision: 1.12.2.1 $ */
 /* Definition of the cart class
 this class can hold all the information for:
 
@@ -21,6 +21,7 @@ Class Cart {
 	var $total; /*total cost of the items ordered */
 	var $totalVolume;
 	var $totalWeight;
+	var $LineCounter;
 	var $ItemsOrdered; /*no of different line items ordered */
 	var $DeliveryDate;
 	var $DefaultSalesType;
@@ -52,6 +53,7 @@ Class Cart {
 		$this->LineItems = array();
 		$this->total=0;
 		$this->ItemsOrdered=0;
+		$this->LineCounter=0;
 		$this->DefaltSalesType="";
 	}
 
@@ -73,7 +75,6 @@ Class Cart {
 				$DecimalPlaces=0,
 				$Narrative='',
 				$UpdateDB='No'){
-
 				
 		if (isset($StockID) AND $StockID!="" AND $Qty>0 AND isset($Qty)){
 
@@ -81,7 +82,8 @@ Class Cart {
 				$Price=0;
 			}
 			
-			$this->LineItems[$StockID] = new LineDetails($StockID,
+			$this->LineItems[$this->LineCounter] = new LineDetails($this->LineCounter,
+									$StockID,
 									$Descr,
 									$Qty,
 									$Price,
@@ -99,7 +101,7 @@ Class Cart {
 									$DecimalPlaces,
 									$Narrative);
 			$this->ItemsOrdered++;
-
+			
 			if ($UpdateDB=='Yes'){
 				/*ExistingOrder !=0 set means that an order is selected or created for entry
 				of items - ExistingOrder is set to 0 in scripts that should not allow
@@ -110,12 +112,14 @@ Class Cart {
 				errors anyway */
 
 				global $db;
-				$sql = "INSERT INTO salesorderdetails (orderno,
+				$sql = "INSERT INTO salesorderdetails (orderlineno,
+									orderno,
 									stkcode,
 									quantity,
 									unitprice,
 									discountpercent)
-								VALUES(" . $_SESSION['ExistingOrder'] . ",
+								VALUES(" . $this->LineCounter . ",
+									" . $_SESSION['ExistingOrder'] . ",
 									'" . $StockID ."',
 									" . $Qty . ",
 									" . $Price . ",
@@ -124,20 +128,21 @@ Class Cart {
 							$db ,
 							_('The order line for') . ' ' . $StockID . ' ' ._('could not be inserted'));
 			}
-
+			
+			$this->LineCounter++;
 			Return 1;
 		}
 		Return 0;
 	}
 
-	function update_cart_item($UpdateItem, $Qty, $Price, $Disc, $Narrative, $UpdateDB='No'){
+	function update_cart_item( $UpdateLineNumber, $StockID, $Qty, $Price, $Disc, $Narrative, $UpdateDB='No'){
 
 		if ($Qty>0){
-			$this->LineItems[$UpdateItem]->Quantity = $Qty;
+			$this->LineItems[$UpdateLineNumber]->Quantity = $Qty;
 		}
-		$this->LineItems[$UpdateItem]->Price = $Price;
-		$this->LineItems[$UpdateItem]->DiscountPercent = $Disc;
-		$this->LineItems[$UpdateItem]->Narrative = $Narrative;
+		$this->LineItems[$UpdateLineNumber]->Price = $Price;
+		$this->LineItems[$UpdateLineNumber]->DiscountPercent = $Disc;
+		$this->LineItems[$UpdateLineNumber]->Narrative = $Narrative;
 
 		if ($UpdateDB=='Yes'){
 			global $db;
@@ -147,24 +152,25 @@ Class Cart {
 						discountpercent=" . $Disc . ",
 						narrative ='" . $Narrative . "'
 					WHERE orderno=" . $_SESSION['ExistingOrder'] . "
-					AND stkcode='" . $UpdateItem ."'"
+					AND stkcode='" . $StockID ."'
+					AND orderlineno=" . $UpdateLineNumber
 				, $db
-				, _('The order line for') . ' ' . $UpdateItem .  ' ' . _('could not be updated'));
+				, _('The order line number') . ' ' . $UpdateLineNumber .  ' ' . _('could not be updated'));
 		}
 	}
 
-	function remove_from_cart(&$StockID,$UpdateDB='No'){
-		if (isset($StockID)){
-			unset($this->LineItems[$StockID]);
+	function remove_from_cart(&$LineNumber,$UpdateDB='No'){
+		if (isset($LineNumber)){
+			unset($this->LineItems[$LineNumber]);
 			$this->ItemsOrdered--;
 		}
 		if ($UpdateDB=='Yes'){
 			global $db;
 			$result = DB_query("DELETE FROM salesorderdetails
 						WHERE orderno=" . $_SESSION['ExistingOrder'] . "
-						AND stkcode='" . $StockID ."'",
+						AND orderlineno='" . $LineNumber ."'",
 						$db,
-						_('The order line for') . ' ' . $StockID . ' ' . _('could not be deleted'));
+						_('The order line could not be deleted because'));
 		}
 	}
 
@@ -194,10 +200,10 @@ Class Cart {
 
 	}
 
-	function Some_Already_Delivered($StockID){
+	function Some_Already_Delivered($LineNumber){
 		/* Checks if there have been deliveries of a specific line item */
 
-		if ($this->LineItems[$StockID]->QtyInv !=0){
+		if ($this->LineItems[$LineNumber]->QtyInv !=0){
 			return 1;
 		}
 		return 0;
@@ -214,6 +220,7 @@ Class Cart {
 } /* end of class defintion */
 
 Class LineDetails {
+	Var $LineNumber;
 	Var $StockID;
 	Var $ItemDescription;
 	Var $Quantity;
@@ -235,8 +242,10 @@ Class LineDetails {
 	Var $DecimalPlaces;
 	Var $SerialItems;
 	Var $Narrative;
+	Var $Taxes;
 
-	function LineDetails ($StockItem,
+	function LineDetails ($LineNumber,
+				$StockItem,
 				$Descr,
 				$Qty,
 				$Prc,
@@ -255,7 +264,7 @@ Class LineDetails {
 				$Narrative){
 
 /* Constructor function to add a new LineDetail object with passed params */
-
+		$this->LineNumber = $LineNumber;
 		$this->StockID =$StockItem;
 		$this->ItemDescription = $Descr;
 		$this->Quantity = $Qty;
@@ -279,7 +288,19 @@ Class LineDetails {
 		$this->DecimalPlaces = $DecimalPlaces;
 		$this->SerialItems = array();
 		$this->Narrative = $Narrative;
+		$this->Taxes = array();
 	}
 }
 
+Class Taxes {
+	Var $TaxAuth;
+	Var $TaxRate;
+	Var $TaxOnTax;
+		
+	function Taxes ($TaxAuth, $TaxRate, $TaxOnTax){
+		$this->TaxAuth = $TaxAuth;
+		$this->TaxRate =  $TaxRate;
+		$this->TaxOnTax = $TaxOnTax;
+	}
+}
 ?>

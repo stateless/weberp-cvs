@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.3.2.1 $ */
+/* $Revision: 1.3.2.2 $ */
 $PageSecurity =15;
 
 include('includes/session.inc');
@@ -161,6 +161,9 @@ if (isset($_POST['submit'])) {
 		}
 		if ($_SESSION['PO_AllowSameItemMultipleTimes'] != $_POST['X_PO_AllowSameItemMultipleTimes'] ) {
 			$sql[] = "UPDATE config SET confvalue = '".$_POST['X_PO_AllowSameItemMultipleTimes']."' WHERE confname = 'PO_AllowSameItemMultipleTimes'";
+		}
+		if ($_SESSION['SO_AllowSameItemMultipleTimes'] != $_POST['X_SO_AllowSameItemMultipleTimes'] ) {
+			$sql[] = "UPDATE config SET confvalue = '".$_POST['X_SO_AllowSameItemMultipleTimes']."' WHERE confname = 'SO_AllowSameItemMultipleTimes'";
 		}
 		if ($_SESSION['YearEnd'] != $_POST['X_YearEnd'] ) {
 			$sql[] = "UPDATE config SET confvalue = '".$_POST['X_YearEnd']."' WHERE confname = 'YearEnd'";
@@ -407,6 +410,14 @@ echo '<TR><TD>' . _('Purchase Order Allows Same Item Multiple Times') . ':</TD>
 	<OPTION '.($_SESSION['PO_AllowSameItemMultipleTimes']?'SELECTED ':'').'VALUE="1">'._('Yes').'
 	<OPTION '.(!$_SESSION['PO_AllowSameItemMultipleTimes']?'SELECTED ':'').'VALUE="0">'._('No').'
 	</SELECT></TD><TD></TD></TR>';
+
+// SO_AllowSameItemMultipleTimes
+echo '<TR><TD>' . _('Sales Order Allows Same Item Multiple Times') . ':</TD>
+	<TD><SELECT Name="X_SO_AllowSameItemMultipleTimes">
+	<OPTION '.($_SESSION['SO_AllowSameItemMultipleTimes']?'SELECTED ':'').'VALUE="1">'._('Yes').'
+	<OPTION '.(!$_SESSION['SO_AllowSameItemMultipleTimes']?'SELECTED ':'').'VALUE="0">'._('No').'
+	</SELECT></TD><TD></TD></TR>';
+
 
 echo '<TR><TD COLSPAN=3 class="tableheader"><CENTER>' . _('General Settings') . '</CENTER></TD></TR>';
 echo $TableHeader;	
