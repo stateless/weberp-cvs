@@ -918,6 +918,8 @@ INSERT INTO config VALUES('RadioBraconFTP_server', '192.168.2.2');
 INSERT INTO config VALUES('RadioBeaconFTP_user_name', 'RadioBeacon ftp server user name');
 INSERT INTO config VALUES('RadionBeaconFTP_user_pass','Radio Beacon remote ftp server password');
 ALTER TABLE www_users CHANGE password `password TEXT NOT NULL;
+
+
 UPDATE www_users SET password ='f0f77a7f88e7c1e93ab4e316b4574c7843b00ea4' WHERE userid='demo';
 
 CREATE TABLE taxcategories(
@@ -929,10 +931,6 @@ PRIMARY KEY ( taxcatid )
 ALTER TABLE www_users ADD COLUMN pinno varchar(30) NOT NULL;
 ALTER TABLE www_users ADD COLUMN swipecard varchar(50) NOT NULL;
 
-ALTER TABLE `taxauthorities` ADD `bank` VARCHAR( 50 ) NOT NULL ,
-ADD `bankacctype` VARCHAR( 20 ) NOT NULL ,
-ADD `bankacc` VARCHAR( 50 ) NOT NULL ,
-ADD `bankswift` VARCHAR( 30 ) NOT NULL ;
 
 ALTER TABLE taxauthlevels DROP FOREIGN KEY `taxauthlevels_ibfk_2` ;
 ALTER TABLE `taxauthlevels` CHANGE `dispatchtaxauthority` `dispatchtaxprovince` TINYINT( 4 ) DEFAULT '1' NOT NULL;
@@ -998,3 +996,62 @@ ALTER TABLE `stockmaster` ADD INDEX ( `taxcatid` );
 UPDATE stockmaster SET taxcatid=3 WHERE taxcatid>3;
 
 ALTER TABLE stockmaster ADD FOREIGN KEY (taxcatid) REFERENCES taxcategories (taxcatid);
+
+ALTER TABLE suppliers DROP FOREIGN KEY `suppliers_ibfk_3`;
+ALTER TABLE `suppliers` CHANGE `taxauthority` `taxgroupid` TINYINT( 4 ) DEFAULT '1' NOT NULL;
+ALTER TABLE `suppliers` DROP INDEX `taxauthority` , ADD INDEX `taxgroupid` ( `taxgroupid` );
+UPDATE suppliers SET taxgroupid=1;
+ALTER TABLE suppliers ADD FOREIGN KEY (taxgroupid) REFERENCES taxgroups (taxgroupid);
+
+
+ALTER TABLE `taxauthorities` ADD `bank` VARCHAR( 50 ) NOT NULL ,
+ADD `bankacctype` VARCHAR( 20 ) NOT NULL ,
+ADD `bankacc` VARCHAR( 50 ) NOT NULL ,
+ADD `bankswift` VARCHAR( 30 ) NOT NULL ;
+
+
+ALTER TABLE banktrans CHANGE amountcleared amountcleared double NOT NULL default '0';
+ALTER TABLE banktrans CHANGE amount amount double NOT NULL default '0';
+ALTER TABLE buckets CHANGE capacity capacity double NOT NULL default '0.00';
+ALTER TABLE chartdetails CHANGE budget budget double NOT NULL default '0';
+ALTER TABLE chartdetails CHANGE actual actual double NOT NULL default '0';
+ALTER TABLE chartdetails CHANGE bfwd bfwd double NOT NULL default '0';
+ALTER TABLE chartdetails CHANGE bfwdbudget bfwdbudget double NOT NULL default '0';
+ALTER TABLE debtorsmaster CHANGE creditlimit creditlimit double NOT NULL default '1000';
+ALTER TABLE debtortrans CHANGE ovamount ovamount double NOT NULL default '0';
+ALTER TABLE debtortrans CHANGE ovgst ovgst double NOT NULL default '0';
+ALTER TABLE debtortrans CHANGE ovfreight ovfreight double NOT NULL default '0';
+ALTER TABLE debtortrans CHANGE ovdiscount ovdiscount double NOT NULL default '0';
+ALTER TABLE debtortrans CHANGE diffonexch diffonexch double NOT NULL default '0';
+ALTER TABLE debtortrans CHANGE alloc alloc double NOT NULL default '0';
+ALTER TABLE gltrans CHANGE amount amount double NOT NULL default '0';
+ALTER TABLE recurringsalesorders CHANGE `freightcost` `freightcost` double NOT NULL default '0.00';
+ALTER TABLE reportcolumns CHANGE  `constant` `constant` double NOT NULL default '0';
+ALTER TABLE salesorders CHANGE freightcost freightcost double NOT NULL default '0.00';
+ALTER TABLE shipmentcharges CHANGE  value value double NOT NULL default '0';
+ALTER TABLE stockcheckfreeze CHANGE qoh qoh double NOT NULL default '0';
+ALTER TABLE stockcounts CHANGE `qtycounted` `qtycounted` double NOT NULL default '0';
+ALTER TABLE stockmoves CHANGE `taxrate` `taxrate` double NOT NULL default '0';
+ALTER TABLE stockserialitems CHANGE `quantity` `quantity` double NOT NULL default '0';
+ALTER TABLE stockserialmoves CHANGE `moveqty` `moveqty` double NOT NULL default '0';
+ALTER TABLE suppallocs CHANGE `amt` `amt` double NOT NULL default '0.00';
+
+
+CREATE TABLE `salescat` (
+  `salescatid` tinyint(4) NOT NULL auto_increment,
+  `parentcatid` tinyint(4) default NULL,
+  `salescatname` varchar(30) default NULL,
+  PRIMARY KEY  (`salescatid`)
+) ENGINE=InnoDB;
+   
+CREATE TABLE salescatprod (
+  salescatid tinyint not null,
+  stockid varchar(20) not null,
+PRIMARY KEY(salescatid,stockid)
+) ENGINE=InnoDB;
+
+ALTER TABLE salescatprod ADD INDEX (salescatid);
+ALTER TABLE salescatprod ADD INDEX (stockid);
+ALTER TABLE salescatprod ADD FOREIGN KEY (stockid) REFERENCES stockmaster (stockid);
+ALTER TABLE salescatprod ADD FOREIGN KEY (salescatid) REFERENCES salescat (salescatid);
+
