@@ -1,5 +1,7 @@
 <P>webERP Change Log
 
+<P>10/3/05 ConfirmDispatch_Invoice.php now gets the multiple taxes and displays and cacluates
+<P>9/3/05 SelectOrderItems.php now allows same item multiple times - DefineCartClass.php SelectOrderItems_IntoCart.inc now each line item has a line number - changes to salesorderitems to have a line number to ensure changes to lines update the correct line.
 <P>5/3/05 Danie - TaxAuthorities.php now with Bank details account etc
 <P>5/3/05 Danie - changes to Stock.php to use the image manipulation features and changed Z_GetStockImage.php to GetStockImage.php
 <P>5/3/05 Danie - Added SalesCategories.php also table salescat and salescatprod for POS/Shopping integration

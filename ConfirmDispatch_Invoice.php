@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.19 $ */
+/* $Revision: 1.19.2.1 $ */
 /* Session started in session.inc for password checking and authorisation level check */
 include('includes/DefineCartClass.php');
 include('includes/DefineSerialItems.php');
@@ -30,11 +30,8 @@ if (!isset($_GET['OrderNumber']) && !isset($_SESSION['ProcessingOrder'])) {
 	Session_register('Items');
 	Session_register('ProcessingOrder');
 	Session_register('Old_FreightCost');
-	Session_register('TaxRate');
-	Session_Register('TaxDescription');
 	Session_Register('CurrencyRate');
-	Session_Register('TaxGLCode');
-
+	
 	$_SESSION['ProcessingOrder']=$_GET['OrderNumber'];
 	$_SESSION['Items'] = new cart;
 
@@ -60,22 +57,18 @@ if (!isset($_GET['OrderNumber']) && !isset($_SESSION['ProcessingOrder'])) {
 					salesorders.deliverydate,
 					debtorsmaster.currcode,
 					salesorders.fromstkloc,
-					locations.taxauthority as dispatchtaxauthority,
-					taxauthorities.taxid,
-					taxauthorities.description,
+					locations.taxprovinceid,
+					custbranch.taxgroupid,
 					currencies.rate as currency_rate,
-					taxauthorities.taxglcode,
 					custbranch.defaultshipvia
 			FROM salesorders,
 				debtorsmaster,
 				custbranch,
-				taxauthorities,
 				currencies,
 				locations
 			WHERE salesorders.debtorno = debtorsmaster.debtorno
 			AND salesorders.branchcode = custbranch.branchcode
 			AND salesorders.debtorno = custbranch.debtorno
-			AND custbranch.taxauthority = taxauthorities.taxid
 			AND locations.loccode=salesorders.fromstkloc
 			AND debtorsmaster.currcode = currencies.currabrev
 			AND salesorders.orderno = ' . $_GET['OrderNumber'];
@@ -113,13 +106,10 @@ if (!isset($_GET['OrderNumber']) && !isset($_SESSION['ProcessingOrder'])) {
 		$_SESSION['Old_FreightCost'] = $myrow['freightcost'];
 		$_POST['ChargeFreightCost'] = $_SESSION['Old_FreightCost'];
 		$_SESSION['Items']->$Orig_OrderDate = $myrow['orddate'];
-		// $_SESSION['TaxRate'] = $myrow['rate'];
-		$_SESSION['TaxDescription'] = $myrow['description'];
-		$_SESSION['TaxGLCode'] = $myrow['taxglcode'];
 		$_SESSION['CurrencyRate'] = $myrow['currency_rate'];
-		$TaxAuthority = $myrow['taxid'];
-		$DispatchTaxAuthority = $myrow['dispatchtaxauthority'];
-		$_POST['FreightTaxRate'] = GetTaxRate($TaxAuthority, $DispatchTaxAuthority, $_SESSION['DefaultTaxLevel'],$db)*100;
+		$TaxGroup = $myrow['taxgroupid'];
+		$DispatchTaxProvince = $myrow['taxprovinceid'];
+		//$_POST['FreightTaxRate'] = GetTaxRate($TaxGroup, $DispatchTaxProvince, $_SESSION['DefaultTaxLevel'],$db)*100;
 
 		DB_free_result($GetOrdHdrResult);
 
@@ -133,13 +123,14 @@ if (!isset($_GET['OrderNumber']) && !isset($_SESSION['ProcessingOrder'])) {
 					stockmaster.kgs,
 					stockmaster.units,
 					stockmaster.decimalplaces,
-					taxlevel,
+					taxcatid,
 					unitprice,
 					quantity,
 					discountpercent,
 					actualdispatchdate,
 					qtyinvoiced,
 					salesorderdetails.narrative,
+					salesorderdetails.orderlineno,
 					stockmaster.discountcategory,
 					stockmaster.materialcost + stockmaster.labourcost + stockmaster.overheadcost as standardcost
 				FROM salesorderdetails,
@@ -170,15 +161,14 @@ if (!isset($_GET['OrderNumber']) && !isset($_SESSION['ProcessingOrder'])) {
 						$myrow['controlled'],
 						$myrow['serialised'],
 						$myrow['decimalplaces'],
-						$myrow['narrative']
-						);
-						/*NB Update DB defaults to NO */
+						$myrow['narrative'],
+						'No',
+						$myrow['orderlineno']);	/*NB NO Update to DB */
 
-				$_SESSION['Items']->LineItems[$myrow['stkcode']]->StandardCost = $myrow['standardcost'];
+				$_SESSION['Items']->LineItems[$myrow['orderlineno']]->StandardCost = $myrow['standardcost'];
 
-				/*Calculate the tax applicable to this line item from TaxAuthority and Item TaxLevel */
-				$_SESSION['Items']->LineItems[$myrow['stkcode']]->TaxRate = GetTaxRate ($TaxAuthority, $DispatchTaxAuthority, $myrow['taxlevel'], $db);
-
+				/*Calculate the taxes applicable to this line item from the customer branch Tax Group and Item Tax Category */
+				$_SESSION['Items']->LineItems[$myrow['orderlineno']]->GetTaxes($TaxGroup, $DispatchTaxProvince, $myrow['taxcatid'], &$db);
 			} /* line items from sales order details */
 		} else { /* there are no line items that have a quantity to deliver */
 			echo '<CENTER><A HREF="'. $rootpath. '/SelectSalesOrder.php?' . SID . '">' ._('Select a different sales order to invoice') .'</A></CENTER>';
@@ -202,11 +192,11 @@ if (!isset($_GET['OrderNumber']) && !isset($_SESSION['ProcessingOrder'])) {
 /* if processing, a dispatch page has been called and ${$StkItm->StockID} would have been set from the post */
 	foreach ($_SESSION['Items']->LineItems as $Itm) {
 
-		if (is_numeric($_POST[$Itm->StockID .  '_QtyDispatched' ])AND $_POST[$Itm->StockID .  '_QtyDispatched'] <=($_SESSION['Items']->LineItems[$Itm->StockID]->Quantity - $_SESSION['Items']->LineItems[$Itm->StockID]->QtyInv)){
-			$_SESSION['Items']->LineItems[$Itm->StockID]->QtyDispatched = $_POST[$Itm->StockID  . '_QtyDispatched'];
+		if (is_numeric($_POST[$Itm->LineNumber .  '_QtyDispatched' ])AND $_POST[$Itm->LineNumber .  '_QtyDispatched'] <=($_SESSION['Items']->LineItems[$Itm->StockID]->Quantity - $_SESSION['Items']->LineItems[$Itm->LineNumber]->QtyInv)){
+			$_SESSION['Items']->LineItems[$Itm->LineNumber]->QtyDispatched = $_POST[$Itm->LineNumber  . '_QtyDispatched'];
 		}
 
-		$_SESSION['Items']->LineItems[$Itm->StockID]->TaxRate = $_POST[$Itm->StockID  . '_TaxRate']/100;
+		$_SESSION['Items']->LineItems[$Itm->LineNumber]->TaxRate = $_POST[$Itm->LineNumber  . '_TaxRate']/100;
 	}
 	$_SESSION['Items']->$ShipVia = $_POST['ShipVia'];
 }
@@ -271,7 +261,7 @@ foreach ($_SESSION['Items']->LineItems as $LnItm) {
 
 	if ($LnItm->Controlled==1){
 
-		echo '<TD ALIGN=RIGHT><input type=hidden name="' . $LnItm->StockID . '_QtyDispatched"  value="' . $LnItm->QtyDispatched . '"><a href="' . $rootpath .'/ConfirmDispatchControlled_Invoice.php?' . SID . 'StockID='. $LnItm->StockID.'">' .$LnItm->QtyDispatched . '</a></TD>';
+		echo '<TD ALIGN=RIGHT><input type=hidden name="' . $LnItm->StockID . '_QtyDispatched"  value="' . $LnItm->QtyDispatched . '"><a href="' . $rootpath .'/ConfirmDispatchControlled_Invoice.php?' . SID . '&StockID='. $LnItm->StockID.'">' .$LnItm->QtyDispatched . '</a></TD>';
 
 	} else {
 
@@ -285,7 +275,28 @@ foreach ($_SESSION['Items']->LineItems as $LnItm) {
 		<TD ALIGN=RIGHT>'.$DisplayDiscountPercent.'</TD>
 		<TD ALIGN=RIGHT>'.$DisplayLineNetTotal.'</TD>';
 
-	echo '<TD ALIGN=RIGHT><input type=text name="' . $LnItm->StockID .'_TaxRate" maxlength=4 SIZE=4 value="' . $LnItm->TaxRate*100 . '"></TD>';
+	/*Need to list the taxes applicable to this line */
+	echo '<TD>';
+	$i=0;
+	foreach ($LnItm->Taxes AS $Tax) {
+		if ($i>0){
+			echo '<BR>';
+		}
+		echo $Tax->TaxAuthDescription;
+		$i++;
+	}
+	echo '</TD>';
+	echo '<TD ALIGN=RIGHT>';
+	$i=0;
+	foreach ($LnItm->Taxes AS $Tax) {
+		if ($i>0){
+			echo '<BR>';
+		}
+		echo '<input type=text name="' . $LnItm->LineNumber . $Tax->TaxCalculationOrder . '_TaxRate" maxlength=4 SIZE=4 value="' . $Tax->TaxRate*100 . '">';
+		$i++;
+	}
+	echo '</TD>';		
+	
 
 	$DisplayTaxAmount = number_format($LnItm->TaxRate * $LineTotal ,2);
 
@@ -489,10 +500,10 @@ invoices can have a zero amount but there must be a quantity to invoice */
 
 	while ($myrow = DB_fetch_array($Result)) {
 
-		$stkItm = $myrow['stkcode'];
+		$stkItm = $myrow['orderlineno'];
 		if ($_SESSION['Items']->LineItems[$stkItm]->Quantity != $myrow['quantity'] OR $_SESSION['Items']->LineItems[$stkItm]->QtyInv != $myrow['qtyinvoiced']) {
 
-			echo '<BR>'. _('Orig order for'). ' ' . $myrow['stkcode'] . ' '. _('has a quantity of'). ' ' .
+			echo '<BR>'. _('Orig order for'). ' ' . $myrow['orderlineno'] . ' '. _('has a quantity of'). ' ' .
 				$myrow['quantity'] . ' '. _('and an invoiced qty of'). ' ' . $myrow['qtyinvoiced'] . ' '.
 				_('the session shows quantity of'). ' ' . $_SESSION['Items']->LineItems[$stkItm]->Quantity .
 				' ' . _('and quantity invoice of'). ' ' . $_SESSION['Items']->LineItems[$stkItm]->QtyInv;

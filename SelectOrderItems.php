@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.22.2.2 $ */
+/* $Revision: 1.22.2.3 $ */
 
 require('includes/DefineCartClass.php');
 

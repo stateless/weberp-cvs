@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.9 $ */
+/* $Revision: 1.9.2.1 $ */
 
 $PageSecurity = 3;
 
@@ -270,7 +270,7 @@ if (!isset($DebtorNo)) {
 	$result=DB_query('SELECT typeabbrev, sales_type FROM salestypes ',$db);
 	if (DB_num_rows($result)==0){
 		$DataError =1;
-		echo '<TR><TD COLSPAN=2>' . prnMsg(_('There are no sales types/price lists currently defined - go to the setup tab of the main menu and set at least one up first','error') . '</TD></TR>';
+		echo '<TR><TD COLSPAN=2>' . prnMsg(_('There are no sales types/price lists currently defined - go to the setup tab of the main menu and set at least one up first'),'error') . '</TD></TR>';
 	} else {
 		echo '<TR><TD>' . _('Sales Type') . '/' . _('Price List') . ":</TD>
 			<TD><SELECT name='SalesType'>";
@@ -297,7 +297,7 @@ if (!isset($DebtorNo)) {
 	$result=DB_query('SELECT terms, termsindicator FROM paymentterms',$db);
 	if (DB_num_rows($result)==0){
 		$DataError =1;
-		echo '<TR><TD COLSPAN=2>' . prnMsg(_('There are no payment terms currently defined - go to the setup tab of the main menu and set at least one up first','error') . '</TD></TR>';
+		echo '<TR><TD COLSPAN=2>' . prnMsg(_('There are no payment terms currently defined - go to the setup tab of the main menu and set at least one up first'),'error') . '</TD></TR>';
 	} else {
 	
 		echo '<TR><TD>' . _('Payment Terms') . ":</TD>
@@ -315,7 +315,7 @@ if (!isset($DebtorNo)) {
 	$result=DB_query('SELECT reasoncode, reasondescription FROM holdreasons',$db);
 	if (DB_num_rows($result)==0){
 		$DataError =1;
-		echo '<TR><TD COLSPAN=2>' . prnMsg(_('There are no credit statuses currently defined - go to the setup tab of the main menu and set at least one up first','error') . '</TD></TR>';
+		echo '<TR><TD COLSPAN=2>' . prnMsg(_('There are no credit statuses currently defined - go to the setup tab of the main menu and set at least one up first'),'error') . '</TD></TR>';
 	} else {
 		while ($myrow = DB_fetch_array($result)) {
 			echo "<OPTION VALUE='". $myrow['reasoncode'] . "'>" . $myrow['reasondescription'];
@@ -327,7 +327,7 @@ if (!isset($DebtorNo)) {
 	$result=DB_query('SELECT currency, currabrev FROM currencies',$db);
 	if (DB_num_rows($result)==0){
 		$DataError =1;
-		echo '<TR><TD COLSPAN=2>' . prnMsg(_('There are no currencies currently defined - go to the setup tab of the main menu and set at least one up first','error') . '</TD></TR>';
+		echo '<TR><TD COLSPAN=2>' . prnMsg(_('There are no currencies currently defined - go to the setup tab of the main menu and set at least one up first'),'error') . '</TD></TR>';
 	} else {
 		if (!isset($_POST['CurrCode'])){
 			$CurrResult = DB_query('SELECT currencydefault FROM companies WHERE coycode=1',$db);

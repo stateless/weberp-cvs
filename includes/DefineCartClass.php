@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.12.2.2 $ */
+/* $Revision: 1.12.2.3 $ */
 /* Definition of the cart class
 this class can hold all the information for:
 
@@ -74,7 +74,8 @@ Class Cart {
 				$Serialised=0,
 				$DecimalPlaces=0,
 				$Narrative='',
-				$UpdateDB='No'){
+				$UpdateDB='No',
+				$LineNumber=0){
 		
 				
 		if (isset($StockID) AND $StockID!="" AND $Qty>0 AND isset($Qty)){
@@ -83,7 +84,11 @@ Class Cart {
 				$Price=0;
 			}
 			
-			$this->LineItems[$this->LineCounter] = new LineDetails($this->LineCounter,
+			if ($LineNumber==0){
+				$LineNumber = $this->LineCounter;
+			}
+			
+			$this->LineItems[$this->LineCounter] = new LineDetails($LineNumber,
 									$StockID,
 									$Descr,
 									$Qty,
@@ -159,13 +164,20 @@ Class Cart {
 		}
 	}
 
-	function remove_from_cart(&$LineNumber,$UpdateDB='No'){
+	function remove_from_cart($LineNumber,$UpdateDB='No'){
 		if (isset($LineNumber)){
 			unset($this->LineItems[$LineNumber]);
 			$this->ItemsOrdered--;
 		}
 		if ($UpdateDB=='Yes'){
 			global $db;
+			
+			
+			
+			echo '<BR>Deleted ' . $LineNumber . ' existing order number ' . $_SESSION['ExistingOrder'];
+			
+			
+			
 			$result = DB_query("DELETE FROM salesorderdetails
 						WHERE orderno=" . $_SESSION['ExistingOrder'] . "
 						AND orderlineno='" . $LineNumber ."'",
@@ -290,17 +302,56 @@ Class LineDetails {
 		$this->Narrative = $Narrative;
 		$this->Taxes = array();
 	}
+	
+	function GetTaxes ($TaxGroup, $DispatchTaxProvince, $TaxCategory,&$db){
+	
+		/*Gets the Taxes and rates applicable to this line from the TaxGroup of the branch and TaxCategory of the item */
+
+		$SQL = "SELECT taxgrouptaxes.calculationorder,
+					taxauthorities.description,
+					taxgrouptaxes.taxauthid,
+					taxauthorities.taxglcode,
+					taxgrouptaxes.taxontax,
+					taxauthrates.taxrate
+			FROM taxauthrates INNER JOIN taxgrouptaxes ON
+				taxauthrates.taxauthority=taxgrouptaxes.taxauthid
+				INNER JOIN taxauthorities ON
+				taxauthrates.taxauthority=taxauthorities.taxid
+			WHERE taxgrouptaxes.taxgroupid=" . $TaxGroup . " 
+			AND taxauthrates.dispatchtaxprovince=" . $DispatchTaxProvince . " 
+			AND taxauthrates.taxcatid = " . $TaxCategory . "
+			ORDER BY taxgrouptaxes.calculationorder";
+
+		$ErrMsg = _('The taxes and rates for this item could not be retreived because');
+		$GetTaxRatesResult = DB_query($SQL,$db,$ErrMsg);
+		
+		while ($myrow = DB_fetch_row($GetTaxRatesResult)){
+		
+			$this->Taxes[$myrow['calculationorder']] = new Tax($myrow['calculationorder'],
+										$myrow['taxauthid'],
+										$myrow['description'],
+										$myrow['taxrate'],
+										$myrow['taxontax'],
+										$myrow['taxglcode']);
+		}
+	}
 }
 
-Class Taxes {
-	Var $TaxAuth;
+Class Tax {
+	Var $TaxCalculationOrder;  /*the index for the array */
+	Var $TaxAuthID;
+	Var $TaxAuthDescription;
 	Var $TaxRate;
 	Var $TaxOnTax;
+	var $TaxGLCode;
 		
-	function Taxes ($TaxAuth, $TaxRate, $TaxOnTax){
-		$this->TaxAuth = $TaxAuth;
+	function Tax ($TaxCalculationOrder, $TaxAuthID, $TaxAuthDescription, $TaxRate, $TaxOnTax, $TaxGLCode){
+		$this->TaxCalculationOrder = $TaxCalculationOrder;
+		$this->TaxAuthID = $TaxAuthID;
+		$this->TaxAuthDescription = $TaxAuthDescription;
 		$this->TaxRate =  $TaxRate;
 		$this->TaxOnTax = $TaxOnTax;
+		$this->TaxGLCode = $TaxGLCode;
 	}
 }
 ?>
