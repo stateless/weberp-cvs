@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.12.2.1 $ */
+/* $Revision: 1.12.2.2 $ */
 /* Definition of the cart class
 this class can hold all the information for:
 
@@ -61,7 +61,7 @@ Class Cart {
 				$Qty,
 				$Descr,
 				$Price,
-				$Disc,
+				$Disc=0,
 				$UOM,
 				$Volume,
 				$Weight,
@@ -75,6 +75,7 @@ Class Cart {
 				$DecimalPlaces=0,
 				$Narrative='',
 				$UpdateDB='No'){
+		
 				
 		if (isset($StockID) AND $StockID!="" AND $Qty>0 AND isset($Qty)){
 
@@ -135,7 +136,7 @@ Class Cart {
 		Return 0;
 	}
 
-	function update_cart_item( $UpdateLineNumber, $StockID, $Qty, $Price, $Disc, $Narrative, $UpdateDB='No'){
+	function update_cart_item( $UpdateLineNumber, $Qty, $Price, $Disc, $Narrative, $UpdateDB='No'){
 
 		if ($Qty>0){
 			$this->LineItems[$UpdateLineNumber]->Quantity = $Qty;
@@ -152,7 +153,6 @@ Class Cart {
 						discountpercent=" . $Disc . ",
 						narrative ='" . $Narrative . "'
 					WHERE orderno=" . $_SESSION['ExistingOrder'] . "
-					AND stkcode='" . $StockID ."'
 					AND orderlineno=" . $UpdateLineNumber
 				, $db
 				, _('The order line number') . ' ' . $UpdateLineNumber .  ' ' . _('could not be updated'));
