@@ -1,5 +1,5 @@
 <?php
-$PageSecurity = 15;
+$PageSecurity = 1;
 include ('includes/session.inc');
 /*
 http://127.0.0.1/~brink/webERP/getstockimg.php
@@ -25,9 +25,10 @@ if (!function_exists('imagecreatefrompng')){
 	include('includes/footer.inc');
 	exit;
 }
-$defaultimage = 'MUS001.png';
+$defaultimage = 'webERPsmall.png';
 
 $PartPics = $_SESSION['part_pics_dir'];
+
 // FOR APACHE
 if ( $_SERVER["PATH_TRANSLATED"][0] == '/' ) {
 	//Linux
@@ -64,6 +65,19 @@ if( isset($_GET['transcolor'])) {
 if( isset($_GET['bevel']) ) {
 	$bevel = $_GET['bevel'];
 }
+if( isset($_GET['useblank']) ) {
+	$useblank = $_GET['useblank'];
+}
+if( isset($_GET['fontsize']) ) {
+	$fontsize = $_GET['fontsize'];
+} else {
+	$fontsize = 3;
+}
+if( isset($_GET['notextbg']) ) {
+	$notextbg = true;
+}
+
+
 
 // Color decode function
 function DecodeBgColor( $colorstr ) {
@@ -142,7 +156,7 @@ if( !$automake && !isset($filename) ) {
 }
 
 // See if we need to automake this image
-if( $automake && !isset($filename) ) {
+if( $automake && !isset($filename) || $useblank ) {
 	// Have we got height and width specs
 	if( !isset($width) )
 		$width = 64;
@@ -197,14 +211,15 @@ if( $automake && !isset($filename) ) {
 	if(!isset($text))
 		$text = $stockid;
 	if(strlen($text) > 0 ) {
-		$fw = imagefontwidth(3);
-		$fh = imagefontheight(3);
-		$fy = imagesy($im) - ($fh);
-		$fyh = imagesy($im) - 1;
+		$fw = imagefontwidth($fontsize);
+		$fh = imagefontheight($fontsize);
+		$fy = (imagesy($im) - ($fh)) / 2;
+		$fyh = $fy + $fh - 1;
 		$textwidth = $fw * strlen($text);
 		$px = (imagesx($im) - $textwidth) / 2;
-		imagefilledrectangle($im,$px,$fy,imagesx($im)-($px+1),$fyh, $ixtextbgcolor );
-		imagestring($im, 3, $px, $fy, $text, $ixtextcolor);
+		if (!$notextbg)
+			imagefilledrectangle($im,$px,$fy,imagesx($im)-($px+1),$fyh, $ixtextbgcolor );
+		imagestring($im, $fontsize, $px, $fy, $text, $ixtextcolor);
 	}
 
 } else {
@@ -295,14 +310,15 @@ if( $automake && !isset($filename) ) {
 	if(!isset($text))
 		$text = $stockid;
 	if(strlen($text) > 0 ) {
-		$fw = imagefontwidth(3);
-		$fh = imagefontheight(3);
+		$fw = imagefontwidth($fontsize);
+		$fh = imagefontheight($fontsize);
 		$fy = imagesy($im) - ($fh);
 		$fyh = imagesy($im) - 1;
 		$textwidth = $fw * strlen($text);
 		$px = (imagesx($im) - $textwidth) / 2;
-		imagefilledrectangle($im,$px,$fy,imagesx($im)-($px+1),$fyh, $ixtextbgcolor );
-		imagestring($im, 3, $px, $fy, $text, $ixtextcolor);
+		if (!$notextbg)
+			imagefilledrectangle($im,$px,$fy,imagesx($im)-($px+1),$fyh, $ixtextbgcolor );
+		imagestring($im, $fontsize, $px, $fy, $text, $ixtextcolor);
 	}
 }
 // Do we need to bevel

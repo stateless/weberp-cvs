@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.33 $ */
+/* $Revision: 1.33.2.1 $ */
 
 $PageSecurity = 1;
 
@@ -568,6 +568,11 @@ if (count($_SESSION['AllowedPageSecurityTokens'])==1){
 								<?php echo "<a href='" . $rootpath . '/PurchData.php?' . SID . "'><li>" . _('Maintain Purchasing Data') . '</li></a>'; ?>
 							</td>
 							</tr>
+							<tr>
+							<td class="menu_group_item">
+								<?php echo "<a href='" . $rootpath . '/SalesCategories.php?' . SID . "'><li>" . _('Sales Category Maintenance') . '</li></a>'; ?>
+							</td>
+							</tr>
 						</table>
 					</td>
 					</tr>
@@ -728,7 +733,12 @@ if (count($_SESSION['AllowedPageSecurityTokens'])==1){
 							</tr>
 							<tr>
 							<td class="menu_group_item">
-								<?php echo "<a href='" . $rootpath . '/TaxAuthorities.php?' . SID . "'><li>" . _('Tax Types and Rates Maintenance') . '</li></a>'; ?>
+								<?php echo "<a href='" . $rootpath . '/TaxAuthorities.php?' . SID . "'><li>" . _('Tax Authorities and Rates Maintenance') . '</li></a>'; ?>
+							</td>
+							</tr>
+							<tr>
+							<td class="menu_group_item">
+								<?php echo "<a href='" . $rootpath . '/TaxGroups.php?' . SID . "'><li>" . _('Tax Group Maintenance') . '</li></a>'; ?>
 							</td>
 							</tr>
 							<tr>

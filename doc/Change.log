@@ -1,11 +1,14 @@
 <P>webERP Change Log
 
+<P>5/3/05 Danie - changes to Stock.php to use the image manipulation features and changed Z_GetStockImage.php to GetStockImage.php
+<P>5/3/05 Danie - Added SalesCategories.php also table salescat and salescatprod for POS/Shopping integration
 <P>2/3/05 Danie - Stocks.php updated for taxcategories not levels
 <P>2/3/05 Danie - Locations.php updated for taxprovince rather than taxauthority
 <P>1/3/05 Danie - TaxGroups.php new script to adminster taxgroups and taxgrouptaxes tables.
 <P>1/3/05 Danie - CustomerBranches.php now selects taxgroup rather than taxauthorities
 <P>1/3/05 Danie - Large changes to database new tables for taxgroups, taxprovinces, taxgrouptaxes, taxcategories to accomodate the new tax structure. Renaming of some fields too see upgrade2.9b-2.9c.sql
-<P>26/2/05 Addedd Janusz Dobrowlski/ David Luo wrapper includes/class.pdf.php for R&OS pdf class to use FPDF class by Olivier PLATHEY in place of R&OS pdf.php class which is not good at alternative fonts/character sets.
+<P>26/2/05 Jesse - changed ALT references to TITLE - TITLE needs to be used for the pop up text to appear as per html spec. ALT just for when images turned off.
+<P>26/2/05 Addedd Janusz Dobrowlski/ David Lao wrapper includes/class.pdf.php for R&OS pdf class to use FPDF class by Olivier PLATHEY in place of R&OS pdf.php class which is not good at alternative fonts/character sets.
 <P>23/2/05 Links to Danie's new scripts in Z_index.php
 <P>23/2/05 Danie - Z_DataExport.php allows export of various data as csv files
 <P>23/2/05 Danie - session.inc, config.php, WWW_Users.php, UserSettings.php passwords now have a choice of md5, sha1 or plain text depending on setting in config.php - default is sha1
