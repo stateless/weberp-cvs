@@ -665,7 +665,6 @@ ALTER TABLE `worksorders` CHANGE AccumValueTrfd accumvaluetrfd decimal(20,4)  NO
 ALTER TABLE `worksorders` CHANGE Closed closed tinyint(4)  NOT NULL default '0';
 ALTER TABLE `worksorders` CHANGE Released released tinyint(4)  NOT NULL default '0';
 
-
 ALTER TABLE `taxauthorities` CHANGE `taxid` 'taxid' tinyint NOT NULL auto_increment;
 
 ALTER TABLE `salesorders` ADD `quotation` TINYINT DEFAULT '0' NOT NULL ;
@@ -700,7 +699,7 @@ CREATE TABLE `recurringsalesorders` (
   KEY `ordertype` (`ordertype`),
   KEY `locationindex` (`fromstkloc`),
   KEY `branchcode` (`branchcode`,`debtorno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) TYPE=InnoDB DEFAULT CHARSET=latin1;
 
 ALTER TABLE `recurringsalesorders`
   ADD CONSTRAINT `recurringsalesorders_ibfk_1` FOREIGN KEY (`branchcode`, `debtorno`) REFERENCES `custbranch` (`branchcode`, `debtorno`);
@@ -716,7 +715,7 @@ ALTER TABLE `recurringsalesorders`
   KEY `orderno` (`recurrorderno`),
   KEY `stkcode` (`stkcode`),
   CONSTRAINT `recurrsalesorderdetails_ibfk_2` FOREIGN KEY (`stkcode`) REFERENCES `stockmaster` (`stockid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) TYPE=InnoDB DEFAULT CHARSET=latin1;
 
 ALTER TABLE `recurrsalesorderdetails`
   ADD CONSTRAINT `recurrsalesorderdetails_ibfk_1` FOREIGN KEY (`recurrorderno`) REFERENCES `recurringsalesorders` (`recurrorderno`);
@@ -727,7 +726,7 @@ CREATE TABLE accountsection (
     sectionid integer NOT NULL,
     sectionname text NOT NULL,
     PRIMARY KEY (sectionid)
-)ENGINE=InnoDB;
+)TYPE=InnoDB;
 
 INSERT INTO accountsection (sectionid, sectionname) VALUES (1,'Income');
 INSERT INTO accountsection (sectionid, sectionname) VALUES (2,'Cost Of Sales');
@@ -851,7 +850,7 @@ CREATE TABLE paymentmethods (
     paymenttype integer DEFAULT 1 NOT NULL,
     receipttype integer DEFAULT 1 NOT NULL,
     PRIMARY KEY (paymentid)
-);
+) TYPE=INNODB;
 
 INSERT INTO paymentmethods VALUES (1, 'Cheque', 1, 1);
 INSERT INTO paymentmethods VALUES (2, 'Cash', 1, 1);
@@ -861,7 +860,7 @@ CREATE TABLE unitsofmeasure (
 	unitid tinyint NOT NULL auto_increment,
 	unitname varchar(15) NOT NULL,
 	PRIMARY KEY (unitid)
-);
+) TYPE=INNODB;
 
 INSERT INTO unitsofmeasure VALUES (2, 'metres');
 INSERT INTO unitsofmeasure VALUES (3, 'kgs');
@@ -874,7 +873,7 @@ CREATE TABLE config(
 confname varchar( 35 ) NOT NULL ,
 confvalue text NOT NULL ,
 PRIMARY KEY ( confname )
-)
+) TYPE=INNODB;
 
 INSERT INTO config VALUES('DefaultDateFormat','d/m/Y');
 INSERT INTO config VALUES('DefaultTheme','fresh');
@@ -920,3 +919,70 @@ INSERT INTO config VALUES('RadioBeaconFTP_user_name', 'RadioBeacon ftp server us
 INSERT INTO config VALUES('RadionBeaconFTP_user_pass','Radio Beacon remote ftp server password');
 ALTER TABLE www_users CHANGE password `password TEXT NOT NULL;
 UPDATE www_users SET password ='f0f77a7f88e7c1e93ab4e316b4574c7843b00ea4' WHERE userid='demo';
+
+CREATE TABLE taxcategories(
+taxcatid tinyint( 4 ) AUTO_INCREMENT NOT NULL ,
+taxcatname varchar( 30 ) NOT NULL ,
+PRIMARY KEY ( taxcatid )
+) TYPE=INNODB;
+
+ALTER TABLE www_users ADD COLUMN pinno varchar(30) NOT NULL;
+ALTER TABLE www_users ADD COLUMN swipecard varchar(50) NOT NULL;
+
+ALTER TABLE `taxauthorities` ADD `bank` VARCHAR( 50 ) NOT NULL ,
+ADD `bankacctype` VARCHAR( 20 ) NOT NULL ,
+ADD `bankacc` VARCHAR( 50 ) NOT NULL ,
+ADD `bankswift` VARCHAR( 30 ) NOT NULL ;
+
+ALTER TABLE taxauthlevels DROP FOREIGN KEY `taxauthlevels_ibfk_2` ;
+ALTER TABLE `taxauthlevels` CHANGE `dispatchtaxauthority` `dispatchtaxprovince` TINYINT( 4 ) DEFAULT '1' NOT NULL;
+ALTER TABLE `taxauthlevels` CHANGE `level` `taxcatid` TINYINT( 4 ) DEFAULT '0' NOT NULL;
+ALTER TABLE `taxauthlevels` DROP INDEX `dispatchtaxauthority` , ADD INDEX `dispatchtaxprovince` ( `dispatchtaxprovince` )
+ALTER TABLE `taxauthlevels` ADD INDEX ( `taxcatid` ) 
+INSERT INTO `taxcategories` ( `taxcatid` , `taxcatname` ) VALUES ('1', 'Taxable supply');
+INSERT INTO `taxcategories` ( `taxcatid` , `taxcatname` ) VALUES ('2', 'Luxury Items');
+INSERT INTO `taxcategories` ( `taxcatid` , `taxcatname` ) VALUES ('0', 'Exempt');
+
+DELETE FROM taxauthlevels WHERE taxprovinceid <>1 OR taxcatid > 2;
+
+ALTER TABLE taxauthlevels ADD FOREIGN KEY (taxcatid) REFERENCES taxcategories (taxcatid) ;
+
+CREATE TABLE taxprovinces(
+taxprovinceid tinyint( 4 ) AUTO_INCREMENT NOT NULL ,
+taxprovincename varchar( 30 ) NOT NULL ,
+PRIMARY KEY ( taxprovinceid )
+) TYPE=INNODB;
+
+
+ALTER TABLE `locations` CHANGE `taxauthority` `taxprovinceid` TINYINT( 4 ) DEFAULT '1' NOT NULL;
+ALTER TABLE `locations` ADD INDEX ( `taxprovinceid` );
+UPDATE locations SET taxprovinceid=1;
+INSERT INTO `taxprovinces` ( `taxprovinceid` , `taxprovincename` ) VALUES ('1', 'Default Tax province');
+ALTER TABLE locations ADD FOREIGN KEY (taxprovinceid) REFERENCES taxprovinces (taxprovinceid);
+
+CREATE TABLE taxgroups (
+  taxgroupid tinyint(4) auto_increment NOT NULL,
+  taxgroupdescription varchar(30) NOT NULL,
+  PRIMARY KEY(taxgroupid)
+)TYPE=INNODB;
+
+CREATE TABLE taxgrouptaxes (
+  taxgroupid tinyint(4) NOT NULL,
+  taxauthid tinyint(4) NOT NULL,
+  calculationorder tinyint(4) NOT NULL,
+  taxontax tinyiny(4) DEFAULT 0 NOT NULL
+  PRIMARY KEY(taxgroupid, taxauthid )
+) TYPE=INNODB;
+
+ALTER TABLE `taxgrouptaxes` ADD INDEX ( `taxgroupid` );
+ALTER TABLE `taxgrouptaxes` ADD INDEX ( `taxauthid` );
+ALTER TABLE taxgrouptaxes ADD FOREIGN KEY (taxgroupid) REFERENCES taxgroups (taxgroupid);
+ALTER TABLE taxgrouptaxes ADD FOREIGN KEY (taxauthid) REFERENCES taxauthorities (taxid);
+
+ALTER TABLE custbranch DROP FOREIGN KEY custbranch_ibfk_5;
+ALTER TABLE `custbranch` CHANGE `taxauthority` `taxgroupid` TINYINT( 4 ) DEFAULT '1' NOT NULL;
+ALTER TABLE `custbranch` DROP INDEX `area_2` ;
+ALTER TABLE `custbranch` DROP INDEX `taxauthority` , ADD INDEX `taxgroupid` ( `taxgroupid` ) ;
+UPDATE custbranch SET taxgroupid=1;
+INSERT INTO taxgroups (taxgroupid, taxgroupdescription) VALUES (1,'Default tax group');
+ALTER TABLE custbranch ADD FOREIGN KEY (taxgroupid) REFERENCES taxgroups (taxgroupid);

@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.49 $ */
+/* $Revision: 1.49.2.1 $ */
 	/*--------------------------------------------------\
 	| 		|               | config.php        |
 	|---------------------------------------------------|
@@ -19,7 +19,7 @@ $DefaultLanguage ='en_GB';
 $allow_demo_mode = True;
 
 // Application version
-$Version = '2.9c';
+$Version = '2.9c_tax';
 
 // The timezone of the business - this allows the possibility of having
 // the web-server on a overseas machine but record local time
@@ -35,11 +35,11 @@ $Version = '2.9c';
 $host = 'localhost';
 
 //The type of db server being used - currently only postgres or mysql
-$dbType = 'postgres';
+$dbType = 'mysql';
 //$dbType = 'postgres';
 //$dbType = 'mysql';
 
-$DatabaseName = 'weberp';
+$DatabaseName = 'weberptax';
 
 // sql user & password
 $dbuser = 'weberp_db_user';

@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.12 $ */
+/* $Revision: 1.12.2.1 $ */
 $PageSecurity = 3;
 
 include('includes/session.inc');
@@ -85,7 +85,7 @@ if (isset($_POST['submit'])) {
 						area='" . $_POST['Area'] . "',
 						estdeliverydays =" . $_POST['EstDeliveryDays'] . ",
 						email='" . $_POST['Email'] . "',
-						taxauthority=" . $_POST['TaxAuthority'] . ",
+						taxgroupid=" . $_POST['TaxGroup'] . ",
 						defaultlocation='" . $_POST['DefaultLocation'] . "',
 						brpostaddr1 = '" . DB_escape_string($_POST['BrPostAddr1']) . "',
 						brpostaddr2 = '" . DB_escape_string($_POST['BrPostAddr2']) . "',
@@ -117,7 +117,7 @@ if (isset($_POST['submit'])) {
 						contactname,
 						area,
 						email,
-						taxauthority,
+						taxgroupid,
 						defaultlocation,
 						brpostaddr1,
 						brpostaddr2,
@@ -141,7 +141,7 @@ if (isset($_POST['submit'])) {
 					'" . DB_escape_string($_POST['ContactName']) . "',
 					'" . $_POST['Area'] . "',
 					'" . DB_escape_string($_POST['Email']) . "',
-					" . $_POST['TaxAuthority'] . ",
+					" . $_POST['TaxGroup'] . ",
 					'" . $_POST['DefaultLocation'] . "',
 					'" . DB_escape_string($_POST['BrPostAddr1']) . "',
 					'" . DB_escape_string($_POST['BrPostAddr2']) . "',
@@ -174,7 +174,7 @@ if (isset($_POST['submit'])) {
 		unset($_POST['ContactName']);
 		unset($_POST['Area']);
 		unset($_POST['Email']);
-		unset($_POST['TaxAuthority']);
+		unset($_POST['TaxGroup']);
 		unset($_POST['DefaultLocation']);
 		unset($_POST['DisableTrans']);
 		unset($_POST['BrPostAddr1']);
@@ -256,7 +256,7 @@ if (!isset($SelectedBranch)){
 			phoneno,
 			faxno,
 			email,
-			taxauthority,
+			taxgroupid,
 			custbranch.branchcode
 		FROM custbranch,
 			debtorsmaster,
@@ -282,7 +282,7 @@ if (!isset($SelectedBranch)){
 			<td class='tableheader'>"._('Phone No')."</td>
 			<td class='tableheader'>"._('Fax No')."</td>
 			<td class='tableheader'>"._('Email')."</td>
-			<td class='tableheader'>"._('Tax Auth')."</td></tr>";
+			<td class='tableheader'>"._('Tax Group')."</td></tr>";
 
 		do {
 			printf("<tr><td><font size=2>%s</td>
@@ -370,7 +370,7 @@ if (! isset($_GET['delete'])) {
 				faxno,
 				contactname,
 				email,
-				taxauthority,
+				taxgroupid,
 				defaultlocation,
 				brpostaddr1,
 				brpostaddr2,
@@ -404,7 +404,7 @@ if (! isset($_GET['delete'])) {
 		$_POST['PhoneNo'] =$myrow['phoneno'];
 		$_POST['FaxNo'] =$myrow['faxno'];
 		$_POST['Email'] =$myrow['email'];
-		$_POST['TaxAuthority'] = $myrow['taxauthority'];
+		$_POST['TaxGroup'] = $myrow['taxgroupid'];
 		$_POST['DisableTrans'] = $myrow['disabletrans'];
 		$_POST['DefaultLocation'] = $myrow['defaultlocation'];
 		$_POST['DefaultShipVia'] = $myrow['defaultshipvia'];
@@ -533,21 +533,21 @@ if (! isset($_GET['delete'])) {
 	echo '<TR><TD><a href="Mailto:'. $_POST['Email'].'">'._('Email').':</a></TD>';
 	echo '<TD><input type="Text" name="Email" SIZE=56 MAXLENGTH=55 value="'. $_POST['Email'].'"></TD></TR>';
 
-	echo '<TR><TD>'._('Tax Authority').':</TD>';
-	echo '<TD><SELECT name="TaxAuthority">';
+	echo '<TR><TD>'._('Tax Group').':</TD>';
+	echo '<TD><SELECT name="TaxGroup">';
 
 	DB_data_seek($result,0);
 
-	$sql = 'SELECT taxid, description FROM taxauthorities';
+	$sql = 'SELECT taxgroupid, taxgroupdescription FROM taxgroups';
 	$result = DB_query($sql,$db);
 
 	while ($myrow = DB_fetch_array($result)) {
-		if ($myrow['taxid']==$_POST['TaxAuthority']) {
+		if ($myrow['taxgroupid']==$_POST['TaxGroup']) {
 			echo '<OPTION SELECTED VALUE=';
 		} else {
 			echo '<OPTION VALUE=';
 		}
-		echo $myrow['taxid'] . '>' . $myrow['description'];
+		echo $myrow['taxgroupid'] . '>' . $myrow['taxgroupdescription'];
 
 	} //end while loop
 
