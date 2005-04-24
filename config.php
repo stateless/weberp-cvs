@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.49.2.2 $ */
+
+/* $Revision: 1.49.2.3 $ */
+
 	/*--------------------------------------------------\
 	| 		|               | config.php        |
 	|---------------------------------------------------|
@@ -20,7 +22,8 @@ $allow_demo_mode = True;
 
 // Application version
 
-$Version = '3.0rc1';
+$Version = '3.00';
+
 
 // The timezone of the business - this allows the possibility of having
 // the web-server on a overseas machine but record local time
@@ -94,5 +97,6 @@ if (!function_exists('_')){
 		return ($text);
 	}
 }
-/*Make sure there is nothing -not even spaces after this last ?> */
+
+/*Make sure there is nothing - not even spaces after this last ?> */
 ?>

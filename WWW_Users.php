@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.12.2.1 $ */
+
+/* $Revision: 1.12.2.2 $ */
+
 $PageSecurity=15;
 
 include('includes/session.inc');
@@ -121,7 +123,8 @@ if (isset($_POST['submit'])) {
 						pagesize,
 						fullaccess,
 						defaultlocation,
-						modulesallowed)
+						modulesallowed,
+						theme)
 					VALUES ('" . $_POST['UserID'] . "',
 						'" . DB_escape_string($_POST['RealName']) ."',
 						'" . DB_escape_string($_POST['Cust']) ."',
@@ -132,7 +135,8 @@ if (isset($_POST['submit'])) {
 						'" . $_POST['PageSize'] ."',
 						" . $_POST['Access'] . ",
 						'" . $_POST['DefaultLocation'] ."',
-						'" . $ModulesAllowed . "')";
+						'" . $ModulesAllowed . "',
+						'" . $_SESSION['DefaultTheme'] . "')";
 		$msg = _('A new user record has been inserted');
 	}
 
@@ -300,6 +304,17 @@ if (isset($SelectedUser)) {
 } else { //end of if $SelectedUser only do the else when a new record is being entered
 
 	echo '<CENTER><TABLE><TR><TD>' . _('User code') . ":</TD><TD><input type='Text' name='UserID' SIZE=22 MAXLENGTH=20 Value='" . $_POST['UserID'] . "'></TD></TR>";
+	
+	/*set the default modules to show to all 
+	this had trapped a few people previously*/
+	$i=0;
+	foreach($ModuleList as $ModuleName){
+		if ($i>0){
+			$_POST['ModulesAllowed'] .=',';
+		}
+		$_POST['ModulesAllowed'] .= '1';
+		$i++;
+	}
 }
 
 echo '<TR><TD>' . _('Password') . ":</TD>

@@ -1,5 +1,6 @@
 <?php
-/* $Revision: 1.13.2.1 $ */
+
+/* $Revision: 1.13.2.2 $ */
 
 $PageSecurity=1;
 
@@ -104,7 +105,7 @@ echo $_SESSION['UsersRealName'] . '</TD></TR>';
 
 echo '<TR>
 	<TD>' . _('Maximum Number of Records to Display') . ":</TD>
-	<TD><INPUT TYPE='Text' name='DisplayRecordsMax' VALUE=" . $_POST['DisplayRecordsMax'] . " SIZE=32 MAXLENGTH=30></TD>
+	<TD><INPUT TYPE='Text' name='DisplayRecordsMax' SIZE=3 MAXLENGTH=3 VALUE=" . $_POST['DisplayRecordsMax'] . " ></TD>
 	</TR>";
 	
 	
@@ -112,10 +113,11 @@ echo '<TR>
 if (!function_exists('gettext')){
 	echo '<TR>
 	<TD COLSPAN=2><FONT SIZE=1><I>' . _('The GNU gettext system must be installed on the web-server for other languages to be displayed') . '<BR>' . _('Once gettext is installed an option to allow changes to the language will show') . '</I></FONT></TD></TR>';
-} else {	
+} else { 
 	
 	echo '<TR>
 	<TD>' . _('Language') . ":</TD>
+
 	<TD><SELECT name='Language'>";
 
 	$LangDirHandle = dir('locale/');

@@ -1,5 +1,6 @@
 <?php
-/* $Revision: 1.19.2.2 $ */
+
+/* $Revision: 1.19.2.3 $ */
 
 /* Session started in session.inc for password checking and authorisation level check */
 include('includes/DefineCartClass.php');

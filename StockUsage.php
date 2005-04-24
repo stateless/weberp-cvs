@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.7.2.1 $ */
+
+/* $Revision: 1.7.2.2 $ */
+
 
 $PageSecurity = 2;
 
@@ -25,6 +27,8 @@ $result = DB_query("SELECT description,
 $myrow = DB_fetch_row($result);
 
 $DecimalPlaces = $myrow[3];
+
+echo '<CENTER>';
 
 $Its_A_KitSet_Assembly_Or_Dummy =False;
 if (($myrow[2]=='K') OR ($myrow[2]=='A') OR ($myrow[2]=='D')) {

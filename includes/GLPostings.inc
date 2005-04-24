@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.6.2.2 $ */
+
+/* $Revision: 1.6.2.3 $ */
+
 /* This file contains the code to post GL transactions.
 
 This file can be included on any page that needs GL postings to be posted eg inquiries or GL reports
@@ -35,10 +37,11 @@ $CreateFrom = $FirstPeriodRow[0];
 $CreateTo = $LastPeriodRow[0];
 
 
+
 /*First off see if there are any chartdetails missing create recordset of */
 
 $sql = 'SELECT chartmaster.accountcode, MIN(periods.periodno) AS startperiod 
-		FROM chartmaster INNER JOIN periods ON True 
+		FROM chartmaster CROSS JOIN periods 
 			LEFT JOIN chartdetails ON chartmaster.accountcode = chartdetails.accountcode 
 				AND periods.periodno = chartdetails.period
 		WHERE (periods.periodno BETWEEN '  . $CreateFrom . ' AND ' . $CreateTo . ') 
@@ -52,16 +55,15 @@ if(DB_num_rows($ChartDetailsNotSetUpResult)>0){
 	/*Now insert the chartdetails records that do not already exist */
 	$sql = 'INSERT INTO chartdetails (accountcode, period)
 			SELECT chartmaster.accountcode, periods.periodno 
-		FROM chartmaster INNER JOIN periods ON True 
+		FROM chartmaster CROSS JOIN periods 
 			LEFT JOIN chartdetails ON chartmaster.accountcode = chartdetails.accountcode 
 				AND periods.periodno = chartdetails.period
 		WHERE (periods.periodno BETWEEN '  . $CreateFrom . ' AND ' . $CreateTo . ') 
 		AND chartdetails.accountcode IS NULL';
 	
-	
 	$ErrMsg = _('Inserting new chart details records required failed because');
 	$InsChartDetailsRecords = DB_query($sql,$db,$ErrMsg);
-	
+
 }
 
 /*All the ChartDetail records should have been created now and be available to accept postings */

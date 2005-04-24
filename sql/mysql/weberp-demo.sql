@@ -1,18 +1,19 @@
 SET FOREIGN_KEY_CHECKS = 0;
--- MySQL dump 10.8
+-- MySQL dump 10.9
 --
 -- Host: localhost    Database: weberp
 -- ------------------------------------------------------
--- Server version	4.1.7-standard
+-- Server version	4.1.11-standard
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE="NO_AUTO_VALUE_ON_ZERO,MYSQL40" */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO,MYSQL40' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
 -- Current Database: `weberp`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `weberp`;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `weberp` /*!40100 DEFAULT CHARACTER SET latin1 */;
 
 USE `weberp`;
 
@@ -22,12 +23,13 @@ USE `weberp`;
 
 CREATE TABLE `accountgroups` (
   `groupname` char(30) NOT NULL default '',
-  `sectioninaccounts` smallint(6) NOT NULL default '0',
+  `sectioninaccounts` int(11) NOT NULL default '0',
   `pandl` tinyint(4) NOT NULL default '1',
   `sequenceintb` smallint(6) NOT NULL default '0',
   PRIMARY KEY  (`groupname`),
-  KEY `sequenceintb` (`sequenceintb`),
-  KEY `sectioninaccounts` (`sectioninaccounts`)
+  KEY `SequenceInTB` (`sequenceintb`),
+  KEY `sectioninaccounts` (`sectioninaccounts`),
+  CONSTRAINT `accountgroups_ibfk_1` FOREIGN KEY (`sectioninaccounts`) REFERENCES `accountsection` (`sectionid`)
 ) TYPE=InnoDB;
 
 --
@@ -60,9 +62,9 @@ CREATE TABLE `bankaccounts` (
   `bankaccountnumber` char(50) NOT NULL default '',
   `bankaddress` char(50) default NULL,
   PRIMARY KEY  (`accountcode`),
-  KEY `bankaccountname` (`bankaccountname`),
-  KEY `bankaccountnumber` (`bankaccountnumber`),
-  CONSTRAINT `bankaccounts_ibfk_1` FOREIGN KEY (`accountcode`) REFERENCES `chartmaster` (`accountcode`)
+  KEY `BankAccountName` (`bankaccountname`),
+  KEY `BankAccountNumber` (`bankaccountnumber`),
+  CONSTRAINT `bankaccounts_ibfk_1` FOREIGN KEY (`accountcode`) REFERENCES `chartmaster` (`AccountCode`)
 ) TYPE=InnoDB;
 
 --
@@ -82,12 +84,12 @@ CREATE TABLE `banktrans` (
   `amount` double NOT NULL default '0',
   `currcode` char(3) NOT NULL default '',
   PRIMARY KEY  (`banktransid`),
-  KEY `bankact` (`bankact`,`ref`),
-  KEY `transdate` (`transdate`),
-  KEY `transtype` (`banktranstype`),
-  KEY `type` (`type`,`transno`),
-  KEY `currcode` (`currcode`),
-  CONSTRAINT `banktrans_ibfk_1` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
+  KEY `BankAct` (`bankact`,`ref`),
+  KEY `TransDate` (`transdate`),
+  KEY `TransType` (`banktranstype`),
+  KEY `Type` (`type`,`transno`),
+  KEY `CurrCode` (`currcode`),
+  CONSTRAINT `banktrans_ibfk_1` FOREIGN KEY (`type`) REFERENCES `systypes` (`TypeID`),
   CONSTRAINT `banktrans_ibfk_2` FOREIGN KEY (`bankact`) REFERENCES `bankaccounts` (`accountcode`)
 ) TYPE=InnoDB;
 
@@ -104,17 +106,17 @@ CREATE TABLE `bom` (
   `effectiveto` date NOT NULL default '9999-12-31',
   `quantity` double(16,4) NOT NULL default '1.0000',
   PRIMARY KEY  (`parent`,`component`,`workcentreadded`,`loccode`),
-  KEY `component` (`component`),
-  KEY `effectiveafter` (`effectiveafter`),
-  KEY `effectiveto` (`effectiveto`),
-  KEY `loccode` (`loccode`),
-  KEY `parent` (`parent`,`effectiveafter`,`effectiveto`,`loccode`),
-  KEY `parent_2` (`parent`),
-  KEY `workcentreadded` (`workcentreadded`),
-  CONSTRAINT `bom_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `stockmaster` (`stockid`),
-  CONSTRAINT `bom_ibfk_2` FOREIGN KEY (`component`) REFERENCES `stockmaster` (`stockid`),
-  CONSTRAINT `bom_ibfk_3` FOREIGN KEY (`workcentreadded`) REFERENCES `workcentres` (`code`),
-  CONSTRAINT `bom_ibfk_4` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`)
+  KEY `Component` (`component`),
+  KEY `EffectiveAfter` (`effectiveafter`),
+  KEY `EffectiveTo` (`effectiveto`),
+  KEY `LocCode` (`loccode`),
+  KEY `Parent` (`parent`,`effectiveafter`,`effectiveto`,`loccode`),
+  KEY `Parent_2` (`parent`),
+  KEY `WorkCentreAdded` (`workcentreadded`),
+  CONSTRAINT `bom_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `stockmaster` (`StockID`),
+  CONSTRAINT `bom_ibfk_2` FOREIGN KEY (`component`) REFERENCES `stockmaster` (`StockID`),
+  CONSTRAINT `bom_ibfk_3` FOREIGN KEY (`workcentreadded`) REFERENCES `workcentres` (`Code`),
+  CONSTRAINT `bom_ibfk_4` FOREIGN KEY (`loccode`) REFERENCES `locations` (`LocCode`)
 ) TYPE=InnoDB;
 
 --
@@ -126,9 +128,9 @@ CREATE TABLE `buckets` (
   `availdate` datetime NOT NULL default '0000-00-00 00:00:00',
   `capacity` double NOT NULL default '0',
   PRIMARY KEY  (`workcentre`,`availdate`),
-  KEY `workcentre` (`workcentre`),
-  KEY `availdate` (`availdate`),
-  CONSTRAINT `buckets_ibfk_1` FOREIGN KEY (`workcentre`) REFERENCES `workcentres` (`code`)
+  KEY `WorkCentre` (`workcentre`),
+  KEY `AvailDate` (`availdate`),
+  CONSTRAINT `buckets_ibfk_1` FOREIGN KEY (`workcentre`) REFERENCES `workcentres` (`Code`)
 ) TYPE=InnoDB;
 
 --
@@ -143,9 +145,9 @@ CREATE TABLE `chartdetails` (
   `bfwd` double NOT NULL default '0',
   `bfwdbudget` double NOT NULL default '0',
   PRIMARY KEY  (`accountcode`,`period`),
-  KEY `period` (`period`),
-  CONSTRAINT `chartdetails_ibfk_1` FOREIGN KEY (`accountcode`) REFERENCES `chartmaster` (`accountcode`),
-  CONSTRAINT `chartdetails_ibfk_2` FOREIGN KEY (`period`) REFERENCES `periods` (`periodno`)
+  KEY `Period` (`period`),
+  CONSTRAINT `chartdetails_ibfk_1` FOREIGN KEY (`accountcode`) REFERENCES `chartmaster` (`AccountCode`),
+  CONSTRAINT `chartdetails_ibfk_2` FOREIGN KEY (`period`) REFERENCES `periods` (`PeriodNo`)
 ) TYPE=InnoDB;
 
 --
@@ -157,9 +159,9 @@ CREATE TABLE `chartmaster` (
   `accountname` char(50) NOT NULL default '',
   `group_` char(30) NOT NULL default '',
   PRIMARY KEY  (`accountcode`),
-  KEY `accountcode` (`accountcode`),
-  KEY `accountname` (`accountname`),
-  KEY `group_` (`group_`),
+  KEY `AccountCode` (`accountcode`),
+  KEY `AccountName` (`accountname`),
+  KEY `Group_` (`group_`),
   CONSTRAINT `chartmaster_ibfk_1` FOREIGN KEY (`group_`) REFERENCES `accountgroups` (`groupname`)
 ) TYPE=InnoDB;
 
@@ -172,13 +174,13 @@ CREATE TABLE `cogsglpostings` (
   `area` char(2) NOT NULL default '',
   `stkcat` varchar(6) NOT NULL default '',
   `glcode` int(11) NOT NULL default '0',
-  `salestype` char(2) NOT NULL default 'an',
+  `salestype` char(2) NOT NULL default 'AN',
   PRIMARY KEY  (`id`),
-  UNIQUE KEY `area_stkcat` (`area`,`stkcat`,`salestype`),
-  KEY `area` (`area`),
-  KEY `stkcat` (`stkcat`),
-  KEY `glcode` (`glcode`),
-  KEY `salestype` (`salestype`)
+  UNIQUE KEY `Area_StkCat` (`area`,`stkcat`,`salestype`),
+  KEY `Area` (`area`),
+  KEY `StkCat` (`stkcat`),
+  KEY `GLCode` (`glcode`),
+  KEY `SalesType` (`salestype`)
 ) TYPE=InnoDB;
 
 --
@@ -221,7 +223,7 @@ CREATE TABLE `config` (
   `confname` varchar(35) NOT NULL default '',
   `confvalue` text NOT NULL,
   PRIMARY KEY  (`confname`)
-) TYPE=MyISAM;
+) TYPE=InnoDB;
 
 --
 -- Table structure for table `contractbom`
@@ -234,14 +236,14 @@ CREATE TABLE `contractbom` (
   `loccode` char(5) NOT NULL default '',
   `quantity` double(16,4) NOT NULL default '1.0000',
   PRIMARY KEY  (`contractref`,`component`,`workcentreadded`,`loccode`),
-  KEY `component` (`component`),
-  KEY `loccode` (`loccode`),
-  KEY `contractref` (`contractref`),
-  KEY `workcentreadded` (`workcentreadded`),
-  KEY `workcentreadded_2` (`workcentreadded`),
-  CONSTRAINT `contractbom_ibfk_1` FOREIGN KEY (`workcentreadded`) REFERENCES `workcentres` (`code`),
-  CONSTRAINT `contractbom_ibfk_2` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`),
-  CONSTRAINT `contractbom_ibfk_3` FOREIGN KEY (`component`) REFERENCES `stockmaster` (`stockid`)
+  KEY `Component` (`component`),
+  KEY `LocCode` (`loccode`),
+  KEY `ContractRef` (`contractref`),
+  KEY `WorkCentreAdded` (`workcentreadded`),
+  KEY `WorkCentreAdded_2` (`workcentreadded`),
+  CONSTRAINT `contractbom_ibfk_1` FOREIGN KEY (`workcentreadded`) REFERENCES `workcentres` (`Code`),
+  CONSTRAINT `contractbom_ibfk_2` FOREIGN KEY (`loccode`) REFERENCES `locations` (`LocCode`),
+  CONSTRAINT `contractbom_ibfk_3` FOREIGN KEY (`component`) REFERENCES `stockmaster` (`StockID`)
 ) TYPE=InnoDB;
 
 --
@@ -255,8 +257,8 @@ CREATE TABLE `contractreqts` (
   `quantity` double(16,4) NOT NULL default '1.0000',
   `priceperunit` decimal(20,4) NOT NULL default '0.0000',
   PRIMARY KEY  (`contractreqid`),
-  KEY `contract` (`contract`),
-  CONSTRAINT `contractreqts_ibfk_1` FOREIGN KEY (`contract`) REFERENCES `contracts` (`contractref`)
+  KEY `Contract` (`contract`),
+  CONSTRAINT `contractreqts_ibfk_1` FOREIGN KEY (`contract`) REFERENCES `contracts` (`ContractRef`)
 ) TYPE=InnoDB;
 
 --
@@ -268,7 +270,7 @@ CREATE TABLE `contracts` (
   `contractdescription` varchar(50) NOT NULL default '',
   `debtorno` varchar(10) NOT NULL default '',
   `branchcode` varchar(10) NOT NULL default '',
-  `status` varchar(10) NOT NULL default 'quotation',
+  `status` varchar(10) NOT NULL default 'Quotation',
   `categoryid` varchar(6) NOT NULL default '',
   `typeabbrev` char(2) NOT NULL default '',
   `orderno` int(11) NOT NULL default '0',
@@ -280,19 +282,19 @@ CREATE TABLE `contracts` (
   `quantityreqd` double(16,4) NOT NULL default '1.0000',
   `specifications` longblob NOT NULL,
   `datequoted` datetime NOT NULL default '0000-00-00 00:00:00',
-  `units` varchar(15) NOT NULL default 'each',
+  `units` varchar(15) NOT NULL default 'Each',
   `drawing` longblob NOT NULL,
   `rate` double(16,4) NOT NULL default '1.0000',
   PRIMARY KEY  (`contractref`),
-  KEY `orderno` (`orderno`),
-  KEY `categoryid` (`categoryid`),
-  KEY `status` (`status`),
-  KEY `typeabbrev` (`typeabbrev`),
-  KEY `woref` (`woref`),
-  KEY `debtorno` (`debtorno`,`branchcode`),
-  CONSTRAINT `contracts_ibfk_1` FOREIGN KEY (`debtorno`, `branchcode`) REFERENCES `custbranch` (`debtorno`, `branchcode`),
-  CONSTRAINT `contracts_ibfk_2` FOREIGN KEY (`categoryid`) REFERENCES `stockcategory` (`categoryid`),
-  CONSTRAINT `contracts_ibfk_3` FOREIGN KEY (`typeabbrev`) REFERENCES `salestypes` (`typeabbrev`)
+  KEY `OrderNo` (`orderno`),
+  KEY `CategoryID` (`categoryid`),
+  KEY `Status` (`status`),
+  KEY `TypeAbbrev` (`typeabbrev`),
+  KEY `WORef` (`woref`),
+  KEY `DebtorNo` (`debtorno`,`branchcode`),
+  CONSTRAINT `contracts_ibfk_1` FOREIGN KEY (`debtorno`, `branchcode`) REFERENCES `custbranch` (`DebtorNo`, `BranchCode`),
+  CONSTRAINT `contracts_ibfk_2` FOREIGN KEY (`categoryid`) REFERENCES `stockcategory` (`CategoryID`),
+  CONSTRAINT `contracts_ibfk_3` FOREIGN KEY (`typeabbrev`) REFERENCES `salestypes` (`TypeAbbrev`)
 ) TYPE=InnoDB;
 
 --
@@ -303,10 +305,10 @@ CREATE TABLE `currencies` (
   `currency` char(20) NOT NULL default '',
   `currabrev` char(3) NOT NULL default '',
   `country` char(50) NOT NULL default '',
-  `hundredsname` char(15) NOT NULL default 'cents',
+  `hundredsname` char(15) NOT NULL default 'Cents',
   `rate` double(16,4) NOT NULL default '1.0000',
   PRIMARY KEY  (`currabrev`),
-  KEY `country` (`country`)
+  KEY `Country` (`country`)
 ) TYPE=InnoDB;
 
 --
@@ -320,11 +322,11 @@ CREATE TABLE `custallocns` (
   `transid_allocfrom` int(11) NOT NULL default '0',
   `transid_allocto` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
-  KEY `datealloc` (`datealloc`),
-  KEY `transid_allocfrom` (`transid_allocfrom`),
-  KEY `transid_allocto` (`transid_allocto`),
-  CONSTRAINT `custallocns_ibfk_1` FOREIGN KEY (`transid_allocfrom`) REFERENCES `debtortrans` (`id`),
-  CONSTRAINT `custallocns_ibfk_2` FOREIGN KEY (`transid_allocto`) REFERENCES `debtortrans` (`id`)
+  KEY `DateAlloc` (`datealloc`),
+  KEY `TransID_AllocFrom` (`transid_allocfrom`),
+  KEY `TransID_AllocTo` (`transid_allocto`),
+  CONSTRAINT `custallocns_ibfk_1` FOREIGN KEY (`transid_allocfrom`) REFERENCES `debtortrans` (`ID`),
+  CONSTRAINT `custallocns_ibfk_2` FOREIGN KEY (`transid_allocto`) REFERENCES `debtortrans` (`ID`)
 ) TYPE=InnoDB;
 
 --
@@ -350,6 +352,7 @@ CREATE TABLE `custbranch` (
   `defaultlocation` varchar(5) NOT NULL default '',
   `taxauthority` tinyint(4) NOT NULL default '1',
   `defaultshipvia` int(11) NOT NULL default '1',
+  `deliverblind` tinyint(1) default '1',
   `disabletrans` tinyint(4) NOT NULL default '0',
   `brpostaddr1` varchar(40) NOT NULL default '',
   `brpostaddr2` varchar(40) NOT NULL default '',
@@ -357,21 +360,21 @@ CREATE TABLE `custbranch` (
   `brpostaddr4` varchar(20) NOT NULL default '',
   `custbranchcode` varchar(30) NOT NULL default '',
   PRIMARY KEY  (`branchcode`,`debtorno`),
-  KEY `branchcode` (`branchcode`),
-  KEY `brname` (`brname`),
-  KEY `debtorno` (`debtorno`),
-  KEY `salesman` (`salesman`),
-  KEY `area` (`area`),
-  KEY `area_2` (`area`),
-  KEY `defaultlocation` (`defaultlocation`),
-  KEY `taxauthority` (`taxauthority`),
-  KEY `defaultshipvia` (`defaultshipvia`),
-  CONSTRAINT `custbranch_ibfk_1` FOREIGN KEY (`debtorno`) REFERENCES `debtorsmaster` (`debtorno`),
+  KEY `BranchCode` (`branchcode`),
+  KEY `BrName` (`brname`),
+  KEY `DebtorNo` (`debtorno`),
+  KEY `Salesman` (`salesman`),
+  KEY `Area` (`area`),
+  KEY `Area_2` (`area`),
+  KEY `DefaultLocation` (`defaultlocation`),
+  KEY `TaxAuthority` (`taxauthority`),
+  KEY `DefaultShipVia` (`defaultshipvia`),
+  CONSTRAINT `custbranch_ibfk_1` FOREIGN KEY (`debtorno`) REFERENCES `debtorsmaster` (`DebtorNo`),
   CONSTRAINT `custbranch_ibfk_2` FOREIGN KEY (`area`) REFERENCES `areas` (`areacode`),
-  CONSTRAINT `custbranch_ibfk_3` FOREIGN KEY (`salesman`) REFERENCES `salesman` (`salesmancode`),
-  CONSTRAINT `custbranch_ibfk_4` FOREIGN KEY (`defaultlocation`) REFERENCES `locations` (`loccode`),
-  CONSTRAINT `custbranch_ibfk_5` FOREIGN KEY (`taxauthority`) REFERENCES `taxauthorities` (`taxid`),
-  CONSTRAINT `custbranch_ibfk_6` FOREIGN KEY (`defaultshipvia`) REFERENCES `shippers` (`shipper_id`)
+  CONSTRAINT `custbranch_ibfk_3` FOREIGN KEY (`salesman`) REFERENCES `salesman` (`SalesmanCode`),
+  CONSTRAINT `custbranch_ibfk_4` FOREIGN KEY (`defaultlocation`) REFERENCES `locations` (`LocCode`),
+  CONSTRAINT `custbranch_ibfk_5` FOREIGN KEY (`taxauthority`) REFERENCES `taxauthorities` (`TaxID`),
+  CONSTRAINT `custbranch_ibfk_6` FOREIGN KEY (`defaultshipvia`) REFERENCES `shippers` (`Shipper_ID`)
 ) TYPE=InnoDB;
 
 --
@@ -395,7 +398,6 @@ CREATE TABLE `debtorsmaster` (
   `lastpaid` double(16,4) NOT NULL default '0.0000',
   `lastpaiddate` datetime default NULL,
   `creditlimit` double NOT NULL default '1000',
-  `taxref` varchar(20) NOT NULL default '',
   `invaddrbranch` tinyint(4) NOT NULL default '0',
   `discountcode` char(2) NOT NULL default '',
   `ediinvoices` tinyint(4) NOT NULL default '0',
@@ -405,18 +407,19 @@ CREATE TABLE `debtorsmaster` (
   `ediaddress` varchar(50) NOT NULL default '',
   `ediserveruser` varchar(20) NOT NULL default '',
   `ediserverpwd` varchar(20) NOT NULL default '',
+  `taxref` varchar(20) NOT NULL default '',
   PRIMARY KEY  (`debtorno`),
-  KEY `currency` (`currcode`),
-  KEY `holdreason` (`holdreason`),
-  KEY `name` (`name`),
-  KEY `paymentterms` (`paymentterms`),
-  KEY `salestype` (`salestype`),
-  KEY `ediinvoices` (`ediinvoices`),
-  KEY `ediorders` (`ediorders`),
-  CONSTRAINT `debtorsmaster_ibfk_1` FOREIGN KEY (`holdreason`) REFERENCES `holdreasons` (`reasoncode`),
+  KEY `Currency` (`currcode`),
+  KEY `HoldReason` (`holdreason`),
+  KEY `Name` (`name`),
+  KEY `PaymentTerms` (`paymentterms`),
+  KEY `SalesType` (`salestype`),
+  KEY `EDIInvoices` (`ediinvoices`),
+  KEY `EDIOrders` (`ediorders`),
+  CONSTRAINT `debtorsmaster_ibfk_1` FOREIGN KEY (`holdreason`) REFERENCES `holdreasons` (`ReasonCode`),
   CONSTRAINT `debtorsmaster_ibfk_2` FOREIGN KEY (`currcode`) REFERENCES `currencies` (`currabrev`),
-  CONSTRAINT `debtorsmaster_ibfk_3` FOREIGN KEY (`paymentterms`) REFERENCES `paymentterms` (`termsindicator`),
-  CONSTRAINT `debtorsmaster_ibfk_4` FOREIGN KEY (`salestype`) REFERENCES `salestypes` (`typeabbrev`)
+  CONSTRAINT `debtorsmaster_ibfk_3` FOREIGN KEY (`paymentterms`) REFERENCES `paymentterms` (`TermsIndicator`),
+  CONSTRAINT `debtorsmaster_ibfk_4` FOREIGN KEY (`salestype`) REFERENCES `salestypes` (`TypeAbbrev`)
 ) TYPE=InnoDB;
 
 --
@@ -447,19 +450,19 @@ CREATE TABLE `debtortrans` (
   `edisent` tinyint(4) NOT NULL default '0',
   `consignment` varchar(15) NOT NULL default '',
   PRIMARY KEY  (`id`),
-  KEY `debtorno` (`debtorno`,`branchcode`),
-  KEY `order_` (`order_`),
-  KEY `prd` (`prd`),
-  KEY `tpe` (`tpe`),
-  KEY `type` (`type`),
-  KEY `settled` (`settled`),
-  KEY `trandate` (`trandate`),
-  KEY `transno` (`transno`),
-  KEY `type_2` (`type`,`transno`),
-  KEY `edisent` (`edisent`),
+  KEY `DebtorNo` (`debtorno`,`branchcode`),
+  KEY `Order_` (`order_`),
+  KEY `Prd` (`prd`),
+  KEY `Tpe` (`tpe`),
+  KEY `Type` (`type`),
+  KEY `Settled` (`settled`),
+  KEY `TranDate` (`trandate`),
+  KEY `TransNo` (`transno`),
+  KEY `Type_2` (`type`,`transno`),
+  KEY `EDISent` (`edisent`),
   CONSTRAINT `debtortrans_ibfk_1` FOREIGN KEY (`debtorno`) REFERENCES `custbranch` (`debtorno`),
-  CONSTRAINT `debtortrans_ibfk_2` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
-  CONSTRAINT `debtortrans_ibfk_3` FOREIGN KEY (`prd`) REFERENCES `periods` (`periodno`)
+  CONSTRAINT `debtortrans_ibfk_2` FOREIGN KEY (`type`) REFERENCES `systypes` (`TypeID`),
+  CONSTRAINT `debtortrans_ibfk_3` FOREIGN KEY (`prd`) REFERENCES `periods` (`PeriodNo`)
 ) TYPE=InnoDB;
 
 --
@@ -472,10 +475,10 @@ CREATE TABLE `discountmatrix` (
   `quantitybreak` int(11) NOT NULL default '1',
   `discountrate` double(16,4) NOT NULL default '0.0000',
   PRIMARY KEY  (`salestype`,`discountcategory`,`quantitybreak`),
-  KEY `quantitybreak` (`quantitybreak`),
-  KEY `discountcategory` (`discountcategory`),
-  KEY `salestype` (`salestype`),
-  CONSTRAINT `discountmatrix_ibfk_1` FOREIGN KEY (`salestype`) REFERENCES `salestypes` (`typeabbrev`)
+  KEY `QuantityBreak` (`quantitybreak`),
+  KEY `DiscountCategory` (`discountcategory`),
+  KEY `SalesType` (`salestype`),
+  CONSTRAINT `discountmatrix_ibfk_1` FOREIGN KEY (`salestype`) REFERENCES `salestypes` (`TypeAbbrev`)
 ) TYPE=InnoDB;
 
 --
@@ -499,8 +502,8 @@ CREATE TABLE `edi_orders_segs` (
   `seggroup` tinyint(4) NOT NULL default '0',
   `maxoccur` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
-  KEY `segtag` (`segtag`),
-  KEY `segno` (`seggroup`)
+  KEY `SegTag` (`segtag`),
+  KEY `SegNo` (`seggroup`)
 ) TYPE=InnoDB;
 
 --
@@ -513,10 +516,10 @@ CREATE TABLE `ediitemmapping` (
   `stockid` varchar(20) NOT NULL default '',
   `partnerstockid` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`supporcust`,`partnercode`,`stockid`),
-  KEY `partnercode` (`partnercode`),
-  KEY `stockid` (`stockid`),
-  KEY `partnerstockid` (`partnerstockid`),
-  KEY `supporcust` (`supporcust`)
+  KEY `PartnerCode` (`partnercode`),
+  KEY `StockID` (`stockid`),
+  KEY `PartnerStockID` (`partnerstockid`),
+  KEY `SuppOrCust` (`supporcust`)
 ) TYPE=InnoDB;
 
 --
@@ -531,8 +534,8 @@ CREATE TABLE `edimessageformat` (
   `sequenceno` int(11) NOT NULL default '0',
   `linetext` varchar(70) NOT NULL default '',
   PRIMARY KEY  (`id`),
-  UNIQUE KEY `partnercode` (`partnercode`,`messagetype`,`sequenceno`),
-  KEY `section` (`section`)
+  UNIQUE KEY `PartnerCode` (`partnercode`,`messagetype`,`sequenceno`),
+  KEY `Section` (`section`)
 ) TYPE=InnoDB;
 
 --
@@ -551,12 +554,12 @@ CREATE TABLE `freightcosts` (
   `fixedprice` double(16,2) NOT NULL default '0.00',
   `minimumchg` double(16,2) NOT NULL default '0.00',
   PRIMARY KEY  (`shipcostfromid`),
-  KEY `destination` (`destination`),
-  KEY `locationfrom` (`locationfrom`),
-  KEY `shipperid` (`shipperid`),
-  KEY `destination_2` (`destination`,`locationfrom`,`shipperid`),
-  CONSTRAINT `freightcosts_ibfk_1` FOREIGN KEY (`locationfrom`) REFERENCES `locations` (`loccode`),
-  CONSTRAINT `freightcosts_ibfk_2` FOREIGN KEY (`shipperid`) REFERENCES `shippers` (`shipper_id`)
+  KEY `Destination` (`destination`),
+  KEY `LocationFrom` (`locationfrom`),
+  KEY `ShipperID` (`shipperid`),
+  KEY `Destination_2` (`destination`,`locationfrom`,`shipperid`),
+  CONSTRAINT `freightcosts_ibfk_1` FOREIGN KEY (`locationfrom`) REFERENCES `locations` (`LocCode`),
+  CONSTRAINT `freightcosts_ibfk_2` FOREIGN KEY (`shipperid`) REFERENCES `shippers` (`Shipper_ID`)
 ) TYPE=InnoDB;
 
 --
@@ -576,17 +579,17 @@ CREATE TABLE `gltrans` (
   `posted` tinyint(4) NOT NULL default '0',
   `jobref` varchar(20) NOT NULL default '',
   PRIMARY KEY  (`counterindex`),
-  KEY `account` (`account`),
-  KEY `chequeno` (`chequeno`),
-  KEY `periodno` (`periodno`),
-  KEY `posted` (`posted`),
-  KEY `trandate` (`trandate`),
-  KEY `typeno` (`typeno`),
-  KEY `type_and_number` (`type`,`typeno`),
-  KEY `jobref` (`jobref`),
+  KEY `Account` (`account`),
+  KEY `ChequeNo` (`chequeno`),
+  KEY `PeriodNo` (`periodno`),
+  KEY `Posted` (`posted`),
+  KEY `TranDate` (`trandate`),
+  KEY `TypeNo` (`typeno`),
+  KEY `Type_and_Number` (`type`,`typeno`),
+  KEY `JobRef` (`jobref`),
   CONSTRAINT `gltrans_ibfk_1` FOREIGN KEY (`account`) REFERENCES `chartmaster` (`accountcode`),
-  CONSTRAINT `gltrans_ibfk_2` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
-  CONSTRAINT `gltrans_ibfk_3` FOREIGN KEY (`periodno`) REFERENCES `periods` (`periodno`)
+  CONSTRAINT `gltrans_ibfk_2` FOREIGN KEY (`type`) REFERENCES `systypes` (`TypeID`),
+  CONSTRAINT `gltrans_ibfk_3` FOREIGN KEY (`periodno`) REFERENCES `periods` (`PeriodNo`)
 ) TYPE=InnoDB;
 
 --
@@ -604,12 +607,12 @@ CREATE TABLE `grns` (
   `quantityinv` double(16,4) NOT NULL default '0.0000',
   `supplierid` varchar(10) NOT NULL default '',
   PRIMARY KEY  (`grnno`),
-  KEY `deliverydate` (`deliverydate`),
-  KEY `itemcode` (`itemcode`),
-  KEY `podetailitem` (`podetailitem`),
-  KEY `supplierid` (`supplierid`),
-  CONSTRAINT `grns_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `suppliers` (`supplierid`),
-  CONSTRAINT `grns_ibfk_2` FOREIGN KEY (`podetailitem`) REFERENCES `purchorderdetails` (`podetailitem`)
+  KEY `DeliveryDate` (`deliverydate`),
+  KEY `ItemCode` (`itemcode`),
+  KEY `PODetailItem` (`podetailitem`),
+  KEY `SupplierID` (`supplierid`),
+  CONSTRAINT `grns_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `suppliers` (`SupplierID`),
+  CONSTRAINT `grns_ibfk_2` FOREIGN KEY (`podetailitem`) REFERENCES `purchorderdetails` (`PODetailItem`)
 ) TYPE=InnoDB;
 
 --
@@ -621,8 +624,8 @@ CREATE TABLE `holdreasons` (
   `reasondescription` char(30) NOT NULL default '',
   `dissallowinvoices` tinyint(4) NOT NULL default '-1',
   PRIMARY KEY  (`reasoncode`),
-  KEY `reasoncode` (`reasoncode`),
-  KEY `reasondescription` (`reasondescription`)
+  KEY `ReasonCode` (`reasoncode`),
+  KEY `ReasonDescription` (`reasondescription`)
 ) TYPE=InnoDB;
 
 --
@@ -671,9 +674,9 @@ CREATE TABLE `locstock` (
   `quantity` double(16,1) NOT NULL default '0.0',
   `reorderlevel` bigint(20) NOT NULL default '0',
   PRIMARY KEY  (`loccode`,`stockid`),
-  KEY `stockid` (`stockid`),
+  KEY `StockID` (`stockid`),
   CONSTRAINT `locstock_ibfk_1` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`),
-  CONSTRAINT `locstock_ibfk_2` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`)
+  CONSTRAINT `locstock_ibfk_2` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`StockID`)
 ) TYPE=InnoDB;
 
 --
@@ -689,14 +692,14 @@ CREATE TABLE `loctransfers` (
   `recdate` date NOT NULL default '0000-00-00',
   `shiploc` varchar(7) NOT NULL default '',
   `recloc` varchar(7) NOT NULL default '',
-  KEY `reference` (`reference`,`stockid`),
-  KEY `shiploc` (`shiploc`),
-  KEY `recloc` (`recloc`),
-  KEY `stockid` (`stockid`),
+  KEY `Reference` (`reference`,`stockid`),
+  KEY `ShipLoc` (`shiploc`),
+  KEY `RecLoc` (`recloc`),
+  KEY `StockID` (`stockid`),
   CONSTRAINT `loctransfers_ibfk_1` FOREIGN KEY (`shiploc`) REFERENCES `locations` (`loccode`),
   CONSTRAINT `loctransfers_ibfk_2` FOREIGN KEY (`recloc`) REFERENCES `locations` (`loccode`),
-  CONSTRAINT `loctransfers_ibfk_3` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`)
-) TYPE=InnoDB COMMENT='stores shipments to and from locations';
+  CONSTRAINT `loctransfers_ibfk_3` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`StockID`)
+) TYPE=InnoDB COMMENT='Stores Shipments To And From Locations';
 
 --
 -- Table structure for table `orderdeliverydifferenceslog`
@@ -709,15 +712,15 @@ CREATE TABLE `orderdeliverydifferenceslog` (
   `quantitydiff` double(16,4) NOT NULL default '0.0000',
   `debtorno` varchar(10) NOT NULL default '',
   `branch` varchar(10) NOT NULL default '',
-  `can_or_bo` char(3) NOT NULL default 'can',
+  `can_or_bo` char(3) NOT NULL default 'CAN',
   PRIMARY KEY  (`orderno`,`invoiceno`,`stockid`),
-  KEY `stockid` (`stockid`),
-  KEY `debtorno` (`debtorno`,`branch`),
-  KEY `can_or_bo` (`can_or_bo`),
-  KEY `orderno` (`orderno`),
-  CONSTRAINT `orderdeliverydifferenceslog_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  KEY `StockID` (`stockid`),
+  KEY `DebtorNo` (`debtorno`,`branch`),
+  KEY `Can_or_BO` (`can_or_bo`),
+  KEY `OrderNo` (`orderno`),
+  CONSTRAINT `orderdeliverydifferenceslog_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`StockID`),
   CONSTRAINT `orderdeliverydifferenceslog_ibfk_2` FOREIGN KEY (`debtorno`, `branch`) REFERENCES `custbranch` (`debtorno`, `branchcode`),
-  CONSTRAINT `orderdeliverydifferenceslog_ibfk_3` FOREIGN KEY (`orderno`) REFERENCES `salesorders` (`orderno`)
+  CONSTRAINT `orderdeliverydifferenceslog_ibfk_3` FOREIGN KEY (`orderno`) REFERENCES `salesorders` (`OrderNo`)
 ) TYPE=InnoDB;
 
 --
@@ -730,7 +733,7 @@ CREATE TABLE `paymentmethods` (
   `paymenttype` int(11) NOT NULL default '1',
   `receipttype` int(11) NOT NULL default '1',
   PRIMARY KEY  (`paymentid`)
-) TYPE=MyISAM;
+) TYPE=InnoDB;
 
 --
 -- Table structure for table `paymentterms`
@@ -742,8 +745,8 @@ CREATE TABLE `paymentterms` (
   `daysbeforedue` smallint(6) NOT NULL default '0',
   `dayinfollowingmonth` smallint(6) NOT NULL default '0',
   PRIMARY KEY  (`termsindicator`),
-  KEY `daysbeforedue` (`daysbeforedue`),
-  KEY `dayinfollowingmonth` (`dayinfollowingmonth`)
+  KEY `DaysBeforeDue` (`daysbeforedue`),
+  KEY `DayInFollowingMonth` (`dayinfollowingmonth`)
 ) TYPE=InnoDB;
 
 --
@@ -754,7 +757,7 @@ CREATE TABLE `periods` (
   `periodno` smallint(6) NOT NULL default '0',
   `lastdate_in_period` date NOT NULL default '0000-00-00',
   PRIMARY KEY  (`periodno`),
-  KEY `lastdate_in_period` (`lastdate_in_period`)
+  KEY `LastDate_in_Period` (`lastdate_in_period`)
 ) TYPE=InnoDB;
 
 --
@@ -769,13 +772,13 @@ CREATE TABLE `prices` (
   `price` decimal(20,4) NOT NULL default '0.0000',
   `branchcode` varchar(10) NOT NULL default '',
   PRIMARY KEY  (`stockid`,`typeabbrev`,`currabrev`,`debtorno`),
-  KEY `currabrev` (`currabrev`),
-  KEY `debtorno` (`debtorno`),
-  KEY `stockid` (`stockid`),
-  KEY `typeabbrev` (`typeabbrev`),
-  CONSTRAINT `prices_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  KEY `CurrAbrev` (`currabrev`),
+  KEY `DebtorNo` (`debtorno`),
+  KEY `StockID` (`stockid`),
+  KEY `TypeAbbrev` (`typeabbrev`),
+  CONSTRAINT `prices_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`StockID`),
   CONSTRAINT `prices_ibfk_2` FOREIGN KEY (`currabrev`) REFERENCES `currencies` (`currabrev`),
-  CONSTRAINT `prices_ibfk_3` FOREIGN KEY (`typeabbrev`) REFERENCES `salestypes` (`typeabbrev`)
+  CONSTRAINT `prices_ibfk_3` FOREIGN KEY (`typeabbrev`) REFERENCES `salestypes` (`TypeAbbrev`)
 ) TYPE=InnoDB;
 
 --
@@ -792,11 +795,11 @@ CREATE TABLE `purchdata` (
   `leadtime` smallint(6) NOT NULL default '1',
   `preferred` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`supplierno`,`stockid`),
-  KEY `stockid` (`stockid`),
-  KEY `supplierno` (`supplierno`),
-  KEY `preferred` (`preferred`),
-  CONSTRAINT `purchdata_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
-  CONSTRAINT `purchdata_ibfk_2` FOREIGN KEY (`supplierno`) REFERENCES `suppliers` (`supplierid`)
+  KEY `StockID` (`stockid`),
+  KEY `SupplierNo` (`supplierno`),
+  KEY `Preferred` (`preferred`),
+  CONSTRAINT `purchdata_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`StockID`),
+  CONSTRAINT `purchdata_ibfk_2` FOREIGN KEY (`supplierno`) REFERENCES `suppliers` (`SupplierID`)
 ) TYPE=InnoDB;
 
 --
@@ -820,14 +823,14 @@ CREATE TABLE `purchorderdetails` (
   `jobref` varchar(20) NOT NULL default '',
   `completed` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`podetailitem`),
-  KEY `deliverydate` (`deliverydate`),
-  KEY `glcode` (`glcode`),
-  KEY `itemcode` (`itemcode`),
-  KEY `jobref` (`jobref`),
-  KEY `orderno` (`orderno`),
-  KEY `shiptref` (`shiptref`),
-  KEY `completed` (`completed`),
-  CONSTRAINT `purchorderdetails_ibfk_1` FOREIGN KEY (`orderno`) REFERENCES `purchorders` (`orderno`)
+  KEY `DeliveryDate` (`deliverydate`),
+  KEY `GLCode` (`glcode`),
+  KEY `ItemCode` (`itemcode`),
+  KEY `JobRef` (`jobref`),
+  KEY `OrderNo` (`orderno`),
+  KEY `ShiptRef` (`shiptref`),
+  KEY `Completed` (`completed`),
+  CONSTRAINT `purchorderdetails_ibfk_1` FOREIGN KEY (`orderno`) REFERENCES `purchorders` (`OrderNo`)
 ) TYPE=InnoDB;
 
 --
@@ -850,11 +853,11 @@ CREATE TABLE `purchorders` (
   `deladd3` varchar(40) NOT NULL default '',
   `deladd4` varchar(40) NOT NULL default '',
   PRIMARY KEY  (`orderno`),
-  KEY `orddate` (`orddate`),
-  KEY `supplierno` (`supplierno`),
-  KEY `intostocklocation` (`intostocklocation`),
-  KEY `allowprintpo` (`allowprint`),
-  CONSTRAINT `purchorders_ibfk_1` FOREIGN KEY (`supplierno`) REFERENCES `suppliers` (`supplierid`),
+  KEY `OrdDate` (`orddate`),
+  KEY `SupplierNo` (`supplierno`),
+  KEY `IntoStockLocation` (`intostocklocation`),
+  KEY `AllowPrintPO` (`allowprint`),
+  CONSTRAINT `purchorders_ibfk_1` FOREIGN KEY (`supplierno`) REFERENCES `suppliers` (`SupplierID`),
   CONSTRAINT `purchorders_ibfk_2` FOREIGN KEY (`intostocklocation`) REFERENCES `locations` (`loccode`)
 ) TYPE=InnoDB;
 
@@ -882,17 +885,16 @@ CREATE TABLE `recurringsalesorders` (
   `freightcost` double NOT NULL default '0',
   `fromstkloc` varchar(5) NOT NULL default '',
   `lastrecurrence` date NOT NULL default '0000-00-00',
-  `frequency` tinyint(4) NOT NULL default '0',
   `stopdate` date NOT NULL default '0000-00-00',
-  `autoinvoice` int(11) NOT NULL default '0',
+  `frequency` tinyint(4) NOT NULL default '1',
+  `autoinvoice` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`recurrorderno`),
   KEY `debtorno` (`debtorno`),
   KEY `orddate` (`orddate`),
   KEY `ordertype` (`ordertype`),
   KEY `locationindex` (`fromstkloc`),
   KEY `branchcode` (`branchcode`,`debtorno`),
-  KEY `shipvia` (`shipvia`),
-  CONSTRAINT `recurringsalesorders_ibfk_2` FOREIGN KEY (`shipvia`) REFERENCES `shippers` (`shipper_id`)
+  CONSTRAINT `recurringsalesorders_ibfk_1` FOREIGN KEY (`branchcode`, `debtorno`) REFERENCES `custbranch` (`branchcode`, `debtorno`)
 ) TYPE=InnoDB;
 
 --
@@ -907,9 +909,10 @@ CREATE TABLE `recurrsalesorderdetails` (
   `discountpercent` double(16,4) NOT NULL default '0.0000',
   `narrative` text NOT NULL,
   PRIMARY KEY  (`recurrorderno`,`stkcode`),
-  KEY `recurrorderno` (`recurrorderno`),
+  KEY `orderno` (`recurrorderno`),
   KEY `stkcode` (`stkcode`),
-  CONSTRAINT `reccursalesorderdetails_ibfk_2` FOREIGN KEY (`stkcode`) REFERENCES `stockmaster` (`stockid`)
+  CONSTRAINT `recurrsalesorderdetails_ibfk_1` FOREIGN KEY (`recurrorderno`) REFERENCES `recurringsalesorders` (`recurrorderno`),
+  CONSTRAINT `recurrsalesorderdetails_ibfk_2` FOREIGN KEY (`stkcode`) REFERENCES `stockmaster` (`stockid`)
 ) TYPE=InnoDB;
 
 --
@@ -929,10 +932,10 @@ CREATE TABLE `reportcolumns` (
   `coldenominator` tinyint(4) default NULL,
   `calcoperator` char(1) default NULL,
   `budgetoractual` tinyint(1) NOT NULL default '0',
-  `valformat` char(1) NOT NULL default 'n',
+  `valformat` char(1) NOT NULL default 'N',
   `constant` double NOT NULL default '0',
   PRIMARY KEY  (`reportid`,`colno`),
-  CONSTRAINT `reportcolumns_ibfk_1` FOREIGN KEY (`reportid`) REFERENCES `reportheaders` (`reportid`)
+  CONSTRAINT `reportcolumns_ibfk_1` FOREIGN KEY (`reportid`) REFERENCES `reportheaders` (`ReportID`)
 ) TYPE=InnoDB;
 
 --
@@ -959,7 +962,7 @@ CREATE TABLE `reportheaders` (
   `upper4` varchar(10) NOT NULL default '',
   `lower4` varchar(10) NOT NULL default '',
   PRIMARY KEY  (`reportid`),
-  KEY `reportheading` (`reportheading`)
+  KEY `ReportHeading` (`reportheading`)
 ) TYPE=InnoDB;
 
 --
@@ -982,15 +985,15 @@ CREATE TABLE `salesanalysis` (
   `stkcategory` varchar(6) NOT NULL default '',
   `id` int(11) NOT NULL auto_increment,
   PRIMARY KEY  (`id`),
-  KEY `custbranch` (`custbranch`),
-  KEY `cust` (`cust`),
-  KEY `periodno` (`periodno`),
-  KEY `stkcategory` (`stkcategory`),
-  KEY `stockid` (`stockid`),
-  KEY `typeabbrev` (`typeabbrev`),
-  KEY `area` (`area`),
-  KEY `budgetoractual` (`budgetoractual`),
-  KEY `salesperson` (`salesperson`),
+  KEY `CustBranch` (`custbranch`),
+  KEY `Cust` (`cust`),
+  KEY `PeriodNo` (`periodno`),
+  KEY `StkCategory` (`stkcategory`),
+  KEY `StockID` (`stockid`),
+  KEY `TypeAbbrev` (`typeabbrev`),
+  KEY `Area` (`area`),
+  KEY `BudgetOrActual` (`budgetoractual`),
+  KEY `Salesperson` (`salesperson`),
   CONSTRAINT `salesanalysis_ibfk_1` FOREIGN KEY (`periodno`) REFERENCES `periods` (`periodno`)
 ) TYPE=InnoDB;
 
@@ -1001,7 +1004,7 @@ CREATE TABLE `salesanalysis` (
 CREATE TABLE `salescat` (
   `salescatid` tinyint(4) NOT NULL auto_increment,
   `parentcatid` tinyint(4) default NULL,
-  `salescatname` varchar(20) default NULL,
+  `salescatname` varchar(30) default NULL,
   PRIMARY KEY  (`salescatid`)
 ) TYPE=InnoDB;
 
@@ -1029,12 +1032,12 @@ CREATE TABLE `salesglpostings` (
   `stkcat` varchar(6) NOT NULL default '',
   `discountglcode` int(11) NOT NULL default '0',
   `salesglcode` int(11) NOT NULL default '0',
-  `salestype` char(2) NOT NULL default 'an',
+  `salestype` char(2) NOT NULL default 'AN',
   PRIMARY KEY  (`id`),
-  UNIQUE KEY `area_stkcat` (`area`,`stkcat`,`salestype`),
-  KEY `area` (`area`),
-  KEY `stkcat` (`stkcat`),
-  KEY `salestype` (`salestype`)
+  UNIQUE KEY `Area_StkCat` (`area`,`stkcat`,`salestype`),
+  KEY `Area` (`area`),
+  KEY `StkCat` (`stkcat`),
+  KEY `SalesType` (`salestype`)
 ) TYPE=InnoDB;
 
 --
@@ -1068,11 +1071,11 @@ CREATE TABLE `salesorderdetails` (
   `completed` tinyint(1) NOT NULL default '0',
   `narrative` text NOT NULL,
   PRIMARY KEY  (`orderno`,`stkcode`),
-  KEY `orderno` (`orderno`),
-  KEY `stkcode` (`stkcode`),
-  KEY `completed` (`completed`),
-  CONSTRAINT `salesorderdetails_ibfk_1` FOREIGN KEY (`orderno`) REFERENCES `salesorders` (`orderno`),
-  CONSTRAINT `salesorderdetails_ibfk_2` FOREIGN KEY (`stkcode`) REFERENCES `stockmaster` (`stockid`)
+  KEY `OrderNo` (`orderno`),
+  KEY `StkCode` (`stkcode`),
+  KEY `Completed` (`completed`),
+  CONSTRAINT `salesorderdetails_ibfk_1` FOREIGN KEY (`orderno`) REFERENCES `salesorders` (`OrderNo`),
+  CONSTRAINT `salesorderdetails_ibfk_2` FOREIGN KEY (`stkcode`) REFERENCES `stockmaster` (`StockID`)
 ) TYPE=InnoDB;
 
 --
@@ -1096,6 +1099,7 @@ CREATE TABLE `salesorders` (
   `contactphone` varchar(25) default NULL,
   `contactemail` varchar(25) default NULL,
   `deliverto` varchar(40) NOT NULL default '',
+  `deliverblind` tinyint(1) default '1',
   `freightcost` double NOT NULL default '0',
   `fromstkloc` varchar(5) NOT NULL default '',
   `deliverydate` date NOT NULL default '0000-00-00',
@@ -1103,16 +1107,15 @@ CREATE TABLE `salesorders` (
   `datepackingslipprinted` date NOT NULL default '0000-00-00',
   `quotation` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`orderno`),
-  KEY `debtorno` (`debtorno`),
-  KEY `orddate` (`orddate`),
-  KEY `ordertype` (`ordertype`),
-  KEY `locationindex` (`fromstkloc`),
-  KEY `branchcode` (`branchcode`,`debtorno`),
-  KEY `shipvia` (`shipvia`),
+  KEY `DebtorNo` (`debtorno`),
+  KEY `OrdDate` (`orddate`),
+  KEY `OrderType` (`ordertype`),
+  KEY `LocationIndex` (`fromstkloc`),
+  KEY `BranchCode` (`branchcode`,`debtorno`),
+  KEY `ShipVia` (`shipvia`),
   KEY `quotation` (`quotation`),
-  CONSTRAINT `recurringsalesorders_ibfk_1` FOREIGN KEY (`branchcode`, `debtorno`) REFERENCES `custbranch` (`branchcode`, `debtorno`),
   CONSTRAINT `salesorders_ibfk_1` FOREIGN KEY (`branchcode`, `debtorno`) REFERENCES `custbranch` (`branchcode`, `debtorno`),
-  CONSTRAINT `salesorders_ibfk_2` FOREIGN KEY (`shipvia`) REFERENCES `shippers` (`shipper_id`),
+  CONSTRAINT `salesorders_ibfk_2` FOREIGN KEY (`shipvia`) REFERENCES `shippers` (`Shipper_ID`),
   CONSTRAINT `salesorders_ibfk_3` FOREIGN KEY (`fromstkloc`) REFERENCES `locations` (`loccode`)
 ) TYPE=InnoDB;
 
@@ -1124,7 +1127,7 @@ CREATE TABLE `salestypes` (
   `typeabbrev` char(2) NOT NULL default '',
   `sales_type` char(20) NOT NULL default '',
   PRIMARY KEY  (`typeabbrev`),
-  KEY `sales_type` (`sales_type`)
+  KEY `Sales_Type` (`sales_type`)
 ) TYPE=InnoDB;
 
 --
@@ -1136,8 +1139,8 @@ CREATE TABLE `scripts` (
   `filename` varchar(50) NOT NULL default '',
   `pagedescription` text NOT NULL,
   PRIMARY KEY  (`pageid`),
-  KEY `filename` (`filename`)
-) TYPE=InnoDB COMMENT='index of all scripts';
+  KEY `FileName` (`filename`)
+) TYPE=InnoDB COMMENT='Index of all scripts';
 
 --
 -- Table structure for table `securitygroups`
@@ -1147,10 +1150,10 @@ CREATE TABLE `securitygroups` (
   `secroleid` int(11) NOT NULL default '0',
   `tokenid` int(11) NOT NULL default '0',
   PRIMARY KEY  (`secroleid`,`tokenid`),
-  KEY `secgroupid` (`secroleid`),
+  KEY `secroleid` (`secroleid`),
   KEY `tokenid` (`tokenid`),
-  CONSTRAINT `securitygroups_ibfk_1` FOREIGN KEY (`secroleid`) REFERENCES `securityroles` (`secroleid`),
-  CONSTRAINT `securitygroups_ibfk_2` FOREIGN KEY (`tokenid`) REFERENCES `securitytokens` (`tokenid`)
+  CONSTRAINT `securitygroups_secroleid_fk` FOREIGN KEY (`secroleid`) REFERENCES `securityroles` (`secroleid`),
+  CONSTRAINT `securitygroups_tokenid_fk` FOREIGN KEY (`tokenid`) REFERENCES `securitytokens` (`tokenid`)
 ) TYPE=InnoDB;
 
 --
@@ -1185,12 +1188,12 @@ CREATE TABLE `shipmentcharges` (
   `stockid` varchar(20) NOT NULL default '',
   `value` double NOT NULL default '0',
   PRIMARY KEY  (`shiptchgid`),
-  KEY `transtype` (`transtype`,`transno`),
-  KEY `shiptref` (`shiptref`),
-  KEY `stockid` (`stockid`),
-  KEY `transtype_2` (`transtype`),
-  CONSTRAINT `shipmentcharges_ibfk_1` FOREIGN KEY (`shiptref`) REFERENCES `shipments` (`shiptref`),
-  CONSTRAINT `shipmentcharges_ibfk_2` FOREIGN KEY (`transtype`) REFERENCES `systypes` (`typeid`)
+  KEY `TransType` (`transtype`,`transno`),
+  KEY `ShiptRef` (`shiptref`),
+  KEY `StockID` (`stockid`),
+  KEY `TransType_2` (`transtype`),
+  CONSTRAINT `shipmentcharges_ibfk_1` FOREIGN KEY (`shiptref`) REFERENCES `shipments` (`ShiptRef`),
+  CONSTRAINT `shipmentcharges_ibfk_2` FOREIGN KEY (`transtype`) REFERENCES `systypes` (`TypeID`)
 ) TYPE=InnoDB;
 
 --
@@ -1206,11 +1209,11 @@ CREATE TABLE `shipments` (
   `supplierid` varchar(10) NOT NULL default '',
   `closed` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`shiptref`),
-  KEY `eta` (`eta`),
-  KEY `supplierid` (`supplierid`),
-  KEY `shipperref` (`voyageref`),
-  KEY `vessel` (`vessel`),
-  CONSTRAINT `shipments_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `suppliers` (`supplierid`)
+  KEY `ETA` (`eta`),
+  KEY `SupplierID` (`supplierid`),
+  KEY `ShipperRef` (`voyageref`),
+  KEY `Vessel` (`vessel`),
+  CONSTRAINT `shipments_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `suppliers` (`SupplierID`)
 ) TYPE=InnoDB;
 
 --
@@ -1231,15 +1234,15 @@ CREATE TABLE `shippers` (
 CREATE TABLE `stockcategory` (
   `categoryid` char(6) NOT NULL default '',
   `categorydescription` char(20) NOT NULL default '',
-  `stocktype` char(1) NOT NULL default 'f',
+  `stocktype` char(1) NOT NULL default 'F',
   `stockact` int(11) NOT NULL default '0',
   `adjglact` int(11) NOT NULL default '0',
   `purchpricevaract` int(11) NOT NULL default '80000',
   `materialuseagevarac` int(11) NOT NULL default '80000',
   `wipact` int(11) NOT NULL default '0',
   PRIMARY KEY  (`categoryid`),
-  KEY `categorydescription` (`categorydescription`),
-  KEY `stocktype` (`stocktype`)
+  KEY `CategoryDescription` (`categorydescription`),
+  KEY `StockType` (`stocktype`)
 ) TYPE=InnoDB;
 
 --
@@ -1251,8 +1254,8 @@ CREATE TABLE `stockcheckfreeze` (
   `loccode` varchar(5) NOT NULL default '',
   `qoh` double NOT NULL default '0',
   PRIMARY KEY  (`stockid`),
-  KEY `loccode` (`loccode`),
-  CONSTRAINT `stockcheckfreeze_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  KEY `LocCode` (`loccode`),
+  CONSTRAINT `stockcheckfreeze_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`StockID`),
   CONSTRAINT `stockcheckfreeze_ibfk_2` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`)
 ) TYPE=InnoDB;
 
@@ -1267,9 +1270,9 @@ CREATE TABLE `stockcounts` (
   `qtycounted` double NOT NULL default '0',
   `reference` varchar(20) NOT NULL default '',
   PRIMARY KEY  (`id`),
-  KEY `stockid` (`stockid`),
-  KEY `loccode` (`loccode`),
-  CONSTRAINT `stockcounts_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  KEY `StockID` (`stockid`),
+  KEY `LocCode` (`loccode`),
+  CONSTRAINT `stockcounts_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`StockID`),
   CONSTRAINT `stockcounts_ibfk_2` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`)
 ) TYPE=InnoDB;
 
@@ -1283,7 +1286,7 @@ CREATE TABLE `stockmaster` (
   `description` varchar(50) NOT NULL default '',
   `longdescription` text NOT NULL,
   `units` varchar(20) NOT NULL default 'each',
-  `mbflag` char(1) NOT NULL default 'b',
+  `mbflag` char(1) NOT NULL default 'B',
   `lastcurcostdate` date NOT NULL default '1800-01-01',
   `actualcost` decimal(20,4) NOT NULL default '0.0000',
   `lastcost` decimal(20,4) NOT NULL default '0.0000',
@@ -1302,13 +1305,13 @@ CREATE TABLE `stockmaster` (
   `serialised` tinyint(4) NOT NULL default '0',
   `decimalplaces` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`stockid`),
-  KEY `categoryid` (`categoryid`),
-  KEY `description` (`description`),
-  KEY `lastcurcostdate` (`lastcurcostdate`),
-  KEY `mbflag` (`mbflag`),
-  KEY `stockid` (`stockid`,`categoryid`),
-  KEY `controlled` (`controlled`),
-  KEY `discountcategory` (`discountcategory`),
+  KEY `CategoryID` (`categoryid`),
+  KEY `Description` (`description`),
+  KEY `LastCurCostDate` (`lastcurcostdate`),
+  KEY `MBflag` (`mbflag`),
+  KEY `StockID` (`stockid`,`categoryid`),
+  KEY `Controlled` (`controlled`),
+  KEY `DiscountCategory` (`discountcategory`),
   CONSTRAINT `stockmaster_ibfk_1` FOREIGN KEY (`categoryid`) REFERENCES `stockcategory` (`categoryid`)
 ) TYPE=InnoDB;
 
@@ -1337,18 +1340,18 @@ CREATE TABLE `stockmoves` (
   `taxrate` double NOT NULL default '0',
   `narrative` text NOT NULL,
   PRIMARY KEY  (`stkmoveno`),
-  KEY `debtorno` (`debtorno`),
-  KEY `loccode` (`loccode`),
-  KEY `prd` (`prd`),
-  KEY `stockid` (`stockid`,`loccode`),
-  KEY `stockid_2` (`stockid`),
-  KEY `trandate` (`trandate`),
-  KEY `transno` (`transno`),
-  KEY `type` (`type`),
-  KEY `show_on_inv_crds` (`show_on_inv_crds`),
-  KEY `hide` (`hidemovt`),
+  KEY `DebtorNo` (`debtorno`),
+  KEY `LocCode` (`loccode`),
+  KEY `Prd` (`prd`),
+  KEY `StockID` (`stockid`,`loccode`),
+  KEY `StockID_2` (`stockid`),
+  KEY `TranDate` (`trandate`),
+  KEY `TransNo` (`transno`),
+  KEY `Type` (`type`),
+  KEY `Show_On_Inv_Crds` (`show_on_inv_crds`),
+  KEY `Hide` (`hidemovt`),
   CONSTRAINT `stockmoves_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
-  CONSTRAINT `stockmoves_ibfk_2` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
+  CONSTRAINT `stockmoves_ibfk_2` FOREIGN KEY (`type`) REFERENCES `systypes` (`TypeID`),
   CONSTRAINT `stockmoves_ibfk_3` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`),
   CONSTRAINT `stockmoves_ibfk_4` FOREIGN KEY (`prd`) REFERENCES `periods` (`periodno`)
 ) TYPE=InnoDB;
@@ -1363,8 +1366,8 @@ CREATE TABLE `stockserialitems` (
   `serialno` varchar(30) NOT NULL default '',
   `quantity` double NOT NULL default '0',
   PRIMARY KEY  (`stockid`,`serialno`,`loccode`),
-  KEY `stockid` (`stockid`),
-  KEY `loccode` (`loccode`),
+  KEY `StockID` (`stockid`),
+  KEY `LocCode` (`loccode`),
   CONSTRAINT `stockserialitems_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
   CONSTRAINT `stockserialitems_ibfk_2` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`)
 ) TYPE=InnoDB;
@@ -1380,8 +1383,8 @@ CREATE TABLE `stockserialmoves` (
   `serialno` varchar(30) NOT NULL default '',
   `moveqty` double NOT NULL default '0',
   PRIMARY KEY  (`stkitmmoveno`),
-  KEY `stockmoveno` (`stockmoveno`),
-  KEY `stockid_sn` (`stockid`,`serialno`),
+  KEY `StockMoveNo` (`stockmoveno`),
+  KEY `StockID_SN` (`stockid`,`serialno`),
   CONSTRAINT `stockserialmoves_ibfk_1` FOREIGN KEY (`stockmoveno`) REFERENCES `stockmoves` (`stkmoveno`),
   CONSTRAINT `stockserialmoves_ibfk_2` FOREIGN KEY (`stockid`, `serialno`) REFERENCES `stockserialitems` (`stockid`, `serialno`)
 ) TYPE=InnoDB;
@@ -1397,11 +1400,11 @@ CREATE TABLE `suppallocs` (
   `transid_allocfrom` int(11) NOT NULL default '0',
   `transid_allocto` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
-  KEY `transid_allocfrom` (`transid_allocfrom`),
-  KEY `transid_allocto` (`transid_allocto`),
-  KEY `datealloc` (`datealloc`),
-  CONSTRAINT `suppallocs_ibfk_1` FOREIGN KEY (`transid_allocfrom`) REFERENCES `supptrans` (`id`),
-  CONSTRAINT `suppallocs_ibfk_2` FOREIGN KEY (`transid_allocto`) REFERENCES `supptrans` (`id`)
+  KEY `TransID_AllocFrom` (`transid_allocfrom`),
+  KEY `TransID_AllocTo` (`transid_allocto`),
+  KEY `DateAlloc` (`datealloc`),
+  CONSTRAINT `suppallocs_ibfk_1` FOREIGN KEY (`transid_allocfrom`) REFERENCES `supptrans` (`ID`),
+  CONSTRAINT `suppallocs_ibfk_2` FOREIGN KEY (`transid_allocto`) REFERENCES `supptrans` (`ID`)
 ) TYPE=InnoDB;
 
 --
@@ -1418,9 +1421,9 @@ CREATE TABLE `suppliercontacts` (
   `email` varchar(55) NOT NULL default '',
   `ordercontact` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`supplierid`,`contact`),
-  KEY `contact` (`contact`),
-  KEY `supplierid` (`supplierid`),
-  CONSTRAINT `suppliercontacts_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `suppliers` (`supplierid`)
+  KEY `Contact` (`contact`),
+  KEY `SupplierID` (`supplierid`),
+  CONSTRAINT `suppliercontacts_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `suppliers` (`SupplierID`)
 ) TYPE=InnoDB;
 
 --
@@ -1445,14 +1448,14 @@ CREATE TABLE `suppliers` (
   `remittance` tinyint(4) NOT NULL default '1',
   `taxauthority` tinyint(4) NOT NULL default '1',
   PRIMARY KEY  (`supplierid`),
-  KEY `currcode` (`currcode`),
-  KEY `paymentterms` (`paymentterms`),
-  KEY `supplierid` (`supplierid`),
-  KEY `suppname` (`suppname`),
-  KEY `taxauthority` (`taxauthority`),
+  KEY `CurrCode` (`currcode`),
+  KEY `PaymentTerms` (`paymentterms`),
+  KEY `SupplierID` (`supplierid`),
+  KEY `SuppName` (`suppname`),
+  KEY `TaxAuthority` (`taxauthority`),
   CONSTRAINT `suppliers_ibfk_1` FOREIGN KEY (`currcode`) REFERENCES `currencies` (`currabrev`),
   CONSTRAINT `suppliers_ibfk_2` FOREIGN KEY (`paymentterms`) REFERENCES `paymentterms` (`termsindicator`),
-  CONSTRAINT `suppliers_ibfk_3` FOREIGN KEY (`taxauthority`) REFERENCES `taxauthorities` (`taxid`)
+  CONSTRAINT `suppliers_ibfk_3` FOREIGN KEY (`taxauthority`) REFERENCES `taxauthorities` (`TaxID`)
 ) TYPE=InnoDB;
 
 --
@@ -1476,17 +1479,17 @@ CREATE TABLE `supptrans` (
   `hold` tinyint(4) NOT NULL default '0',
   `id` int(11) NOT NULL auto_increment,
   PRIMARY KEY  (`id`),
-  UNIQUE KEY `typetransno` (`transno`,`type`),
-  KEY `duedate` (`duedate`),
-  KEY `hold` (`hold`),
-  KEY `supplierno` (`supplierno`),
-  KEY `settled` (`settled`),
-  KEY `supplierno_2` (`supplierno`,`suppreference`),
-  KEY `suppreference` (`suppreference`),
-  KEY `trandate` (`trandate`),
-  KEY `transno` (`transno`),
-  KEY `type` (`type`),
-  CONSTRAINT `supptrans_ibfk_1` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
+  UNIQUE KEY `TypeTransNo` (`transno`,`type`),
+  KEY `DueDate` (`duedate`),
+  KEY `Hold` (`hold`),
+  KEY `SupplierNo` (`supplierno`),
+  KEY `Settled` (`settled`),
+  KEY `SupplierNo_2` (`supplierno`,`suppreference`),
+  KEY `SuppReference` (`suppreference`),
+  KEY `TranDate` (`trandate`),
+  KEY `TransNo` (`transno`),
+  KEY `Type` (`type`),
+  CONSTRAINT `supptrans_ibfk_1` FOREIGN KEY (`type`) REFERENCES `systypes` (`TypeID`),
   CONSTRAINT `supptrans_ibfk_2` FOREIGN KEY (`supplierno`) REFERENCES `suppliers` (`supplierid`)
 ) TYPE=InnoDB;
 
@@ -1499,7 +1502,7 @@ CREATE TABLE `systypes` (
   `typename` char(50) NOT NULL default '',
   `typeno` int(11) NOT NULL default '1',
   PRIMARY KEY  (`typeid`),
-  KEY `typeno` (`typeno`)
+  KEY `TypeNo` (`typeno`)
 ) TYPE=InnoDB;
 
 --
@@ -1512,10 +1515,10 @@ CREATE TABLE `taxauthlevels` (
   `level` tinyint(4) NOT NULL default '0',
   `taxrate` double NOT NULL default '0',
   PRIMARY KEY  (`taxauthority`,`dispatchtaxauthority`,`level`),
-  KEY `taxauthority` (`taxauthority`),
-  KEY `dispatchtaxauthority` (`dispatchtaxauthority`),
-  CONSTRAINT `taxauthlevels_ibfk_1` FOREIGN KEY (`taxauthority`) REFERENCES `taxauthorities` (`taxid`),
-  CONSTRAINT `taxauthlevels_ibfk_2` FOREIGN KEY (`dispatchtaxauthority`) REFERENCES `taxauthorities` (`taxid`)
+  KEY `TaxAuthority` (`taxauthority`),
+  KEY `DispatchTaxAuthority` (`dispatchtaxauthority`),
+  CONSTRAINT `taxauthlevels_ibfk_1` FOREIGN KEY (`taxauthority`) REFERENCES `taxauthorities` (`TaxID`),
+  CONSTRAINT `taxauthlevels_ibfk_2` FOREIGN KEY (`dispatchtaxauthority`) REFERENCES `taxauthorities` (`TaxID`)
 ) TYPE=InnoDB;
 
 --
@@ -1532,8 +1535,8 @@ CREATE TABLE `taxauthorities` (
   `bankacc` varchar(50) NOT NULL default '',
   `bankswift` varchar(30) NOT NULL default '',
   PRIMARY KEY  (`taxid`),
-  KEY `taxglcode` (`taxglcode`),
-  KEY `purchtaxglaccount` (`purchtaxglaccount`),
+  KEY `TaxGLCode` (`taxglcode`),
+  KEY `PurchTaxGLAccount` (`purchtaxglaccount`),
   CONSTRAINT `taxauthorities_ibfk_1` FOREIGN KEY (`taxglcode`) REFERENCES `chartmaster` (`accountcode`),
   CONSTRAINT `taxauthorities_ibfk_2` FOREIGN KEY (`purchtaxglaccount`) REFERENCES `chartmaster` (`accountcode`)
 ) TYPE=InnoDB;
@@ -1546,7 +1549,7 @@ CREATE TABLE `unitsofmeasure` (
   `unitid` tinyint(4) NOT NULL auto_increment,
   `unitname` varchar(15) NOT NULL default '',
   PRIMARY KEY  (`unitid`)
-) TYPE=MyISAM;
+) TYPE=InnoDB;
 
 --
 -- Table structure for table `workcentres`
@@ -1561,8 +1564,8 @@ CREATE TABLE `workcentres` (
   `overheadrecoveryact` int(11) NOT NULL default '0',
   `setuphrs` decimal(20,4) NOT NULL default '0.0000',
   PRIMARY KEY  (`code`),
-  KEY `description` (`description`),
-  KEY `location` (`location`),
+  KEY `Description` (`description`),
+  KEY `Location` (`location`),
   CONSTRAINT `workcentres_ibfk_1` FOREIGN KEY (`location`) REFERENCES `locations` (`loccode`)
 ) TYPE=InnoDB;
 
@@ -1584,11 +1587,11 @@ CREATE TABLE `worksorders` (
   `closed` tinyint(4) NOT NULL default '0',
   `released` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`woref`),
-  KEY `stockid` (`stockid`),
-  KEY `loccode` (`loccode`),
-  KEY `releaseddate` (`releaseddate`),
-  KEY `requiredby` (`requiredby`),
-  KEY `woref` (`woref`,`loccode`),
+  KEY `StockID` (`stockid`),
+  KEY `LocCode` (`loccode`),
+  KEY `ReleasedDate` (`releaseddate`),
+  KEY `RequiredBy` (`requiredby`),
+  KEY `WORef` (`woref`,`loccode`),
   CONSTRAINT `worksorders_ibfk_1` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`),
   CONSTRAINT `worksorders_ibfk_2` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`)
 ) TYPE=InnoDB;
@@ -1608,30 +1611,34 @@ CREATE TABLE `www_users` (
   `fullaccess` int(11) NOT NULL default '1',
   `lastvisitdate` datetime default NULL,
   `branchcode` varchar(10) NOT NULL default '',
-  `pagesize` varchar(20) NOT NULL default 'a4',
+  `pagesize` varchar(20) NOT NULL default 'A4',
   `modulesallowed` varchar(20) NOT NULL default '',
   `blocked` tinyint(4) NOT NULL default '0',
   `displayrecordsmax` int(11) NOT NULL default '0',
   `theme` varchar(30) NOT NULL default 'fresh',
-  `language` varchar(5) NOT NULL default 'en_gb',
+  `language` char(2) NOT NULL default 'en',
+  `pinno` varchar(30) NOT NULL default '',
+  `swipecard` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`userid`),
-  KEY `customerid` (`customerid`),
-  KEY `defaultlocation` (`defaultlocation`),
+  KEY `CustomerID` (`customerid`),
+  KEY `DefaultLocation` (`defaultlocation`),
   CONSTRAINT `www_users_ibfk_1` FOREIGN KEY (`defaultlocation`) REFERENCES `locations` (`loccode`)
 ) TYPE=InnoDB;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- MySQL dump 10.8
+-- MySQL dump 10.9
 --
 -- Host: localhost    Database: weberp
 -- ------------------------------------------------------
--- Server version	4.1.7-standard
+-- Server version	4.1.11-standard
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE="NO_AUTO_VALUE_ON_ZERO,MYSQL40" */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO,MYSQL40' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
 -- Dumping data for table `accountgroups`
@@ -1687,8 +1694,6 @@ INSERT INTO `banktrans` VALUES (42,1,18,700000,'',0,1,'2004-11-28','Cheque',-677
 INSERT INTO `banktrans` VALUES (43,22,5,700000,'GREGCA-',0,0.8,'2004-11-28','Cheque',-55.2000007629395,'GBP');
 INSERT INTO `banktrans` VALUES (44,22,6,700000,'GREGCA-',0,0.8,'2004-12-06','Cheque',-233.330001831055,'GBP');
 INSERT INTO `banktrans` VALUES (45,0,0,700000,'1 FREDBLOW',0,1,'2004-12-31','Cheque',-58.8699989318848,'');
-INSERT INTO `banktrans` VALUES (46,12,4,700000,'',0,1,'2005-01-03','Cheques',52.75,'USD');
-INSERT INTO `banktrans` VALUES (47,1,19,700000,'',0,1,'2005-01-23','Cheques',-152.949996948242,'USD');
 
 --
 -- Dumping data for table `bom`
@@ -1709,25 +1714,23 @@ INSERT INTO `bom` VALUES ('HOND9022','123','ASSEM','DEN','2003-01-29','9999-12-3
 -- Dumping data for table `chartdetails`
 --
 
-INSERT INTO `chartdetails` VALUES (1,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (1,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (1,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (1,54,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (1,55,0,-0.101181566715141,0,0);
-INSERT INTO `chartdetails` VALUES (1,56,0,56.02999868989,-0.910631537436544,0);
-INSERT INTO `chartdetails` VALUES (1,57,0,112.387499094009,503.359335660936,0);
-INSERT INTO `chartdetails` VALUES (1,58,0,0,1514.84652400017,0);
-INSERT INTO `chartdetails` VALUES (1,59,0,-109.212496948428,1514.84652400017,0);
-INSERT INTO `chartdetails` VALUES (1,60,0,0,531.934355877343,0);
-INSERT INTO `chartdetails` VALUES (1,61,0,0,531.934355877343,0);
-INSERT INTO `chartdetails` VALUES (1,62,0,0,531.934355877343,0);
-INSERT INTO `chartdetails` VALUES (1,63,0,0,531.934355877343,0);
-INSERT INTO `chartdetails` VALUES (1,64,0,0,531.934355877343,0);
-INSERT INTO `chartdetails` VALUES (1,65,0,0,531.934355877343,0);
-INSERT INTO `chartdetails` VALUES (1,66,0,0,531.934355877343,0);
-INSERT INTO `chartdetails` VALUES (1,67,0,0,531.934355877343,0);
-INSERT INTO `chartdetails` VALUES (1,68,0,0,531.934355877343,0);
-INSERT INTO `chartdetails` VALUES (100,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (1,55,0,-0.101179003715515,0,0);
+INSERT INTO `chartdetails` VALUES (1,56,0,56.0299987792969,-0.101179003715515,0);
+INSERT INTO `chartdetails` VALUES (1,57,0,112.387001037598,55.9287986755371,0);
+INSERT INTO `chartdetails` VALUES (1,58,0,0,168.315994262695,0);
+INSERT INTO `chartdetails` VALUES (1,59,0,-109.21199798584,168.315994262695,0);
+INSERT INTO `chartdetails` VALUES (1,60,0,0,59.1038017272949,0);
+INSERT INTO `chartdetails` VALUES (1,61,0,0,59.1038017272949,0);
+INSERT INTO `chartdetails` VALUES (1,62,0,0,59.1038017272949,0);
+INSERT INTO `chartdetails` VALUES (1,63,0,0,59.1038017272949,0);
+INSERT INTO `chartdetails` VALUES (1,64,0,0,59.1038017272949,0);
+INSERT INTO `chartdetails` VALUES (1,65,0,0,59.1038017272949,0);
+INSERT INTO `chartdetails` VALUES (1,66,0,0,59.1038017272949,0);
+INSERT INTO `chartdetails` VALUES (1,67,0,0,59.1038017272949,0);
+INSERT INTO `chartdetails` VALUES (1,68,0,0,59.1038017272949,0);
 INSERT INTO `chartdetails` VALUES (100,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (100,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (100,54,0,0,0,0);
@@ -1745,43 +1748,40 @@ INSERT INTO `chartdetails` VALUES (100,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (100,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (100,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (100,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (107,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (107,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (107,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (107,54,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (107,55,0,55.7500529289246,0,0);
-INSERT INTO `chartdetails` VALUES (107,56,0,-174.750402927398,501.750423431397,0);
-INSERT INTO `chartdetails` VALUES (107,57,0,-236.195099592209,-1071.00279998779,0);
-INSERT INTO `chartdetails` VALUES (107,58,0,0,-3196.75860404968,0);
-INSERT INTO `chartdetails` VALUES (107,59,0,941.009971141815,-3196.75860404968,0);
-INSERT INTO `chartdetails` VALUES (107,60,0,0,5272.33117485046,0);
-INSERT INTO `chartdetails` VALUES (107,61,0,0,5272.33117485046,0);
-INSERT INTO `chartdetails` VALUES (107,62,0,0,5272.33117485046,0);
-INSERT INTO `chartdetails` VALUES (107,63,0,0,5272.33117485046,0);
-INSERT INTO `chartdetails` VALUES (107,64,0,0,5272.33117485046,0);
-INSERT INTO `chartdetails` VALUES (107,65,0,0,5272.33117485046,0);
-INSERT INTO `chartdetails` VALUES (107,66,0,0,5272.33117485046,0);
-INSERT INTO `chartdetails` VALUES (107,67,0,0,5272.33117485046,0);
-INSERT INTO `chartdetails` VALUES (107,68,0,0,5272.33117485046,0);
-INSERT INTO `chartdetails` VALUES (112,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (107,55,0,55.75,0,0);
+INSERT INTO `chartdetails` VALUES (107,56,0,-174.75,55.75,0);
+INSERT INTO `chartdetails` VALUES (107,57,0,-236.195007324219,-119,0);
+INSERT INTO `chartdetails` VALUES (107,58,0,0,-355.195007324219,0);
+INSERT INTO `chartdetails` VALUES (107,59,0,941.010009765625,-355.195007324219,0);
+INSERT INTO `chartdetails` VALUES (107,60,0,0,585.815002441406,0);
+INSERT INTO `chartdetails` VALUES (107,61,0,0,585.815002441406,0);
+INSERT INTO `chartdetails` VALUES (107,62,0,0,585.815002441406,0);
+INSERT INTO `chartdetails` VALUES (107,63,0,0,585.815002441406,0);
+INSERT INTO `chartdetails` VALUES (107,64,0,0,585.815002441406,0);
+INSERT INTO `chartdetails` VALUES (107,65,0,0,585.815002441406,0);
+INSERT INTO `chartdetails` VALUES (107,66,0,0,585.815002441406,0);
+INSERT INTO `chartdetails` VALUES (107,67,0,0,585.815002441406,0);
+INSERT INTO `chartdetails` VALUES (107,68,0,0,585.815002441406,0);
 INSERT INTO `chartdetails` VALUES (112,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (112,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (112,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (112,55,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (112,56,0,189.75,0,0);
-INSERT INTO `chartdetails` VALUES (112,57,0,-138.250000476837,1707.75,0);
-INSERT INTO `chartdetails` VALUES (112,58,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,59,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,60,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,61,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,62,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,63,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,64,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,65,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,66,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,67,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (112,68,0,0,463.499996185303,0);
-INSERT INTO `chartdetails` VALUES (200,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (112,57,0,-138.25,189.75,0);
+INSERT INTO `chartdetails` VALUES (112,58,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,59,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,60,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,61,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,62,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,63,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,64,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,65,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,66,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,67,0,0,51.5,0);
+INSERT INTO `chartdetails` VALUES (112,68,0,0,51.5,0);
 INSERT INTO `chartdetails` VALUES (200,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (200,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (200,54,0,0,0,0);
@@ -1799,7 +1799,6 @@ INSERT INTO `chartdetails` VALUES (200,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (200,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (200,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (200,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (301,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (301,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (301,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (301,54,0,0,0,0);
@@ -1808,34 +1807,32 @@ INSERT INTO `chartdetails` VALUES (301,56,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (301,57,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (301,58,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (301,59,0,65.6900024414062,0,0);
-INSERT INTO `chartdetails` VALUES (301,60,0,0,591.210021972656,0);
-INSERT INTO `chartdetails` VALUES (301,61,0,0,591.210021972656,0);
-INSERT INTO `chartdetails` VALUES (301,62,0,0,591.210021972656,0);
-INSERT INTO `chartdetails` VALUES (301,63,0,0,591.210021972656,0);
-INSERT INTO `chartdetails` VALUES (301,64,0,0,591.210021972656,0);
-INSERT INTO `chartdetails` VALUES (301,65,0,0,591.210021972656,0);
-INSERT INTO `chartdetails` VALUES (301,66,0,0,591.210021972656,0);
-INSERT INTO `chartdetails` VALUES (301,67,0,0,591.210021972656,0);
-INSERT INTO `chartdetails` VALUES (301,68,0,0,591.210021972656,0);
-INSERT INTO `chartdetails` VALUES (10000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (301,60,0,0,65.6900024414062,0);
+INSERT INTO `chartdetails` VALUES (301,61,0,0,65.6900024414062,0);
+INSERT INTO `chartdetails` VALUES (301,62,0,0,65.6900024414062,0);
+INSERT INTO `chartdetails` VALUES (301,63,0,0,65.6900024414062,0);
+INSERT INTO `chartdetails` VALUES (301,64,0,0,65.6900024414062,0);
+INSERT INTO `chartdetails` VALUES (301,65,0,0,65.6900024414062,0);
+INSERT INTO `chartdetails` VALUES (301,66,0,0,65.6900024414062,0);
+INSERT INTO `chartdetails` VALUES (301,67,0,0,65.6900024414062,0);
+INSERT INTO `chartdetails` VALUES (301,68,0,0,65.6900024414062,0);
 INSERT INTO `chartdetails` VALUES (10000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (10000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (10000,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (10000,55,0,52.5,0,0);
-INSERT INTO `chartdetails` VALUES (10000,56,0,0,472.5,0);
-INSERT INTO `chartdetails` VALUES (10000,57,0,0,472.5,0);
-INSERT INTO `chartdetails` VALUES (10000,58,0,0,472.5,0);
-INSERT INTO `chartdetails` VALUES (10000,59,0,22,472.5,0);
-INSERT INTO `chartdetails` VALUES (10000,60,0,0,670.5,0);
-INSERT INTO `chartdetails` VALUES (10000,61,0,0,670.5,0);
-INSERT INTO `chartdetails` VALUES (10000,62,0,0,670.5,0);
-INSERT INTO `chartdetails` VALUES (10000,63,0,0,670.5,0);
-INSERT INTO `chartdetails` VALUES (10000,64,0,0,670.5,0);
-INSERT INTO `chartdetails` VALUES (10000,65,0,0,670.5,0);
-INSERT INTO `chartdetails` VALUES (10000,66,0,0,670.5,0);
-INSERT INTO `chartdetails` VALUES (10000,67,0,0,670.5,0);
-INSERT INTO `chartdetails` VALUES (10000,68,0,0,670.5,0);
-INSERT INTO `chartdetails` VALUES (11000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (10000,56,0,0,52.5,0);
+INSERT INTO `chartdetails` VALUES (10000,57,0,0,52.5,0);
+INSERT INTO `chartdetails` VALUES (10000,58,0,0,52.5,0);
+INSERT INTO `chartdetails` VALUES (10000,59,0,22,52.5,0);
+INSERT INTO `chartdetails` VALUES (10000,60,0,0,74.5,0);
+INSERT INTO `chartdetails` VALUES (10000,61,0,0,74.5,0);
+INSERT INTO `chartdetails` VALUES (10000,62,0,0,74.5,0);
+INSERT INTO `chartdetails` VALUES (10000,63,0,0,74.5,0);
+INSERT INTO `chartdetails` VALUES (10000,64,0,0,74.5,0);
+INSERT INTO `chartdetails` VALUES (10000,65,0,0,74.5,0);
+INSERT INTO `chartdetails` VALUES (10000,66,0,0,74.5,0);
+INSERT INTO `chartdetails` VALUES (10000,67,0,0,74.5,0);
+INSERT INTO `chartdetails` VALUES (10000,68,0,0,74.5,0);
 INSERT INTO `chartdetails` VALUES (11000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (11000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (11000,54,0,0,0,0);
@@ -1853,7 +1850,6 @@ INSERT INTO `chartdetails` VALUES (11000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (11000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (11000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (11000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (12000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (12000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (12000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (12000,54,0,0,0,0);
@@ -1871,7 +1867,6 @@ INSERT INTO `chartdetails` VALUES (12000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (12000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (12000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (12000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (19000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (19000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (19000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (19000,54,0,0,0,0);
@@ -1889,7 +1884,6 @@ INSERT INTO `chartdetails` VALUES (19000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (19000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (19000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (19000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (20000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (20000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (20000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (20000,54,0,0,0,0);
@@ -1898,16 +1892,15 @@ INSERT INTO `chartdetails` VALUES (20000,56,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (20000,57,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (20000,58,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (20000,59,0,109.199996948242,0,0);
-INSERT INTO `chartdetails` VALUES (20000,60,0,-21.7975006103517,982.799972534178,0);
-INSERT INTO `chartdetails` VALUES (20000,61,0,0,786.622467041013,0);
-INSERT INTO `chartdetails` VALUES (20000,62,0,0,786.622467041013,0);
-INSERT INTO `chartdetails` VALUES (20000,63,0,0,786.622467041013,0);
-INSERT INTO `chartdetails` VALUES (20000,64,0,0,786.622467041013,0);
-INSERT INTO `chartdetails` VALUES (20000,65,0,0,786.622467041013,0);
-INSERT INTO `chartdetails` VALUES (20000,66,0,0,786.622467041013,0);
-INSERT INTO `chartdetails` VALUES (20000,67,0,0,786.622467041013,0);
-INSERT INTO `chartdetails` VALUES (20000,68,0,0,786.622467041013,0);
-INSERT INTO `chartdetails` VALUES (21000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (20000,60,0,-21.7975006103516,109.199996948242,0);
+INSERT INTO `chartdetails` VALUES (20000,61,0,0,87.4024963378906,0);
+INSERT INTO `chartdetails` VALUES (20000,62,0,0,87.4024963378906,0);
+INSERT INTO `chartdetails` VALUES (20000,63,0,0,87.4024963378906,0);
+INSERT INTO `chartdetails` VALUES (20000,64,0,0,87.4024963378906,0);
+INSERT INTO `chartdetails` VALUES (20000,65,0,0,87.4024963378906,0);
+INSERT INTO `chartdetails` VALUES (20000,66,0,0,87.4024963378906,0);
+INSERT INTO `chartdetails` VALUES (20000,67,0,0,87.4024963378906,0);
+INSERT INTO `chartdetails` VALUES (20000,68,0,0,87.4024963378906,0);
 INSERT INTO `chartdetails` VALUES (21000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (21000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (21000,54,0,0,0,0);
@@ -1925,7 +1918,6 @@ INSERT INTO `chartdetails` VALUES (21000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (21000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (21000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (21000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (23400,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23400,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23400,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23400,54,0,0,0,0);
@@ -1934,16 +1926,15 @@ INSERT INTO `chartdetails` VALUES (23400,56,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23400,57,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23400,58,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23400,59,0,-5.98000001907349,0,0);
-INSERT INTO `chartdetails` VALUES (23400,60,0,1204.21002388,-53.8200001716614,0);
-INSERT INTO `chartdetails` VALUES (23400,61,0,0,10784.0701713562,0);
-INSERT INTO `chartdetails` VALUES (23400,62,0,0,10784.0701713562,0);
-INSERT INTO `chartdetails` VALUES (23400,63,0,0,10784.0701713562,0);
-INSERT INTO `chartdetails` VALUES (23400,64,0,0,10784.0701713562,0);
-INSERT INTO `chartdetails` VALUES (23400,65,0,0,10784.0701713562,0);
-INSERT INTO `chartdetails` VALUES (23400,66,0,0,10784.0701713562,0);
-INSERT INTO `chartdetails` VALUES (23400,67,0,0,10784.0701713562,0);
-INSERT INTO `chartdetails` VALUES (23400,68,0,0,10784.0701713562,0);
-INSERT INTO `chartdetails` VALUES (23500,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (23400,60,0,1204.2099609375,-5.98000001907349,0);
+INSERT INTO `chartdetails` VALUES (23400,61,0,0,1198.22998046875,0);
+INSERT INTO `chartdetails` VALUES (23400,62,0,0,1198.22998046875,0);
+INSERT INTO `chartdetails` VALUES (23400,63,0,0,1198.22998046875,0);
+INSERT INTO `chartdetails` VALUES (23400,64,0,0,1198.22998046875,0);
+INSERT INTO `chartdetails` VALUES (23400,65,0,0,1198.22998046875,0);
+INSERT INTO `chartdetails` VALUES (23400,66,0,0,1198.22998046875,0);
+INSERT INTO `chartdetails` VALUES (23400,67,0,0,1198.22998046875,0);
+INSERT INTO `chartdetails` VALUES (23400,68,0,0,1198.22998046875,0);
 INSERT INTO `chartdetails` VALUES (23500,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23500,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23500,54,0,0,0,0);
@@ -1961,7 +1952,6 @@ INSERT INTO `chartdetails` VALUES (23500,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23500,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23500,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23500,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (23600,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23600,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23600,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23600,54,0,0,0,0);
@@ -1979,7 +1969,6 @@ INSERT INTO `chartdetails` VALUES (23600,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23600,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23600,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23600,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (23700,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23700,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23700,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23700,54,0,0,0,0);
@@ -1987,17 +1976,16 @@ INSERT INTO `chartdetails` VALUES (23700,55,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23700,56,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23700,57,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (23700,58,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (23700,59,0,94.8499965667725,0,0);
-INSERT INTO `chartdetails` VALUES (23700,60,0,0,853.649971008301,0);
-INSERT INTO `chartdetails` VALUES (23700,61,0,0,853.649971008301,0);
-INSERT INTO `chartdetails` VALUES (23700,62,0,0,853.649971008301,0);
-INSERT INTO `chartdetails` VALUES (23700,63,0,0,853.649971008301,0);
-INSERT INTO `chartdetails` VALUES (23700,64,0,0,853.649971008301,0);
-INSERT INTO `chartdetails` VALUES (23700,65,0,0,853.649971008301,0);
-INSERT INTO `chartdetails` VALUES (23700,66,0,0,853.649971008301,0);
-INSERT INTO `chartdetails` VALUES (23700,67,0,0,853.649971008301,0);
-INSERT INTO `chartdetails` VALUES (23700,68,0,0,853.649971008301,0);
-INSERT INTO `chartdetails` VALUES (24000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (23700,59,0,94.8499984741211,0,0);
+INSERT INTO `chartdetails` VALUES (23700,60,0,0,94.8499984741211,0);
+INSERT INTO `chartdetails` VALUES (23700,61,0,0,94.8499984741211,0);
+INSERT INTO `chartdetails` VALUES (23700,62,0,0,94.8499984741211,0);
+INSERT INTO `chartdetails` VALUES (23700,63,0,0,94.8499984741211,0);
+INSERT INTO `chartdetails` VALUES (23700,64,0,0,94.8499984741211,0);
+INSERT INTO `chartdetails` VALUES (23700,65,0,0,94.8499984741211,0);
+INSERT INTO `chartdetails` VALUES (23700,66,0,0,94.8499984741211,0);
+INSERT INTO `chartdetails` VALUES (23700,67,0,0,94.8499984741211,0);
+INSERT INTO `chartdetails` VALUES (23700,68,0,0,94.8499984741211,0);
 INSERT INTO `chartdetails` VALUES (24000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (24000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (24000,54,0,0,0,0);
@@ -2005,17 +1993,16 @@ INSERT INTO `chartdetails` VALUES (24000,55,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (24000,56,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (24000,57,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (24000,58,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (24000,59,0,659,0,0);
-INSERT INTO `chartdetails` VALUES (24000,60,0,0,5925.375,0);
-INSERT INTO `chartdetails` VALUES (24000,61,0,152.949996948242,5925.375,0);
-INSERT INTO `chartdetails` VALUES (24000,62,0,0,7301.92498779297,0);
-INSERT INTO `chartdetails` VALUES (24000,63,0,0,7301.92498779297,0);
-INSERT INTO `chartdetails` VALUES (24000,64,0,0,7301.92498779297,0);
-INSERT INTO `chartdetails` VALUES (24000,65,0,0,7301.92498779297,0);
-INSERT INTO `chartdetails` VALUES (24000,66,0,0,7301.92498779297,0);
-INSERT INTO `chartdetails` VALUES (24000,67,0,0,7301.92498779297,0);
-INSERT INTO `chartdetails` VALUES (24000,68,0,0,7301.92498779297,0);
-INSERT INTO `chartdetails` VALUES (70100,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (24000,59,0,657.125,0,0);
+INSERT INTO `chartdetails` VALUES (24000,60,0,0,657.125,0);
+INSERT INTO `chartdetails` VALUES (24000,61,0,0,657.125,0);
+INSERT INTO `chartdetails` VALUES (24000,62,0,0,657.125,0);
+INSERT INTO `chartdetails` VALUES (24000,63,0,0,657.125,0);
+INSERT INTO `chartdetails` VALUES (24000,64,0,0,657.125,0);
+INSERT INTO `chartdetails` VALUES (24000,65,0,0,657.125,0);
+INSERT INTO `chartdetails` VALUES (24000,66,0,0,657.125,0);
+INSERT INTO `chartdetails` VALUES (24000,67,0,0,657.125,0);
+INSERT INTO `chartdetails` VALUES (24000,68,0,0,657.125,0);
 INSERT INTO `chartdetails` VALUES (70100,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70100,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70100,54,0,0,0,0);
@@ -2033,25 +2020,23 @@ INSERT INTO `chartdetails` VALUES (70100,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70100,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70100,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70100,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (70200,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70200,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70200,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70200,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70200,55,0,-52.5,0,0);
-INSERT INTO `chartdetails` VALUES (70200,56,0,0,-472.5,0);
-INSERT INTO `chartdetails` VALUES (70200,57,0,0,-472.5,0);
-INSERT INTO `chartdetails` VALUES (70200,58,0,0,-472.5,0);
-INSERT INTO `chartdetails` VALUES (70200,59,0,-63.0500006675721,-472.5,0);
-INSERT INTO `chartdetails` VALUES (70200,60,0,0,-1039.95000839233,0);
-INSERT INTO `chartdetails` VALUES (70200,61,0,0,-1039.95000839233,0);
-INSERT INTO `chartdetails` VALUES (70200,62,0,0,-1039.95000839233,0);
-INSERT INTO `chartdetails` VALUES (70200,63,0,0,-1039.95000839233,0);
-INSERT INTO `chartdetails` VALUES (70200,64,0,0,-1039.95000839233,0);
-INSERT INTO `chartdetails` VALUES (70200,65,0,0,-1039.95000839233,0);
-INSERT INTO `chartdetails` VALUES (70200,66,0,0,-1039.95000839233,0);
-INSERT INTO `chartdetails` VALUES (70200,67,0,0,-1039.95000839233,0);
-INSERT INTO `chartdetails` VALUES (70200,68,0,0,-1039.95000839233,0);
-INSERT INTO `chartdetails` VALUES (70300,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (70200,56,0,0,-52.5,0);
+INSERT INTO `chartdetails` VALUES (70200,57,0,0,-52.5,0);
+INSERT INTO `chartdetails` VALUES (70200,58,0,0,-52.5,0);
+INSERT INTO `chartdetails` VALUES (70200,59,0,-63.0499992370605,-52.5,0);
+INSERT INTO `chartdetails` VALUES (70200,60,0,0,-115.550003051758,0);
+INSERT INTO `chartdetails` VALUES (70200,61,0,0,-115.550003051758,0);
+INSERT INTO `chartdetails` VALUES (70200,62,0,0,-115.550003051758,0);
+INSERT INTO `chartdetails` VALUES (70200,63,0,0,-115.550003051758,0);
+INSERT INTO `chartdetails` VALUES (70200,64,0,0,-115.550003051758,0);
+INSERT INTO `chartdetails` VALUES (70200,65,0,0,-115.550003051758,0);
+INSERT INTO `chartdetails` VALUES (70200,66,0,0,-115.550003051758,0);
+INSERT INTO `chartdetails` VALUES (70200,67,0,0,-115.550003051758,0);
+INSERT INTO `chartdetails` VALUES (70200,68,0,0,-115.550003051758,0);
 INSERT INTO `chartdetails` VALUES (70300,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70300,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70300,54,0,0,0,0);
@@ -2069,7 +2054,6 @@ INSERT INTO `chartdetails` VALUES (70300,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70300,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70300,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (70300,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (210000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (210000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (210000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (210000,54,0,0,0,0);
@@ -2087,7 +2071,6 @@ INSERT INTO `chartdetails` VALUES (210000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (210000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (210000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (210000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (250000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (250000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (250000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (250000,54,0,0,0,0);
@@ -2105,7 +2088,6 @@ INSERT INTO `chartdetails` VALUES (250000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (250000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (250000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (250000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (251000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (251000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (251000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (251000,54,0,0,0,0);
@@ -2123,7 +2105,6 @@ INSERT INTO `chartdetails` VALUES (251000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (251000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (251000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (251000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (252000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (252000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (252000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (252000,54,0,0,0,0);
@@ -2141,7 +2122,6 @@ INSERT INTO `chartdetails` VALUES (252000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (252000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (252000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (252000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (253000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (253000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (253000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (253000,54,0,0,0,0);
@@ -2159,7 +2139,6 @@ INSERT INTO `chartdetails` VALUES (253000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (253000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (253000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (253000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (255000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (255000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (255000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (255000,54,0,0,0,0);
@@ -2177,25 +2156,23 @@ INSERT INTO `chartdetails` VALUES (255000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (255000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (255000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (255000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (256000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (256000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (256000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (256000,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (256000,55,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (256000,56,0,-145.350006103516,0,0);
-INSERT INTO `chartdetails` VALUES (256000,57,0,67.2899998426437,-1308.15005493164,0);
-INSERT INTO `chartdetails` VALUES (256000,58,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,59,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,60,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,61,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,62,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,63,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,64,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,65,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,66,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,67,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (256000,68,0,0,-702.540047645572,0);
-INSERT INTO `chartdetails` VALUES (257000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (256000,57,0,67.2900009155273,-145.350006103516,0);
+INSERT INTO `chartdetails` VALUES (256000,58,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,59,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,60,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,61,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,62,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,63,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,64,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,65,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,66,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,67,0,0,-78.0599975585938,0);
+INSERT INTO `chartdetails` VALUES (256000,68,0,0,-78.0599975585938,0);
 INSERT INTO `chartdetails` VALUES (257000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (257000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (257000,54,0,0,0,0);
@@ -2213,7 +2190,6 @@ INSERT INTO `chartdetails` VALUES (257000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (257000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (257000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (257000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (258000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (258000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (258000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (258000,54,0,0,0,0);
@@ -2231,25 +2207,23 @@ INSERT INTO `chartdetails` VALUES (258000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (258000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (258000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (258000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (259000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (259000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (259000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (259000,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (259000,55,0,-2.23024988174438,0,0);
-INSERT INTO `chartdetails` VALUES (259000,56,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,57,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,58,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,59,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,60,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,61,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,62,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,63,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,64,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,65,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,66,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,67,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (259000,68,0,0,-20.0722489356994,0);
-INSERT INTO `chartdetails` VALUES (261000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (259000,56,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,57,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,58,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,59,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,60,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,61,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,62,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,63,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,64,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,65,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,66,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,67,0,0,-2.23024988174438,0);
+INSERT INTO `chartdetails` VALUES (259000,68,0,0,-2.23024988174438,0);
 INSERT INTO `chartdetails` VALUES (261000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (261000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (261000,54,0,0,0,0);
@@ -2267,7 +2241,6 @@ INSERT INTO `chartdetails` VALUES (261000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (261000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (261000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (261000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (262000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (262000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (262000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (262000,54,0,0,0,0);
@@ -2285,7 +2258,6 @@ INSERT INTO `chartdetails` VALUES (262000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (262000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (262000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (262000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (263000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263000,54,0,0,0,0);
@@ -2303,7 +2275,6 @@ INSERT INTO `chartdetails` VALUES (263000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (263100,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263100,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263100,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263100,54,0,0,0,0);
@@ -2321,7 +2292,6 @@ INSERT INTO `chartdetails` VALUES (263100,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263100,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263100,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (263100,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (264000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (264000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (264000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (264000,54,0,0,0,0);
@@ -2339,7 +2309,6 @@ INSERT INTO `chartdetails` VALUES (264000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (264000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (264000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (264000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (265000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (265000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (265000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (265000,54,0,0,0,0);
@@ -2357,7 +2326,6 @@ INSERT INTO `chartdetails` VALUES (265000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (265000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (265000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (265000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (266000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (266000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (266000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (266000,54,0,0,0,0);
@@ -2375,7 +2343,6 @@ INSERT INTO `chartdetails` VALUES (266000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (266000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (266000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (266000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (267000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267000,54,0,0,0,0);
@@ -2393,7 +2360,6 @@ INSERT INTO `chartdetails` VALUES (267000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (267100,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267100,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267100,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267100,54,0,0,0,0);
@@ -2411,7 +2377,6 @@ INSERT INTO `chartdetails` VALUES (267100,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267100,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267100,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (267100,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (270000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (270000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (270000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (270000,54,0,0,0,0);
@@ -2429,7 +2394,6 @@ INSERT INTO `chartdetails` VALUES (270000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (270000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (270000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (270000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (271000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (271000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (271000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (271000,54,0,0,0,0);
@@ -2447,7 +2411,6 @@ INSERT INTO `chartdetails` VALUES (271000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (271000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (271000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (271000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (310000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (310000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (310000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (310000,54,0,0,0,0);
@@ -2465,7 +2428,6 @@ INSERT INTO `chartdetails` VALUES (310000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (310000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (310000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (310000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (320000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (320000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (320000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (320000,54,0,0,0,0);
@@ -2483,7 +2445,6 @@ INSERT INTO `chartdetails` VALUES (320000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (320000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (320000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (320000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (330000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (330000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (330000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (330000,54,0,0,0,0);
@@ -2501,7 +2462,6 @@ INSERT INTO `chartdetails` VALUES (330000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (330000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (330000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (330000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (340000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (340000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (340000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (340000,54,0,0,0,0);
@@ -2519,7 +2479,6 @@ INSERT INTO `chartdetails` VALUES (340000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (340000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (340000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (340000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (342000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (342000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (342000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (342000,54,0,0,0,0);
@@ -2537,7 +2496,6 @@ INSERT INTO `chartdetails` VALUES (342000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (342000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (342000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (342000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (400000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (400000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (400000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (400000,54,0,0,0,0);
@@ -2555,7 +2513,6 @@ INSERT INTO `chartdetails` VALUES (400000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (400000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (400000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (400000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (410000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (410000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (410000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (410000,54,0,0,0,0);
@@ -2573,7 +2530,6 @@ INSERT INTO `chartdetails` VALUES (410000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (410000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (410000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (410000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (411000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (411000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (411000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (411000,54,0,0,0,0);
@@ -2591,7 +2547,6 @@ INSERT INTO `chartdetails` VALUES (411000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (411000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (411000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (411000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (412000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (412000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (412000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (412000,54,0,0,0,0);
@@ -2601,15 +2556,14 @@ INSERT INTO `chartdetails` VALUES (412000,57,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (412000,58,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (412000,59,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (412000,60,0,16.1900005340576,0,0);
-INSERT INTO `chartdetails` VALUES (412000,61,0,0,145.710004806518,0);
-INSERT INTO `chartdetails` VALUES (412000,62,0,0,145.710004806518,0);
-INSERT INTO `chartdetails` VALUES (412000,63,0,0,145.710004806518,0);
-INSERT INTO `chartdetails` VALUES (412000,64,0,0,145.710004806518,0);
-INSERT INTO `chartdetails` VALUES (412000,65,0,0,145.710004806518,0);
-INSERT INTO `chartdetails` VALUES (412000,66,0,0,145.710004806518,0);
-INSERT INTO `chartdetails` VALUES (412000,67,0,0,145.710004806518,0);
-INSERT INTO `chartdetails` VALUES (412000,68,0,0,145.710004806518,0);
-INSERT INTO `chartdetails` VALUES (413000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (412000,61,0,0,16.1900005340576,0);
+INSERT INTO `chartdetails` VALUES (412000,62,0,0,16.1900005340576,0);
+INSERT INTO `chartdetails` VALUES (412000,63,0,0,16.1900005340576,0);
+INSERT INTO `chartdetails` VALUES (412000,64,0,0,16.1900005340576,0);
+INSERT INTO `chartdetails` VALUES (412000,65,0,0,16.1900005340576,0);
+INSERT INTO `chartdetails` VALUES (412000,66,0,0,16.1900005340576,0);
+INSERT INTO `chartdetails` VALUES (412000,67,0,0,16.1900005340576,0);
+INSERT INTO `chartdetails` VALUES (412000,68,0,0,16.1900005340576,0);
 INSERT INTO `chartdetails` VALUES (413000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (413000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (413000,54,0,0,0,0);
@@ -2619,15 +2573,14 @@ INSERT INTO `chartdetails` VALUES (413000,57,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (413000,58,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (413000,59,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (413000,60,0,-32.75,0,0);
-INSERT INTO `chartdetails` VALUES (413000,61,0,0,-294.75,0);
-INSERT INTO `chartdetails` VALUES (413000,62,0,0,-294.75,0);
-INSERT INTO `chartdetails` VALUES (413000,63,0,0,-294.75,0);
-INSERT INTO `chartdetails` VALUES (413000,64,0,0,-294.75,0);
-INSERT INTO `chartdetails` VALUES (413000,65,0,0,-294.75,0);
-INSERT INTO `chartdetails` VALUES (413000,66,0,0,-294.75,0);
-INSERT INTO `chartdetails` VALUES (413000,67,0,0,-294.75,0);
-INSERT INTO `chartdetails` VALUES (413000,68,0,0,-294.75,0);
-INSERT INTO `chartdetails` VALUES (420000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (413000,61,0,0,-32.75,0);
+INSERT INTO `chartdetails` VALUES (413000,62,0,0,-32.75,0);
+INSERT INTO `chartdetails` VALUES (413000,63,0,0,-32.75,0);
+INSERT INTO `chartdetails` VALUES (413000,64,0,0,-32.75,0);
+INSERT INTO `chartdetails` VALUES (413000,65,0,0,-32.75,0);
+INSERT INTO `chartdetails` VALUES (413000,66,0,0,-32.75,0);
+INSERT INTO `chartdetails` VALUES (413000,67,0,0,-32.75,0);
+INSERT INTO `chartdetails` VALUES (413000,68,0,0,-32.75,0);
 INSERT INTO `chartdetails` VALUES (420000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (420000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (420000,54,0,0,0,0);
@@ -2645,25 +2598,23 @@ INSERT INTO `chartdetails` VALUES (420000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (420000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (420000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (420000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (450000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (450000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (450000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (450000,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (450000,55,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (450000,56,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (450000,57,0,-15,0,0);
-INSERT INTO `chartdetails` VALUES (450000,58,0,0,-135,0);
-INSERT INTO `chartdetails` VALUES (450000,59,0,25,-135,0);
-INSERT INTO `chartdetails` VALUES (450000,60,0,0,90,0);
-INSERT INTO `chartdetails` VALUES (450000,61,0,0,90,0);
-INSERT INTO `chartdetails` VALUES (450000,62,0,0,90,0);
-INSERT INTO `chartdetails` VALUES (450000,63,0,0,90,0);
-INSERT INTO `chartdetails` VALUES (450000,64,0,0,90,0);
-INSERT INTO `chartdetails` VALUES (450000,65,0,0,90,0);
-INSERT INTO `chartdetails` VALUES (450000,66,0,0,90,0);
-INSERT INTO `chartdetails` VALUES (450000,67,0,0,90,0);
-INSERT INTO `chartdetails` VALUES (450000,68,0,0,90,0);
-INSERT INTO `chartdetails` VALUES (451000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (450000,58,0,0,-15,0);
+INSERT INTO `chartdetails` VALUES (450000,59,0,25,-15,0);
+INSERT INTO `chartdetails` VALUES (450000,60,0,0,10,0);
+INSERT INTO `chartdetails` VALUES (450000,61,0,0,10,0);
+INSERT INTO `chartdetails` VALUES (450000,62,0,0,10,0);
+INSERT INTO `chartdetails` VALUES (450000,63,0,0,10,0);
+INSERT INTO `chartdetails` VALUES (450000,64,0,0,10,0);
+INSERT INTO `chartdetails` VALUES (450000,65,0,0,10,0);
+INSERT INTO `chartdetails` VALUES (450000,66,0,0,10,0);
+INSERT INTO `chartdetails` VALUES (450000,67,0,0,10,0);
+INSERT INTO `chartdetails` VALUES (450000,68,0,0,10,0);
 INSERT INTO `chartdetails` VALUES (451000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (451000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (451000,54,0,0,0,0);
@@ -2681,7 +2632,6 @@ INSERT INTO `chartdetails` VALUES (451000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (451000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (451000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (451000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (452000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (452000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (452000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (452000,54,0,0,0,0);
@@ -2699,25 +2649,23 @@ INSERT INTO `chartdetails` VALUES (452000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (452000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (452000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (452000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (455000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (455000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (455000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (455000,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (455000,55,0,0.140186995267868,0,0);
-INSERT INTO `chartdetails` VALUES (455000,56,0,0,1.26168295741081,0);
-INSERT INTO `chartdetails` VALUES (455000,57,0,0,1.26168295741081,0);
-INSERT INTO `chartdetails` VALUES (455000,58,0,0,1.26168295741081,0);
-INSERT INTO `chartdetails` VALUES (455000,59,0,2.5,1.26168295741081,0);
-INSERT INTO `chartdetails` VALUES (455000,60,0,-1.875,23.7616858482361,0);
-INSERT INTO `chartdetails` VALUES (455000,61,0,20,6.88668596744537,0);
-INSERT INTO `chartdetails` VALUES (455000,62,0,0,186.886695623398,0);
-INSERT INTO `chartdetails` VALUES (455000,63,0,0,186.886695623398,0);
-INSERT INTO `chartdetails` VALUES (455000,64,0,0,186.886695623398,0);
-INSERT INTO `chartdetails` VALUES (455000,65,0,0,186.886695623398,0);
-INSERT INTO `chartdetails` VALUES (455000,66,0,0,186.886695623398,0);
-INSERT INTO `chartdetails` VALUES (455000,67,0,0,186.886695623398,0);
-INSERT INTO `chartdetails` VALUES (455000,68,0,0,186.886695623398,0);
-INSERT INTO `chartdetails` VALUES (460000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (455000,56,0,0,0.140186995267868,0);
+INSERT INTO `chartdetails` VALUES (455000,57,0,0,0.140186995267868,0);
+INSERT INTO `chartdetails` VALUES (455000,58,0,0,0.140186995267868,0);
+INSERT INTO `chartdetails` VALUES (455000,59,0,2.5,0.140186995267868,0);
+INSERT INTO `chartdetails` VALUES (455000,60,0,-1.875,2.64018988609314,0);
+INSERT INTO `chartdetails` VALUES (455000,61,0,0,0.765190005302429,0);
+INSERT INTO `chartdetails` VALUES (455000,62,0,0,0.765190005302429,0);
+INSERT INTO `chartdetails` VALUES (455000,63,0,0,0.765190005302429,0);
+INSERT INTO `chartdetails` VALUES (455000,64,0,0,0.765190005302429,0);
+INSERT INTO `chartdetails` VALUES (455000,65,0,0,0.765190005302429,0);
+INSERT INTO `chartdetails` VALUES (455000,66,0,0,0.765190005302429,0);
+INSERT INTO `chartdetails` VALUES (455000,67,0,0,0.765190005302429,0);
+INSERT INTO `chartdetails` VALUES (455000,68,0,0,0.765190005302429,0);
 INSERT INTO `chartdetails` VALUES (460000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (460000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (460000,54,0,0,0,0);
@@ -2735,7 +2683,6 @@ INSERT INTO `chartdetails` VALUES (460000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (460000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (460000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (460000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (470000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (470000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (470000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (470000,54,0,0,0,0);
@@ -2753,7 +2700,6 @@ INSERT INTO `chartdetails` VALUES (470000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (470000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (470000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (470000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (480000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (480000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (480000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (480000,54,0,0,0,0);
@@ -2771,7 +2717,6 @@ INSERT INTO `chartdetails` VALUES (480000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (480000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (480000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (480000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (481000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (481000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (481000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (481000,54,0,0,0,0);
@@ -2789,7 +2734,6 @@ INSERT INTO `chartdetails` VALUES (481000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (481000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (481000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (481000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (500000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (500000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (500000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (500000,54,0,0,0,0);
@@ -2807,7 +2751,6 @@ INSERT INTO `chartdetails` VALUES (500000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (500000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (500000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (500000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (501000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501000,54,0,0,0,0);
@@ -2825,7 +2768,6 @@ INSERT INTO `chartdetails` VALUES (501000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (501800,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501800,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501800,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501800,54,0,0,0,0);
@@ -2843,7 +2785,6 @@ INSERT INTO `chartdetails` VALUES (501800,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501800,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501800,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501800,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (501900,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501900,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501900,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501900,54,0,0,0,0);
@@ -2861,7 +2802,6 @@ INSERT INTO `chartdetails` VALUES (501900,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501900,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501900,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (501900,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (502000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502000,54,0,0,0,0);
@@ -2871,15 +2811,14 @@ INSERT INTO `chartdetails` VALUES (502000,57,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502000,58,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502000,59,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502000,60,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (502000,61,0,-2.5,0,0);
-INSERT INTO `chartdetails` VALUES (502000,62,0,0,-22.5,0);
-INSERT INTO `chartdetails` VALUES (502000,63,0,0,-22.5,0);
-INSERT INTO `chartdetails` VALUES (502000,64,0,0,-22.5,0);
-INSERT INTO `chartdetails` VALUES (502000,65,0,0,-22.5,0);
-INSERT INTO `chartdetails` VALUES (502000,66,0,0,-22.5,0);
-INSERT INTO `chartdetails` VALUES (502000,67,0,0,-22.5,0);
-INSERT INTO `chartdetails` VALUES (502000,68,0,0,-22.5,0);
-INSERT INTO `chartdetails` VALUES (502100,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (502000,61,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (502000,62,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (502000,63,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (502000,64,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (502000,65,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (502000,66,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (502000,67,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (502000,68,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502100,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502100,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502100,54,0,0,0,0);
@@ -2897,7 +2836,6 @@ INSERT INTO `chartdetails` VALUES (502100,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502100,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502100,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (502100,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (503000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503000,54,0,0,0,0);
@@ -2915,7 +2853,6 @@ INSERT INTO `chartdetails` VALUES (503000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (503100,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503100,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503100,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503100,54,0,0,0,0);
@@ -2933,7 +2870,6 @@ INSERT INTO `chartdetails` VALUES (503100,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503100,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503100,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (503100,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (504000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (504000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (504000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (504000,54,0,0,0,0);
@@ -2951,7 +2887,6 @@ INSERT INTO `chartdetails` VALUES (504000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (504000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (504000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (504000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (505000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505000,54,0,0,0,0);
@@ -2969,7 +2904,6 @@ INSERT INTO `chartdetails` VALUES (505000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (505100,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505100,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505100,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505100,54,0,0,0,0);
@@ -2987,7 +2921,6 @@ INSERT INTO `chartdetails` VALUES (505100,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505100,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505100,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505100,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (505110,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505110,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505110,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505110,54,0,0,0,0);
@@ -3005,7 +2938,6 @@ INSERT INTO `chartdetails` VALUES (505110,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505110,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505110,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (505110,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (510000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (510000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (510000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (510000,54,0,0,0,0);
@@ -3023,7 +2955,6 @@ INSERT INTO `chartdetails` VALUES (510000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (510000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (510000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (510000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (511000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (511000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (511000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (511000,54,0,0,0,0);
@@ -3041,7 +2972,6 @@ INSERT INTO `chartdetails` VALUES (511000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (511000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (511000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (511000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (513000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (513000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (513000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (513000,54,0,0,0,0);
@@ -3059,7 +2989,6 @@ INSERT INTO `chartdetails` VALUES (513000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (513000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (513000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (513000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (514000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (514000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (514000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (514000,54,0,0,0,0);
@@ -3077,7 +3006,6 @@ INSERT INTO `chartdetails` VALUES (514000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (514000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (514000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (514000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (515000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (515000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (515000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (515000,54,0,0,0,0);
@@ -3095,7 +3023,6 @@ INSERT INTO `chartdetails` VALUES (515000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (515000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (515000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (515000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (516000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (516000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (516000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (516000,54,0,0,0,0);
@@ -3113,7 +3040,6 @@ INSERT INTO `chartdetails` VALUES (516000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (516000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (516000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (516000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (520000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (520000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (520000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (520000,54,0,0,0,0);
@@ -3131,7 +3057,6 @@ INSERT INTO `chartdetails` VALUES (520000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (520000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (520000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (520000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (540000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (540000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (540000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (540000,54,0,0,0,0);
@@ -3149,7 +3074,6 @@ INSERT INTO `chartdetails` VALUES (540000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (540000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (540000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (540000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (541000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (541000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (541000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (541000,54,0,0,0,0);
@@ -3167,7 +3091,6 @@ INSERT INTO `chartdetails` VALUES (541000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (541000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (541000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (541000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (542000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (542000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (542000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (542000,54,0,0,0,0);
@@ -3185,7 +3108,6 @@ INSERT INTO `chartdetails` VALUES (542000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (542000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (542000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (542000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (550000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (550000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (550000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (550000,54,0,0,0,0);
@@ -3203,7 +3125,6 @@ INSERT INTO `chartdetails` VALUES (550000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (550000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (550000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (550000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (560000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (560000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (560000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (560000,54,0,0,0,0);
@@ -3221,43 +3142,40 @@ INSERT INTO `chartdetails` VALUES (560000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (560000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (560000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (560000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (700000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (700000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (700000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (700000,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (700000,55,0,200,0,0);
-INSERT INTO `chartdetails` VALUES (700000,56,0,0,1800,0);
-INSERT INTO `chartdetails` VALUES (700000,57,0,0,1800,0);
-INSERT INTO `chartdetails` VALUES (700000,58,0,0,1800,0);
-INSERT INTO `chartdetails` VALUES (700000,59,0,-746.25,1800,0);
-INSERT INTO `chartdetails` VALUES (700000,60,0,-350.532993316651,-4916.25,0);
-INSERT INTO `chartdetails` VALUES (700000,61,0,-100.199996948242,-8071.04696655274,0);
-INSERT INTO `chartdetails` VALUES (700000,62,0,0,-8972.84689331055,0);
-INSERT INTO `chartdetails` VALUES (700000,63,0,0,-8972.84689331055,0);
-INSERT INTO `chartdetails` VALUES (700000,64,0,0,-8972.84689331055,0);
-INSERT INTO `chartdetails` VALUES (700000,65,0,0,-8972.84689331055,0);
-INSERT INTO `chartdetails` VALUES (700000,66,0,0,-8972.84689331055,0);
-INSERT INTO `chartdetails` VALUES (700000,67,0,0,-8972.84689331055,0);
-INSERT INTO `chartdetails` VALUES (700000,68,0,0,-8972.84689331055,0);
-INSERT INTO `chartdetails` VALUES (700100,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (700000,56,0,0,200,0);
+INSERT INTO `chartdetails` VALUES (700000,57,0,0,200,0);
+INSERT INTO `chartdetails` VALUES (700000,58,0,0,200,0);
+INSERT INTO `chartdetails` VALUES (700000,59,0,-746.25,200,0);
+INSERT INTO `chartdetails` VALUES (700000,60,0,-350.532989501953,-546.25,0);
+INSERT INTO `chartdetails` VALUES (700000,61,0,0,-896.783020019531,0);
+INSERT INTO `chartdetails` VALUES (700000,62,0,0,-896.783020019531,0);
+INSERT INTO `chartdetails` VALUES (700000,63,0,0,-896.783020019531,0);
+INSERT INTO `chartdetails` VALUES (700000,64,0,0,-896.783020019531,0);
+INSERT INTO `chartdetails` VALUES (700000,65,0,0,-896.783020019531,0);
+INSERT INTO `chartdetails` VALUES (700000,66,0,0,-896.783020019531,0);
+INSERT INTO `chartdetails` VALUES (700000,67,0,0,-896.783020019531,0);
+INSERT INTO `chartdetails` VALUES (700000,68,0,0,-896.783020019531,0);
 INSERT INTO `chartdetails` VALUES (700100,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (700100,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (700100,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (700100,55,0,7.54035997390747,0,0);
-INSERT INTO `chartdetails` VALUES (700100,56,0,0,67.8632397651672,0);
-INSERT INTO `chartdetails` VALUES (700100,57,0,0,67.8632397651672,0);
-INSERT INTO `chartdetails` VALUES (700100,58,0,0,67.8632397651672,0);
-INSERT INTO `chartdetails` VALUES (700100,59,0,128.880004882812,67.8632397651672,0);
-INSERT INTO `chartdetails` VALUES (700100,60,0,0,1227.7829170227,0);
-INSERT INTO `chartdetails` VALUES (700100,61,0,0,1227.7829170227,0);
-INSERT INTO `chartdetails` VALUES (700100,62,0,0,1227.7829170227,0);
-INSERT INTO `chartdetails` VALUES (700100,63,0,0,1227.7829170227,0);
-INSERT INTO `chartdetails` VALUES (700100,64,0,0,1227.7829170227,0);
-INSERT INTO `chartdetails` VALUES (700100,65,0,0,1227.7829170227,0);
-INSERT INTO `chartdetails` VALUES (700100,66,0,0,1227.7829170227,0);
-INSERT INTO `chartdetails` VALUES (700100,67,0,0,1227.7829170227,0);
-INSERT INTO `chartdetails` VALUES (700100,68,0,0,1227.7829170227,0);
-INSERT INTO `chartdetails` VALUES (701000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (700100,56,0,0,7.54035997390747,0);
+INSERT INTO `chartdetails` VALUES (700100,57,0,0,7.54035997390747,0);
+INSERT INTO `chartdetails` VALUES (700100,58,0,0,7.54035997390747,0);
+INSERT INTO `chartdetails` VALUES (700100,59,0,128.880004882812,7.54035997390747,0);
+INSERT INTO `chartdetails` VALUES (700100,60,0,0,136.419998168945,0);
+INSERT INTO `chartdetails` VALUES (700100,61,0,0,136.419998168945,0);
+INSERT INTO `chartdetails` VALUES (700100,62,0,0,136.419998168945,0);
+INSERT INTO `chartdetails` VALUES (700100,63,0,0,136.419998168945,0);
+INSERT INTO `chartdetails` VALUES (700100,64,0,0,136.419998168945,0);
+INSERT INTO `chartdetails` VALUES (700100,65,0,0,136.419998168945,0);
+INSERT INTO `chartdetails` VALUES (700100,66,0,0,136.419998168945,0);
+INSERT INTO `chartdetails` VALUES (700100,67,0,0,136.419998168945,0);
+INSERT INTO `chartdetails` VALUES (700100,68,0,0,136.419998168945,0);
 INSERT INTO `chartdetails` VALUES (701000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (701000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (701000,54,0,0,0,0);
@@ -3275,43 +3193,40 @@ INSERT INTO `chartdetails` VALUES (701000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (701000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (701000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (701000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (710000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (710000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (710000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (710000,54,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (710000,55,0,-59.509275436402,0,0);
-INSERT INTO `chartdetails` VALUES (710000,56,0,32.0667533874511,-535.58350372315,0);
-INSERT INTO `chartdetails` VALUES (710000,57,0,387.832096338272,-246.982776641851,0);
-INSERT INTO `chartdetails` VALUES (710000,58,0,0,3243.50560188293,0);
-INSERT INTO `chartdetails` VALUES (710000,59,0,-1105.14747267962,3243.50560188293,0);
-INSERT INTO `chartdetails` VALUES (710000,60,0,0,-6702.82118272782,0);
-INSERT INTO `chartdetails` VALUES (710000,61,0,-70.25,-6702.82118272782,0);
-INSERT INTO `chartdetails` VALUES (710000,62,0,0,-7335.07118272782,0);
-INSERT INTO `chartdetails` VALUES (710000,63,0,0,-7335.07118272782,0);
-INSERT INTO `chartdetails` VALUES (710000,64,0,0,-7335.07118272782,0);
-INSERT INTO `chartdetails` VALUES (710000,65,0,0,-7335.07118272782,0);
-INSERT INTO `chartdetails` VALUES (710000,66,0,0,-7335.07118272782,0);
-INSERT INTO `chartdetails` VALUES (710000,67,0,0,-7335.07118272782,0);
-INSERT INTO `chartdetails` VALUES (710000,68,0,0,-7335.07118272782,0);
-INSERT INTO `chartdetails` VALUES (720000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (710000,55,0,-59.5093002319336,0,0);
+INSERT INTO `chartdetails` VALUES (710000,56,0,32.0666999816895,-59.5093002319336,0);
+INSERT INTO `chartdetails` VALUES (710000,57,0,387.832000732422,-27.4426002502441,0);
+INSERT INTO `chartdetails` VALUES (710000,58,0,0,360.389007568359,0);
+INSERT INTO `chartdetails` VALUES (710000,59,0,-1105.15002441406,360.389007568359,0);
+INSERT INTO `chartdetails` VALUES (710000,60,0,0,-744.757995605469,0);
+INSERT INTO `chartdetails` VALUES (710000,61,0,0,-744.757995605469,0);
+INSERT INTO `chartdetails` VALUES (710000,62,0,0,-744.757995605469,0);
+INSERT INTO `chartdetails` VALUES (710000,63,0,0,-744.757995605469,0);
+INSERT INTO `chartdetails` VALUES (710000,64,0,0,-744.757995605469,0);
+INSERT INTO `chartdetails` VALUES (710000,65,0,0,-744.757995605469,0);
+INSERT INTO `chartdetails` VALUES (710000,66,0,0,-744.757995605469,0);
+INSERT INTO `chartdetails` VALUES (710000,67,0,0,-744.757995605469,0);
+INSERT INTO `chartdetails` VALUES (710000,68,0,0,-744.757995605469,0);
 INSERT INTO `chartdetails` VALUES (720000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (720000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (720000,54,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (720000,55,0,744.000024795532,0,0);
-INSERT INTO `chartdetails` VALUES (720000,56,0,12.4000000953674,6696.00019836426,0);
-INSERT INTO `chartdetails` VALUES (720000,57,0,51.5000015497208,6807.60022354126,0);
-INSERT INTO `chartdetails` VALUES (720000,58,0,0,7271.10023593902,0);
-INSERT INTO `chartdetails` VALUES (720000,59,0,143.839997291565,7271.10023593902,0);
-INSERT INTO `chartdetails` VALUES (720000,60,0,57.7875022888185,8565.66018009186,0);
-INSERT INTO `chartdetails` VALUES (720000,61,0,0,9085.7502374649,0);
-INSERT INTO `chartdetails` VALUES (720000,62,0,0,9085.7502374649,0);
-INSERT INTO `chartdetails` VALUES (720000,63,0,0,9085.7502374649,0);
-INSERT INTO `chartdetails` VALUES (720000,64,0,0,9085.7502374649,0);
-INSERT INTO `chartdetails` VALUES (720000,65,0,0,9085.7502374649,0);
-INSERT INTO `chartdetails` VALUES (720000,66,0,0,9085.7502374649,0);
-INSERT INTO `chartdetails` VALUES (720000,67,0,0,9085.7502374649,0);
-INSERT INTO `chartdetails` VALUES (720000,68,0,0,9085.7502374649,0);
-INSERT INTO `chartdetails` VALUES (721000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (720000,55,0,744,0,0);
+INSERT INTO `chartdetails` VALUES (720000,56,0,12.3999996185303,744,0);
+INSERT INTO `chartdetails` VALUES (720000,57,0,51.5,756.400024414062,0);
+INSERT INTO `chartdetails` VALUES (720000,58,0,0,807.900024414062,0);
+INSERT INTO `chartdetails` VALUES (720000,59,0,143.839996337891,807.900024414062,0);
+INSERT INTO `chartdetails` VALUES (720000,60,0,57.7874984741211,951.739990234375,0);
+INSERT INTO `chartdetails` VALUES (720000,61,0,0,1009.53002929688,0);
+INSERT INTO `chartdetails` VALUES (720000,62,0,0,1009.53002929688,0);
+INSERT INTO `chartdetails` VALUES (720000,63,0,0,1009.53002929688,0);
+INSERT INTO `chartdetails` VALUES (720000,64,0,0,1009.53002929688,0);
+INSERT INTO `chartdetails` VALUES (720000,65,0,0,1009.53002929688,0);
+INSERT INTO `chartdetails` VALUES (720000,66,0,0,1009.53002929688,0);
+INSERT INTO `chartdetails` VALUES (720000,67,0,0,1009.53002929688,0);
+INSERT INTO `chartdetails` VALUES (720000,68,0,0,1009.53002929688,0);
 INSERT INTO `chartdetails` VALUES (721000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (721000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (721000,54,0,0,0,0);
@@ -3329,79 +3244,74 @@ INSERT INTO `chartdetails` VALUES (721000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (721000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (721000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (721000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (722000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (722000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (722000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (722000,54,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (722000,55,0,4941.08979034424,0,0);
-INSERT INTO `chartdetails` VALUES (722000,56,0,29.070007324219,44469.8081665039,0);
-INSERT INTO `chartdetails` VALUES (722000,57,0,-170.289999008179,44731.4385375977,0);
-INSERT INTO `chartdetails` VALUES (722000,58,0,0,43198.8285064697,0);
-INSERT INTO `chartdetails` VALUES (722000,59,0,25.6000008583069,43198.8285064697,0);
-INSERT INTO `chartdetails` VALUES (722000,60,0,0,43429.2286109924,0);
-INSERT INTO `chartdetails` VALUES (722000,61,0,0,43429.2286109924,0);
-INSERT INTO `chartdetails` VALUES (722000,62,0,0,43429.2286109924,0);
-INSERT INTO `chartdetails` VALUES (722000,63,0,0,43429.2286109924,0);
-INSERT INTO `chartdetails` VALUES (722000,64,0,0,43429.2286109924,0);
-INSERT INTO `chartdetails` VALUES (722000,65,0,0,43429.2286109924,0);
-INSERT INTO `chartdetails` VALUES (722000,66,0,0,43429.2286109924,0);
-INSERT INTO `chartdetails` VALUES (722000,67,0,0,43429.2286109924,0);
-INSERT INTO `chartdetails` VALUES (722000,68,0,0,43429.2286109924,0);
-INSERT INTO `chartdetails` VALUES (723000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (722000,55,0,4941.08984375,0,0);
+INSERT INTO `chartdetails` VALUES (722000,56,0,29.0699996948242,4941.08984375,0);
+INSERT INTO `chartdetails` VALUES (722000,57,0,-170.289993286133,4970.16015625,0);
+INSERT INTO `chartdetails` VALUES (722000,58,0,0,4799.8701171875,0);
+INSERT INTO `chartdetails` VALUES (722000,59,0,25.6000003814697,4799.8701171875,0);
+INSERT INTO `chartdetails` VALUES (722000,60,0,0,4825.47021484375,0);
+INSERT INTO `chartdetails` VALUES (722000,61,0,0,4825.47021484375,0);
+INSERT INTO `chartdetails` VALUES (722000,62,0,0,4825.47021484375,0);
+INSERT INTO `chartdetails` VALUES (722000,63,0,0,4825.47021484375,0);
+INSERT INTO `chartdetails` VALUES (722000,64,0,0,4825.47021484375,0);
+INSERT INTO `chartdetails` VALUES (722000,65,0,0,4825.47021484375,0);
+INSERT INTO `chartdetails` VALUES (722000,66,0,0,4825.47021484375,0);
+INSERT INTO `chartdetails` VALUES (722000,67,0,0,4825.47021484375,0);
+INSERT INTO `chartdetails` VALUES (722000,68,0,0,4825.47021484375,0);
 INSERT INTO `chartdetails` VALUES (723000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (723000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (723000,54,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (723000,55,0,-5633.15980911255,0,0);
-INSERT INTO `chartdetails` VALUES (723000,56,0,0,-50698.4386291504,0);
-INSERT INTO `chartdetails` VALUES (723000,57,0,-58.9000015258789,-50698.4386291504,0);
-INSERT INTO `chartdetails` VALUES (723000,58,0,0,-51228.5385437012,0);
-INSERT INTO `chartdetails` VALUES (723000,59,0,-142.582767486573,-51228.5385437012,0);
-INSERT INTO `chartdetails` VALUES (723000,60,0,127.099998474121,-52511.7807617188,0);
-INSERT INTO `chartdetails` VALUES (723000,61,0,0,-51367.8806762695,0);
-INSERT INTO `chartdetails` VALUES (723000,62,0,0,-51367.8806762695,0);
-INSERT INTO `chartdetails` VALUES (723000,63,0,0,-51367.8806762695,0);
-INSERT INTO `chartdetails` VALUES (723000,64,0,0,-51367.8806762695,0);
-INSERT INTO `chartdetails` VALUES (723000,65,0,0,-51367.8806762695,0);
-INSERT INTO `chartdetails` VALUES (723000,66,0,0,-51367.8806762695,0);
-INSERT INTO `chartdetails` VALUES (723000,67,0,0,-51367.8806762695,0);
-INSERT INTO `chartdetails` VALUES (723000,68,0,0,-51367.8806762695,0);
-INSERT INTO `chartdetails` VALUES (800000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (723000,55,0,-5633.16015625,0,0);
+INSERT INTO `chartdetails` VALUES (723000,56,0,0,-5633.16015625,0);
+INSERT INTO `chartdetails` VALUES (723000,57,0,-58.9000015258789,-5633.16015625,0);
+INSERT INTO `chartdetails` VALUES (723000,58,0,0,-5692.06005859375,0);
+INSERT INTO `chartdetails` VALUES (723000,59,0,-142.582992553711,-5692.06005859375,0);
+INSERT INTO `chartdetails` VALUES (723000,60,0,127.099998474121,-5834.64013671875,0);
+INSERT INTO `chartdetails` VALUES (723000,61,0,0,-5707.5400390625,0);
+INSERT INTO `chartdetails` VALUES (723000,62,0,0,-5707.5400390625,0);
+INSERT INTO `chartdetails` VALUES (723000,63,0,0,-5707.5400390625,0);
+INSERT INTO `chartdetails` VALUES (723000,64,0,0,-5707.5400390625,0);
+INSERT INTO `chartdetails` VALUES (723000,65,0,0,-5707.5400390625,0);
+INSERT INTO `chartdetails` VALUES (723000,66,0,0,-5707.5400390625,0);
+INSERT INTO `chartdetails` VALUES (723000,67,0,0,-5707.5400390625,0);
+INSERT INTO `chartdetails` VALUES (723000,68,0,0,-5707.5400390625,0);
 INSERT INTO `chartdetails` VALUES (800000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (800000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (800000,54,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (800000,55,0,-258.869998931885,0,0);
-INSERT INTO `chartdetails` VALUES (800000,56,0,0,-2329.82998657227,0);
-INSERT INTO `chartdetails` VALUES (800000,57,0,0,-2329.82998657227,0);
-INSERT INTO `chartdetails` VALUES (800000,58,0,0,-2329.82998657227,0);
-INSERT INTO `chartdetails` VALUES (800000,59,0,-75.0299983024599,-2329.82998657227,0);
-INSERT INTO `chartdetails` VALUES (800000,60,0,-1133.42202663422,-3005.09997177124,0);
-INSERT INTO `chartdetails` VALUES (800000,61,0,0,-13205.8961372375,0);
-INSERT INTO `chartdetails` VALUES (800000,62,0,0,-13205.8961372375,0);
-INSERT INTO `chartdetails` VALUES (800000,63,0,0,-13205.8961372375,0);
-INSERT INTO `chartdetails` VALUES (800000,64,0,0,-13205.8961372375,0);
-INSERT INTO `chartdetails` VALUES (800000,65,0,0,-13205.8961372375,0);
-INSERT INTO `chartdetails` VALUES (800000,66,0,0,-13205.8961372375,0);
-INSERT INTO `chartdetails` VALUES (800000,67,0,0,-13205.8961372375,0);
-INSERT INTO `chartdetails` VALUES (800000,68,0,0,-13205.8961372375,0);
-INSERT INTO `chartdetails` VALUES (810000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (800000,55,0,-258.869995117188,0,0);
+INSERT INTO `chartdetails` VALUES (800000,56,0,0,-258.869995117188,0);
+INSERT INTO `chartdetails` VALUES (800000,57,0,0,-258.869995117188,0);
+INSERT INTO `chartdetails` VALUES (800000,58,0,0,-258.869995117188,0);
+INSERT INTO `chartdetails` VALUES (800000,59,0,-75.0299987792969,-258.869995117188,0);
+INSERT INTO `chartdetails` VALUES (800000,60,0,-1133.42004394531,-333.899993896484,0);
+INSERT INTO `chartdetails` VALUES (800000,61,0,0,-1467.31994628906,0);
+INSERT INTO `chartdetails` VALUES (800000,62,0,0,-1467.31994628906,0);
+INSERT INTO `chartdetails` VALUES (800000,63,0,0,-1467.31994628906,0);
+INSERT INTO `chartdetails` VALUES (800000,64,0,0,-1467.31994628906,0);
+INSERT INTO `chartdetails` VALUES (800000,65,0,0,-1467.31994628906,0);
+INSERT INTO `chartdetails` VALUES (800000,66,0,0,-1467.31994628906,0);
+INSERT INTO `chartdetails` VALUES (800000,67,0,0,-1467.31994628906,0);
+INSERT INTO `chartdetails` VALUES (800000,68,0,0,-1467.31994628906,0);
 INSERT INTO `chartdetails` VALUES (810000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (810000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (810000,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (810000,55,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (810000,56,0,0.783749997615814,0,0);
-INSERT INTO `chartdetails` VALUES (810000,57,0,0,7.05374997854233,0);
-INSERT INTO `chartdetails` VALUES (810000,58,0,0,7.05374997854233,0);
-INSERT INTO `chartdetails` VALUES (810000,59,0,12.5,7.05374997854233,0);
-INSERT INTO `chartdetails` VALUES (810000,60,0,0,119.553699970245,0);
-INSERT INTO `chartdetails` VALUES (810000,61,0,0,119.553699970245,0);
-INSERT INTO `chartdetails` VALUES (810000,62,0,0,119.553699970245,0);
-INSERT INTO `chartdetails` VALUES (810000,63,0,0,119.553699970245,0);
-INSERT INTO `chartdetails` VALUES (810000,64,0,0,119.553699970245,0);
-INSERT INTO `chartdetails` VALUES (810000,65,0,0,119.553699970245,0);
-INSERT INTO `chartdetails` VALUES (810000,66,0,0,119.553699970245,0);
-INSERT INTO `chartdetails` VALUES (810000,67,0,0,119.553699970245,0);
-INSERT INTO `chartdetails` VALUES (810000,68,0,0,119.553699970245,0);
-INSERT INTO `chartdetails` VALUES (820000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (810000,57,0,0,0.783749997615814,0);
+INSERT INTO `chartdetails` VALUES (810000,58,0,0,0.783749997615814,0);
+INSERT INTO `chartdetails` VALUES (810000,59,0,12.5,0.783749997615814,0);
+INSERT INTO `chartdetails` VALUES (810000,60,0,0,13.2836999893188,0);
+INSERT INTO `chartdetails` VALUES (810000,61,0,0,13.2836999893188,0);
+INSERT INTO `chartdetails` VALUES (810000,62,0,0,13.2836999893188,0);
+INSERT INTO `chartdetails` VALUES (810000,63,0,0,13.2836999893188,0);
+INSERT INTO `chartdetails` VALUES (810000,64,0,0,13.2836999893188,0);
+INSERT INTO `chartdetails` VALUES (810000,65,0,0,13.2836999893188,0);
+INSERT INTO `chartdetails` VALUES (810000,66,0,0,13.2836999893188,0);
+INSERT INTO `chartdetails` VALUES (810000,67,0,0,13.2836999893188,0);
+INSERT INTO `chartdetails` VALUES (810000,68,0,0,13.2836999893188,0);
 INSERT INTO `chartdetails` VALUES (820000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (820000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (820000,54,0,0,0,0);
@@ -3419,25 +3329,23 @@ INSERT INTO `chartdetails` VALUES (820000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (820000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (820000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (820000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (890000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (890000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (890000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (890000,54,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (890000,55,0,5.34999990463257,0,0);
-INSERT INTO `chartdetails` VALUES (890000,56,0,0,48.1499991416931,0);
-INSERT INTO `chartdetails` VALUES (890000,57,0,-0.375,48.1499991416931,0);
-INSERT INTO `chartdetails` VALUES (890000,58,0,0,44.7749991416931,0);
-INSERT INTO `chartdetails` VALUES (890000,59,0,17.1899989917875,44.7749991416931,0);
-INSERT INTO `chartdetails` VALUES (890000,60,0,135.090001702309,199.484992086888,0);
-INSERT INTO `chartdetails` VALUES (890000,61,0,0,1415.29500967264,0);
-INSERT INTO `chartdetails` VALUES (890000,62,0,0,1415.29500967264,0);
-INSERT INTO `chartdetails` VALUES (890000,63,0,0,1415.29500967264,0);
-INSERT INTO `chartdetails` VALUES (890000,64,0,0,1415.29500967264,0);
-INSERT INTO `chartdetails` VALUES (890000,65,0,0,1415.29500967264,0);
-INSERT INTO `chartdetails` VALUES (890000,66,0,0,1415.29500967264,0);
-INSERT INTO `chartdetails` VALUES (890000,67,0,0,1415.29500967264,0);
-INSERT INTO `chartdetails` VALUES (890000,68,0,0,1415.29500967264,0);
-INSERT INTO `chartdetails` VALUES (900000,51,0,0,0,0);
+INSERT INTO `chartdetails` VALUES (890000,56,0,0,5.34999990463257,0);
+INSERT INTO `chartdetails` VALUES (890000,57,0,-0.375,5.34999990463257,0);
+INSERT INTO `chartdetails` VALUES (890000,58,0,0,4.97499990463257,0);
+INSERT INTO `chartdetails` VALUES (890000,59,0,17.1900005340576,4.97499990463257,0);
+INSERT INTO `chartdetails` VALUES (890000,60,0,135.089996337891,22.1650009155273,0);
+INSERT INTO `chartdetails` VALUES (890000,61,0,0,157.255004882812,0);
+INSERT INTO `chartdetails` VALUES (890000,62,0,0,157.255004882812,0);
+INSERT INTO `chartdetails` VALUES (890000,63,0,0,157.255004882812,0);
+INSERT INTO `chartdetails` VALUES (890000,64,0,0,157.255004882812,0);
+INSERT INTO `chartdetails` VALUES (890000,65,0,0,157.255004882812,0);
+INSERT INTO `chartdetails` VALUES (890000,66,0,0,157.255004882812,0);
+INSERT INTO `chartdetails` VALUES (890000,67,0,0,157.255004882812,0);
+INSERT INTO `chartdetails` VALUES (890000,68,0,0,157.255004882812,0);
 INSERT INTO `chartdetails` VALUES (900000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (900000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (900000,54,0,0,0,0);
@@ -3455,7 +3363,6 @@ INSERT INTO `chartdetails` VALUES (900000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (900000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (900000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (900000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (910000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (910000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (910000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (910000,54,0,0,0,0);
@@ -3473,7 +3380,6 @@ INSERT INTO `chartdetails` VALUES (910000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (910000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (910000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (910000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (920000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (920000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (920000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (920000,54,0,0,0,0);
@@ -3491,7 +3397,6 @@ INSERT INTO `chartdetails` VALUES (920000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (920000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (920000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (920000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (930000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (930000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (930000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (930000,54,0,0,0,0);
@@ -3509,7 +3414,6 @@ INSERT INTO `chartdetails` VALUES (930000,65,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (930000,66,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (930000,67,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (930000,68,0,0,0,0);
-INSERT INTO `chartdetails` VALUES (940000,51,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (940000,52,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (940000,53,0,0,0,0);
 INSERT INTO `chartdetails` VALUES (940000,54,0,0,0,0);
@@ -3651,53 +3555,55 @@ INSERT INTO `companies` VALUES (1,'Demo System','15-325-122','','PO Box 999 Well
 -- Dumping data for table `config`
 --
 
-INSERT INTO `config` VALUES ('DefaultLanguage','en_GB');
-INSERT INTO `config` VALUES ('DefaultDateFormat','m/d/Y');
-INSERT INTO `config` VALUES ('DefaultTheme','professional');
-INSERT INTO `config` VALUES ('PastDueDays1','30');
-INSERT INTO `config` VALUES ('PastDueDays2','60');
-INSERT INTO `config` VALUES ('DefaultCreditLimit','1000');
-INSERT INTO `config` VALUES ('Show_Settled_LastMonth','1');
-INSERT INTO `config` VALUES ('RomalpaClause','Ownership will not pass to the buyer until the goods have been paid for in full.');
-INSERT INTO `config` VALUES ('QuickEntries','10');
-INSERT INTO `config` VALUES ('DispatchCutOffTime','14');
 INSERT INTO `config` VALUES ('AllowSalesOfZeroCostItems','0');
-INSERT INTO `config` VALUES ('CreditingControlledItems_MustExist','0');
-INSERT INTO `config` VALUES ('DefaultPriceList','WS');
-INSERT INTO `config` VALUES ('Default_Shipper','1');
-INSERT INTO `config` VALUES ('DoFreightCalc','0');
-INSERT INTO `config` VALUES ('FreightChargeAppliesIfLessThan','1000');
-INSERT INTO `config` VALUES ('DefaultTaxLevel','1');
-INSERT INTO `config` VALUES ('TaxAuthorityReferenceName','Tax Ref');
-INSERT INTO `config` VALUES ('CountryOfOperation','USD');
-INSERT INTO `config` VALUES ('NumberOfPeriodsOfStockUsage','12');
-INSERT INTO `config` VALUES ('Check_Qty_Charged_vs_Del_Qty','1');
+INSERT INTO `config` VALUES ('AutoDebtorNo','0');
+INSERT INTO `config` VALUES ('CheckCreditLimits','0');
 INSERT INTO `config` VALUES ('Check_Price_Charged_vs_Order_Price','1');
-INSERT INTO `config` VALUES ('OverChargeProportion','30');
-INSERT INTO `config` VALUES ('OverReceiveProportion','20');
-INSERT INTO `config` VALUES ('PO_AllowSameItemMultipleTimes','1');
-INSERT INTO `config` VALUES ('YearEnd','3');
-INSERT INTO `config` VALUES ('PageLength','48');
-INSERT INTO `config` VALUES ('part_pics_dir','part_pics');
-INSERT INTO `config` VALUES ('MaxImageSize','300');
-INSERT INTO `config` VALUES ('reports_dir','reports');
+INSERT INTO `config` VALUES ('Check_Qty_Charged_vs_Del_Qty','1');
+INSERT INTO `config` VALUES ('CountryOfOperation','USD');
+INSERT INTO `config` VALUES ('CreditingControlledItems_MustExist','0');
+INSERT INTO `config` VALUES ('DB_Maintenance','1');
+INSERT INTO `config` VALUES ('DB_Maintenance_LastRun','2005-04-23');
+INSERT INTO `config` VALUES ('DefaultBlindPackNote','1');
+INSERT INTO `config` VALUES ('DefaultCreditLimit','1000');
+INSERT INTO `config` VALUES ('DefaultDateFormat','d/m/Y');
+INSERT INTO `config` VALUES ('DefaultDisplayRecordsMax','50');
+INSERT INTO `config` VALUES ('DefaultPriceList','WS');
+INSERT INTO `config` VALUES ('DefaultTaxLevel','1');
+INSERT INTO `config` VALUES ('DefaultTheme','fresh');
+INSERT INTO `config` VALUES ('Default_Shipper','1');
+INSERT INTO `config` VALUES ('DispatchCutOffTime','14');
+INSERT INTO `config` VALUES ('DoFreightCalc','0');
 INSERT INTO `config` VALUES ('EDIHeaderMsgId','D:01B:UN:EAN010');
 INSERT INTO `config` VALUES ('EDIReference','WEBERP');
+INSERT INTO `config` VALUES ('EDI_Incoming_Orders','EDI_Incoming_Orders');
 INSERT INTO `config` VALUES ('EDI_MsgPending','EDI_Pending');
 INSERT INTO `config` VALUES ('EDI_MsgSent','EDI_Sent');
-INSERT INTO `config` VALUES ('EDI_Incoming_Orders','EDI_Incoming_Orders');
-INSERT INTO `config` VALUES ('DefaultDisplayRecordsMax','50');
-INSERT INTO `config` VALUES ('RadioBeaconStockLocation','CPT');
-INSERT INTO `config` VALUES ('RadioBeaconHomeDir','/home/RadioBeacon');
-INSERT INTO `config` VALUES ('RadioBeaconFileCounter','/home/RadioBeacon/FileCounter');
-INSERT INTO `config` VALUES ('RadioBreaconFilePrefix','ORDXX');
-INSERT INTO `config` VALUES ('RadioBraconFTP_server','192.168.2.2');
-INSERT INTO `config` VALUES ('RadioBeaconFTP_user_name','RadioBeacon ftp server user name');
-INSERT INTO `config` VALUES ('RadionBeaconFTP_user_pass','Radio Beacon remote ftp server password');
-INSERT INTO `config` VALUES ('AutoDebtorNo','0');
+INSERT INTO `config` VALUES ('FreightChargeAppliesIfLessThan','1000');
 INSERT INTO `config` VALUES ('HTTPS_Only','0');
-INSERT INTO `config` VALUES ('DB_Maintenance','1');
-INSERT INTO `config` VALUES ('DB_Maintenance_LastRun','2005-03-27');
+INSERT INTO `config` VALUES ('MaxImageSize','300');
+INSERT INTO `config` VALUES ('NumberOfPeriodsOfStockUsage','12');
+INSERT INTO `config` VALUES ('OverChargeProportion','30');
+INSERT INTO `config` VALUES ('OverReceiveProportion','20');
+INSERT INTO `config` VALUES ('PackNoteFormat','1');
+INSERT INTO `config` VALUES ('PageLength','48');
+INSERT INTO `config` VALUES ('part_pics_dir','part_pics');
+INSERT INTO `config` VALUES ('PastDueDays1','30');
+INSERT INTO `config` VALUES ('PastDueDays2','60');
+INSERT INTO `config` VALUES ('PO_AllowSameItemMultipleTimes','1');
+INSERT INTO `config` VALUES ('QuickEntries','10');
+INSERT INTO `config` VALUES ('RadioBeaconFileCounter','/home/RadioBeacon/FileCounter');
+INSERT INTO `config` VALUES ('RadioBeaconFTP_user_name','RadioBeacon ftp server user name');
+INSERT INTO `config` VALUES ('RadioBeaconHomeDir','/home/RadioBeacon');
+INSERT INTO `config` VALUES ('RadioBeaconStockLocation','BL');
+INSERT INTO `config` VALUES ('RadioBraconFTP_server','192.168.2.2');
+INSERT INTO `config` VALUES ('RadioBreaconFilePrefix','ORDXX');
+INSERT INTO `config` VALUES ('RadionBeaconFTP_user_pass','Radio Beacon remote ftp server password');
+INSERT INTO `config` VALUES ('reports_dir','reports');
+INSERT INTO `config` VALUES ('RomalpaClause','Ownership will not pass to the buyer until the goods have been paid for in full.');
+INSERT INTO `config` VALUES ('Show_Settled_LastMonth','1');
+INSERT INTO `config` VALUES ('TaxAuthorityReferenceName','Tax Ref');
+INSERT INTO `config` VALUES ('YearEnd','3');
 
 --
 -- Dumping data for table `contractbom`
@@ -3742,30 +3648,29 @@ INSERT INTO `custallocns` VALUES (54,'99.0000','2004-11-28',68,56);
 -- Dumping data for table `custbranch`
 --
 
-INSERT INTO `custbranch` VALUES ('1234','12345678','One Two Three Four Five Six Seven Eight','','','','',1,'AR','25',0,'','','','','DEN',1,10,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('BILLYBUNT','BILLYBUNT','William Bunter Inc','Unit C Fatboy Industrial Estate','Donut Drive','Colchester','England',3,'UK','25',0,'','','','','MUC',6,10,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('DSSAD','DSSAD','Dressner und Dressner','133 Strasse Grunter','Berlin','Deutcshe','',1,'AR','2',0,'','','','','DEN',1,8,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('GRAN','GRANHR','Gramtham Horton PLC','2 Growler Terraces','West Hemington','BE22 FD2','England',4,'UK','25',0,'','','Ed Heath','','MUC',6,1,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('JOHN','JOHNSON','San Diego','198 Greater Lofty Heights','San Diego','California','USA',2,'AR','25',0,'2412 22356','2412 23549','Rod Champion','rod.champion@johnson.com','DEN',5,1,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('JOHNTEMPE','JOHNSON','Johnson Vehicles Tempe','654 Roberto Street','Tempe','Arizona','USA',2,'AR','2',0,'56565 444 44','222 44 55','Holly Drako','','DEN',5,1,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('TRFGSDIDSI','WALMON','l;sdlm\'mkl\'vm','ldsfklmvkl','','','',1,'AR','2',0,'','','kmvdklmfdklm','','DEN',1,1,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('WALM','WALMON','Wallace Monterey - Sydney','309 Centennial Highway','Ballmain, Sydney','New South Wales 4133','Australia',16,'AR','25',0,'+61 2 3546 8875','+61 2 3546 8874','Phyllis Archibald','phyllis@WallMonterey.com.au','MEL',1,1,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('WALMOADEL','WALMON','Wallace Monterey - Adelaide','2-6 Devon Street','Clovelly Park','Adelaide South Australia 3122','Australia',18,'AR','25',0,'+61 3544 2113','+61 3544 2103','Brian Morrisey','brian@WallMonterey.com.au','MEL',1,1,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('WATT','WATTSGRP','Watts Motor Group Head Office and Admin','81 Trimble Road','Gimlet Rock','Greater Hampton','Arizona',2,'AR','25',0,'233 5442 3255','233 5442 3254','Bill Gobster','billg@watts.motors.com','MEL',5,1,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('WATTLA','WATTSGRP','Watts Group Los Angeles','922 Acton Lane','Reefston','Los Angeles','California',2,'CA','25',0,'235 446 998','235 446 654','Graham Bigglesworth','gbiggles@watts.motors.com','DEN',5,1,0,'','','','','');
-INSERT INTO `custbranch` VALUES ('WATTSSAND','WATTSGRP','Watts Group San Diego','42 Grafton Place','San Diego','California','',2,'CA','25',0,'355 224 566','355 224 544','Sharon Stonely','sstonely@watts.motors.com','DEN',5,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('1234','12345678','One Two Three Four Five Six Seven Eight','','','','',1,'AR','25',0,'','','','','DEN',1,10,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('BILLYBUNT','BILLYBUNT','William Bunter Inc','Unit C Fatboy Industrial Estate','Donut Drive','Colchester','England',3,'UK','25',0,'','','','','MUC',6,10,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('GRAN','GRANHR','Gramtham Horton PLC','2 Growler Terraces','West Hemington','BE22 FD2','England',4,'UK','25',0,'','','Ed Heath','','MUC',6,1,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('JOHN','JOHNSON','San Diego','198 Greater Lofty Heights','San Diego','California','USA',2,'AR','25',0,'2412 22356','2412 23549','Rod Champion','rod.champion@johnson.com','DEN',5,1,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('JOHNTEMPE','JOHNSON','Johnson Vehicles Tempe','654 Roberto Street','Tempe','Arizona','USA',2,'AR','2',0,'56565 444 44','222 44 55','Holly Drako','','DEN',5,1,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('TRFGSDIDSI','WALMON','l;sdlm\'mkl\'vm','ldsfklmvkl','','','',1,'AR','2',0,'','','kmvdklmfdklm','','DEN',1,1,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('WALM','WALMON','Wallace Monterey - Sydney','309 Centennial Highway','Ballmain, Sydney','New South Wales 4133','Australia',16,'AR','25',0,'+61 2 3546 8875','+61 2 3546 8874','Phyllis Archibald','phyllis@WallMonterey.com.au','MEL',1,1,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('WALMOADEL','WALMON','Wallace Monterey - Adelaide','2-6 Devon Street','Clovelly Park','Adelaide South Australia 3122','Australia',18,'AR','25',0,'+61 3544 2113','+61 3544 2103','Brian Morrisey','brian@WallMonterey.com.au','MEL',1,1,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('WATT','WATTSGRP','Watts Motor Group Head Office and Admin','81 Trimble Road','Gimlet Rock','Greater Hampton','Arizona',2,'AR','25',0,'233 5442 3255','233 5442 3254','Bill Gobster','billg@watts.motors.com','MEL',5,1,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('WATTLA','WATTSGRP','Watts Group Los Angeles','922 Acton Lane','Reefston','Los Angeles','California',2,'CA','25',0,'235 446 998','235 446 654','Graham Bigglesworth','gbiggles@watts.motors.com','DEN',5,1,1,0,'','','','','');
+INSERT INTO `custbranch` VALUES ('WATTSSAND','WATTSGRP','Watts Group San Diego','42 Grafton Place','San Diego','California','',2,'CA','25',0,'355 224 566','355 224 544','Sharon Stonely','sstonely@watts.motors.com','DEN',5,1,1,0,'','','','','');
 
 --
 -- Dumping data for table `debtorsmaster`
 --
 
-INSERT INTO `debtorsmaster` VALUES ('12345678','One Two Three Four Five Six Seven Eight','','','','','USD','WS','2003-03-27 00:00:00',1,'20',0.1000,0.0200,53.2500,'2003-03-27 00:00:00',1000,'',0,'',0,0,'','email','','','');
-INSERT INTO `debtorsmaster` VALUES ('BILLYBUNT','William Bunter Inc','Unit C Fatboy Industrial Estate','Donut Drive','Colchester','England','GBP','WS','2004-07-17 00:00:00',1,'30',0.0000,0.0000,12.5000,'2004-07-17 00:00:00',1000,'',0,'',0,0,'','email','','','');
-INSERT INTO `debtorsmaster` VALUES ('DSSAD','Dressner und Dressner','133 Strasse Grunter','Berlin','Deutcshe','','USD','WS','2004-11-28 00:00:00',1,'20',0.0000,0.0000,50.2500,'2005-01-03 00:00:00',1000,'',0,'',0,0,'','email','','','');
-INSERT INTO `debtorsmaster` VALUES ('GRANHR','Gramtham Horton PLC','P O Box 7755','West Hemington','BE22 FD2','England','USD','EX','2003-03-24 00:00:00',1,'20',0.0000,0.0000,30.0000,'2003-06-23 00:00:00',1000,'',0,'',0,0,'','email','','','');
-INSERT INTO `debtorsmaster` VALUES ('JOHNSON','Johnson Vehicle Company Inc','1103 Garrison Road East','Detroit','Michigan','','USD','WS','1978-02-26 00:00:00',1,'30',0.0000,0.0000,2203.3100,'2004-01-14 00:00:00',10000,'',0,'',0,0,'','email','','','');
-INSERT INTO `debtorsmaster` VALUES ('WALMON','Wallace Monterey Pty Ltd','P O Box 564','Ballmain, Sydney','New South Wales 4133','Australia','AUD','EX','1989-05-06 00:00:00',1,'30',0.0000,0.0000,2000.0000,'2003-01-31 00:00:00',30000,'',0,'',1,1,'5412345000013','email','edi@walmon.com','','');
-INSERT INTO `debtorsmaster` VALUES ('WATTSGRP','Watts Motor Group Inc','P O Box 1230','Gimlet Rock','Greater Hampton','Arizona','USD','WS','2003-01-16 00:00:00',1,'7',0.0000,0.0000,122.9000,'2004-11-28 00:00:00',25000,'',0,'',0,0,'','email','','','');
+INSERT INTO `debtorsmaster` VALUES ('12345678','One Two Three Four Five Six Seven Eight','','','','','USD','WS','2003-03-27 00:00:00',1,'20',0.1000,0.0200,53.2500,'2003-03-27 00:00:00',1000,0,'',0,0,'','email','','','','');
+INSERT INTO `debtorsmaster` VALUES ('BILLYBUNT','William Bunter Inc','Unit C Fatboy Industrial Estate','Donut Drive','Colchester','England','GBP','WS','2004-07-17 00:00:00',1,'30',0.0000,0.0000,12.5000,'2004-07-17 00:00:00',1000,0,'',0,0,'','email','','','','');
+INSERT INTO `debtorsmaster` VALUES ('DSSAD','Dressner und Dressner','133 Strasse Grunter','Berlin','Deutcshe','','USD','WS','2004-11-28 00:00:00',1,'20',0.0000,0.0000,0.0000,NULL,1000,0,'',0,0,'','email','','','','');
+INSERT INTO `debtorsmaster` VALUES ('GRANHR','Gramtham Horton PLC','P O Box 7755','West Hemington','BE22 FD2','England','USD','EX','2003-03-24 00:00:00',1,'20',0.0000,0.0000,30.0000,'2003-06-23 00:00:00',1000,0,'',0,0,'','email','','','','');
+INSERT INTO `debtorsmaster` VALUES ('JOHNSON','Johnson Vehicle Company Inc','1103 Garrison Road East','Detroit','Michigan','','USD','WS','1978-02-26 00:00:00',1,'30',0.0000,0.0000,2203.3100,'2004-01-14 00:00:00',10000,0,'',0,0,'','email','','','','');
+INSERT INTO `debtorsmaster` VALUES ('WALMON','Wallace Monterey Pty Ltd','P O Box 564','Ballmain, Sydney','New South Wales 4133','Australia','AUD','EX','1989-05-06 00:00:00',1,'30',0.0000,0.0000,2000.0000,'2003-01-31 00:00:00',30000,0,'',1,1,'5412345000013','email','edi@walmon.com','','','');
+INSERT INTO `debtorsmaster` VALUES ('WATTSGRP','Watts Motor Group Inc','P O Box 1230','Gimlet Rock','Greater Hampton','Arizona','USD','WS','2003-01-16 00:00:00',1,'7',0.0000,0.0000,122.9000,'2004-11-28 00:00:00',25000,0,'',0,0,'','email','','','','');
 
 --
 -- Dumping data for table `debtortrans`
@@ -3796,8 +3701,6 @@ INSERT INTO `debtortrans` VALUES (79,9,11,'WALMON','WALM','2004-11-27 00:00:00',
 INSERT INTO `debtortrans` VALUES (80,10,11,'WALMON','WALM','2004-11-27 00:00:00',59,1,'','EX',0,1.700000,-0.487500011920929,0,0,0,0,-0.490000009536743,'','',0,'');
 INSERT INTO `debtortrans` VALUES (81,2,12,'WATTSGRP','','2004-11-28 00:00:00',59,0,'Cash testing agains','',0,1.000000,-122.900001525879,0,0,-2.5,0,0,'','',0,'');
 INSERT INTO `debtortrans` VALUES (82,11,11,'BILLYBUNT','BILLYBUNT','2004-11-30 00:00:00',59,0,'','WS',0,0.800000,-6.65000009536743,0,0,0,0,0,'','',0,'');
-INSERT INTO `debtortrans` VALUES (83,4,12,'DSSAD','','2005-01-03 00:00:00',61,0,'Cheques one two thre','',0,1.000000,-50.25,0,0,-20,0,0,'','',0,'');
-INSERT INTO `debtortrans` VALUES (84,14,10,'DSSAD','DSSAD','2005-03-28 00:00:00',63,0,'','WS',46,1.000000,585.2,58.52,0,0,0,0,'Balance of Shocks to follow','8',0,'');
 
 --
 -- Dumping data for table `discountmatrix`
@@ -4157,7 +4060,7 @@ INSERT INTO `gltrans` VALUES (662,20,15,0,'2004-11-18',59,800000,'BIGBISC - Inv 
 INSERT INTO `gltrans` VALUES (663,21,6,0,'2004-11-01',59,23700,'BIGBISC',-24.0300006866455,1,'');
 INSERT INTO `gltrans` VALUES (664,21,6,0,'2004-11-01',59,890000,'BIGBISC - Credit Note 78777 GBP2 @ a rate of .8322',-2.40000009536743,1,'');
 INSERT INTO `gltrans` VALUES (665,21,6,0,'2004-11-01',59,800000,'BIGBISC - Credit Note 78777 GBP22.00 @ a rate of .8322',26.4400005340576,1,'');
-INSERT INTO `gltrans` VALUES (666,25,14,0,'2004-11-23',59,24000,'PO: 17 BIGBISC -  - Test nominal item x 1 @ 0.00',1.875,1,'');
+INSERT INTO `gltrans` VALUES (666,25,14,0,'2004-11-23',59,24000,'PO: 17 BIGBISC -  - Test nominal item x 1 @ 0.00',0,1,'');
 INSERT INTO `gltrans` VALUES (667,25,14,0,'2004-11-23',59,723000,'PO: 17 BIGBISC -  - Test nominal item x 1 @ 1.88',-1.875,1,'');
 INSERT INTO `gltrans` VALUES (668,25,15,0,'2004-11-23',59,24000,'PO: 17 BIGBISC -  - Test nominal item x 1 @ 1.88',1.875,1,'');
 INSERT INTO `gltrans` VALUES (669,25,15,0,'2004-11-23',59,723000,'PO: 17 BIGBISC -  - Test nominal item x 1 @ 1.88',-1.875,1,'');
@@ -4221,15 +4124,6 @@ INSERT INTO `gltrans` VALUES (726,22,7,0,'2004-12-31',60,800000,'FREDBLOW - Fred
 INSERT INTO `gltrans` VALUES (727,20,17,0,'2004-12-06',60,20000,'FREDBLOW sklsdalnk',35.9900016784668,1,'');
 INSERT INTO `gltrans` VALUES (728,20,17,0,'2004-12-06',60,890000,'FREDBLOW - Inv 56444 USD3.6 @ a rate of 1.0000',3.59999990463257,1,'');
 INSERT INTO `gltrans` VALUES (729,20,17,0,'2004-12-06',60,800000,'FREDBLOW - Inv 56444 USD39.59 @ a rate of 1.0000',-39.5900001525879,1,'');
-INSERT INTO `gltrans` VALUES (730,12,4,0,'2005-01-03',61,502000,'dreams',-2.5,1,'');
-INSERT INTO `gltrans` VALUES (731,12,4,0,'2005-01-03',61,700000,'',52.75,1,'');
-INSERT INTO `gltrans` VALUES (732,12,4,0,'2005-01-03',61,710000,'',-70.25,1,'');
-INSERT INTO `gltrans` VALUES (733,12,4,0,'2005-01-03',61,455000,'',20,1,'');
-INSERT INTO `gltrans` VALUES (734,1,19,0,'2005-01-23',61,24000,'Erich Von Hammer Haulage',152.949996948242,1,'');
-INSERT INTO `gltrans` VALUES (735,1,19,0,'2005-01-23',61,700000,'',-152.949996948242,1,'');
-INSERT INTO `gltrans` VALUES (736,10,14,0,'2005-03-28',63,107,'DSSAD - HON92FrSus x 11 @ 53.2000',-585.2,0,'');
-INSERT INTO `gltrans` VALUES (737,10,14,0,'2005-03-28',63,710000,'DSSAD',643.72,0,'');
-INSERT INTO `gltrans` VALUES (738,10,14,0,'2005-03-28',63,810000,'DSSAD',-58.52,0,'');
 
 --
 -- Dumping data for table `grns`
@@ -4276,12 +4170,11 @@ INSERT INTO `locstock` VALUES ('DEN','125',304.0,0);
 INSERT INTO `locstock` VALUES ('DEN','127',0.0,0);
 INSERT INTO `locstock` VALUES ('DEN','130',0.0,0);
 INSERT INTO `locstock` VALUES ('DEN','140',0.0,0);
-INSERT INTO `locstock` VALUES ('DEN','FROOM',0.0,0);
-INSERT INTO `locstock` VALUES ('DEN','HON90021',56.2,12);
+INSERT INTO `locstock` VALUES ('DEN','HON90021',78.2,12);
 INSERT INTO `locstock` VALUES ('DEN','HON90022',-7.0,0);
 INSERT INTO `locstock` VALUES ('DEN','HON92FrSus',0.0,0);
 INSERT INTO `locstock` VALUES ('DEN','HONCIVIC92SET',0.0,0);
-INSERT INTO `locstock` VALUES ('DEN','HONShock',-22.0,0);
+INSERT INTO `locstock` VALUES ('DEN','HONShock',0.0,0);
 INSERT INTO `locstock` VALUES ('MEL','*19_1',0.0,0);
 INSERT INTO `locstock` VALUES ('MEL','*20_1',0.0,0);
 INSERT INTO `locstock` VALUES ('MEL','123',0.0,0);
@@ -4289,7 +4182,6 @@ INSERT INTO `locstock` VALUES ('MEL','125',1200.0,0);
 INSERT INTO `locstock` VALUES ('MEL','127',0.0,0);
 INSERT INTO `locstock` VALUES ('MEL','130',0.0,0);
 INSERT INTO `locstock` VALUES ('MEL','140',532.0,0);
-INSERT INTO `locstock` VALUES ('MEL','FROOM',0.0,0);
 INSERT INTO `locstock` VALUES ('MEL','HON90021',488.0,12);
 INSERT INTO `locstock` VALUES ('MEL','HON90022',0.0,0);
 INSERT INTO `locstock` VALUES ('MEL','HON92FrSus',0.0,0);
@@ -4302,7 +4194,6 @@ INSERT INTO `locstock` VALUES ('MUC','125',37.0,0);
 INSERT INTO `locstock` VALUES ('MUC','127',0.0,0);
 INSERT INTO `locstock` VALUES ('MUC','130',0.0,0);
 INSERT INTO `locstock` VALUES ('MUC','140',0.0,0);
-INSERT INTO `locstock` VALUES ('MUC','FROOM',0.0,0);
 INSERT INTO `locstock` VALUES ('MUC','HON90021',-4.0,1);
 INSERT INTO `locstock` VALUES ('MUC','HON90022',5.0,0);
 INSERT INTO `locstock` VALUES ('MUC','HON92FrSus',0.0,0);
@@ -4325,7 +4216,7 @@ INSERT INTO `orderdeliverydifferenceslog` VALUES (35,13,'HOND9022',2.0000,'JOHNS
 -- Dumping data for table `paymentmethods`
 --
 
-INSERT INTO `paymentmethods` VALUES (1,'Cheques',1,1);
+INSERT INTO `paymentmethods` VALUES (1,'Cheque',1,1);
 INSERT INTO `paymentmethods` VALUES (2,'Cash',1,1);
 INSERT INTO `paymentmethods` VALUES (3,'Direct Credit',1,1);
 
@@ -4369,9 +4260,6 @@ INSERT INTO `prices` VALUES ('123','EX','AUD','','9.6500','\'\'');
 INSERT INTO `prices` VALUES ('123','EX','USD','','2.9500','\'\'');
 INSERT INTO `prices` VALUES ('123','WS','AUD','','12.3500','\'\'');
 INSERT INTO `prices` VALUES ('123','WS','USD','','3.2000','\'\'');
-INSERT INTO `prices` VALUES ('FROOM','EX','USD','','53.2500','');
-INSERT INTO `prices` VALUES ('FROOM','WS','AUD','','100.0000','');
-INSERT INTO `prices` VALUES ('FROOM','WS','USD','','58.9000','');
 INSERT INTO `prices` VALUES ('HON90021','EX','AUD','','25.0000','\'\'');
 INSERT INTO `prices` VALUES ('HON90021','EX','AUD','WALMON','22.7500','');
 INSERT INTO `prices` VALUES ('HON90021','EX','USD','','12.6500','\'\'');
@@ -4406,7 +4294,7 @@ INSERT INTO `purchorderdetails` VALUES (31,16,'123','2005-02-23','12.3mm Round S
 INSERT INTO `purchorderdetails` VALUES (32,16,'125','2004-11-02','12.5mm round steel',720000,3.0000,5.2000,0.0000,0.6200,200.0000,202.0000,0,'0',1);
 INSERT INTO `purchorderdetails` VALUES (33,17,'','2004-11-24','Test nominal item',24000,0.0000,1.5000,0.0000,1.8750,5.0000,2.0000,0,'',0);
 INSERT INTO `purchorderdetails` VALUES (34,18,'123','2005-02-23','12.3mm Round Steel coil',720000,0.0000,12.5000,0.0000,0.0000,521.0000,0.0000,8,'0',0);
-INSERT INTO `purchorderdetails` VALUES (35,19,'*19_1','2005-05-31','1300kg 520mm height, 160mm dia spring',722000,0.0000,23.5000,0.0000,0.0000,25.0000,0.0000,12,'',0);
+INSERT INTO `purchorderdetails` VALUES (35,19,'*19_1','2005-01-01','1300kg 520mm height, 160mm dia spring',722000,0.0000,23.5000,0.0000,0.0000,25.0000,0.0000,0,'',0);
 INSERT INTO `purchorderdetails` VALUES (36,20,'*20_1','2004-12-02','testing any old item',722000,0.0000,5.0000,0.0000,0.0000,15.0000,0.0000,0,'',0);
 
 --
@@ -4425,14 +4313,11 @@ INSERT INTO `purchorders` VALUES (20,'GREGCA','','2004-12-01 00:00:00',0.8000,NU
 -- Dumping data for table `recurringsalesorders`
 --
 
-INSERT INTO `recurringsalesorders` VALUES (1,'WALMON','WALM','CF_44321',NULL,'','2005-03-25','EX',8,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','phyllis@WallMonterey.com.','Wallace Monterey - Sydney',0,'MEL','2005-03-03',12,'2006-03-26',0);
 
 --
 -- Dumping data for table `recurrsalesorderdetails`
 --
 
-INSERT INTO `recurrsalesorderdetails` VALUES (1,'HON90021',22.7500,21.0000,0.0000,'');
-INSERT INTO `recurrsalesorderdetails` VALUES (1,'HON90022',26.9000,5.0000,0.0500,'');
 
 --
 -- Dumping data for table `reportcolumns`
@@ -4478,7 +4363,6 @@ INSERT INTO `salesanalysis` VALUES ('WS',59,15.8600,2.1000,'JOHNSON','JOHNTEMPE'
 INSERT INTO `salesanalysis` VALUES ('EX',59,-73.5294,-48.4500,'WALMON','WALM',-5.0000,0.0000,'HON90021','AR',1,'25','Coil',66);
 INSERT INTO `salesanalysis` VALUES ('EX',59,-0.2941,-6.2000,'WALMON','WALM',-10.0000,-0.0074,'125','AR',1,'25','Steel',67);
 INSERT INTO `salesanalysis` VALUES ('WS',59,-8.3125,-10.5000,'BILLYBUNT','BILLYBUNT',-5.0000,0.0000,'HON90022','UK',1,'25','Coil',68);
-INSERT INTO `salesanalysis` VALUES ('WS',63,585.2000,0.0000,'DSSAD','DSSAD',11.0000,0.0000,'HON92FrSus','AR',1,'2','SUSASS',69);
 
 --
 -- Dumping data for table `salescat`
@@ -4538,39 +4422,27 @@ INSERT INTO `salesorderdetails` VALUES (40,'*19_1',0.0000,42.9500,25.0000,0,0.00
 INSERT INTO `salesorderdetails` VALUES (41,'*20_1',0.0000,25.9000,15.0000,0,0.0000,'0000-00-00 00:00:00',0,'');
 INSERT INTO `salesorderdetails` VALUES (42,'123',0.0000,9.6500,11.0000,0,0.0150,'0000-00-00 00:00:00',0,'');
 INSERT INTO `salesorderdetails` VALUES (42,'125',0.0000,12.6600,25.0000,0,0.0000,'0000-00-00 00:00:00',0,'');
-INSERT INTO `salesorderdetails` VALUES (43,'FROOM',0.0000,58.9000,4.0000,0,0.0000,'0000-00-00 00:00:00',0,'');
-INSERT INTO `salesorderdetails` VALUES (44,'HON90021',0.0000,0.0000,23.0000,0,0.2000,'0000-00-00 00:00:00',0,'');
-INSERT INTO `salesorderdetails` VALUES (45,'HON90021',0.0000,22.7500,21.0000,0,0.0000,'0000-00-00 00:00:00',0,'');
-INSERT INTO `salesorderdetails` VALUES (45,'HON90022',0.0000,26.9000,5.0000,0,0.0500,'0000-00-00 00:00:00',0,'');
-INSERT INTO `salesorderdetails` VALUES (46,'HON92FrSus',11.0000,53.2000,15.0000,0,0.0000,'2005-03-28 00:00:00',0,'');
-INSERT INTO `salesorderdetails` VALUES (46,'HONShock',0.0000,25.9000,3.0000,0,0.0500,'0000-00-00 00:00:00',0,'');
-INSERT INTO `salesorderdetails` VALUES (47,'HON90022',0.0000,25.2100,5.0000,0,0.2000,'0000-00-00 00:00:00',0,'');
 
 --
 -- Dumping data for table `salesorders`
 --
 
-INSERT INTO `salesorders` VALUES (27,'WALMON','WALM','',NULL,' Inv 1','2004-07-13','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',0,'MEL','2004-07-13',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (28,'WATTSGRP','WATTLA','',NULL,' Inv 2 Inv 6','2004-07-29','WS',1,'922 Acton Lane','Reefston','Los Angeles','California','235 446 998','','Watts Group Los Angeles',0,'DEN','2004-07-30',1,'2004-07-29',0);
-INSERT INTO `salesorders` VALUES (29,'WALMON','WALM','',NULL,' Inv 3','2004-08-15','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',0,'MEL','2004-08-20',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (30,'WALMON','WALM','',NULL,' Inv 4','2004-09-20','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',0,'MEL','2004-09-21',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (31,'GRANHR','GRAN','',NULL,' Inv 5 Inv 7 Inv 8','2004-09-20','EX',1,'2 Growler Terraces','West Hemington','BE22 FD2','England','','','Gramtham Horton PLC',0,'MUC','2004-09-21',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (32,'WALMON','WALMOADEL','',NULL,'','2004-09-24','EX',1,'2-6 Devon Street','Clovelly Park','Adelaide South','Australia','+61 3544 2113','','Wallace Monterey - Adelaide',0,'MEL','2004-09-25',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (33,'GRANHR','GRAN','9887',NULL,' Inv 9','2004-09-24','EX',1,'2 Growler Terraces','West Hemington','BE22 FD2','England','','','Gramtham Horton PLC',0,'MUC','2004-09-25',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (34,'WATTSGRP','WATT','',NULL,' Inv 10','2004-09-24','WS',1,'81 Trimble Road','Gimlet Rock','Greater Hampton','Arizona','233 5442 3255','','Watts Motor Group Head Office and Admin',0,'MEL','2004-09-25',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (35,'JOHNSON','JOHNTEMPE','',NULL,' Inv 12 Inv 13','2004-09-24','WS',1,'654 Roberto Street','Tempe','Arizona','USA','56565 444 44','','Johnson Vehicles Tempe',0,'DEN','2004-09-25',1,'2031-10-20',0);
-INSERT INTO `salesorders` VALUES (36,'WALMON','WALM','',NULL,'','2004-11-19','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',0,'MEL','2004-11-19',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (37,'GRANHR','GRAN','',NULL,'','2004-11-28','EX',1,'2 Growler Terraces','West Hemington','BE22 FD2','England','','','Gramtham Horton PLC',0,'MUC','2004-11-29',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (38,'BILLYBUNT','BILLYBUNT','',NULL,'','2004-11-28','WS',10,'Unit C Fatboy Industrial Estate','Donut Drive','Colchester','England','','','William Bunter Inc',0,'MUC','2004-11-29',1,'2004-11-28',0);
-INSERT INTO `salesorders` VALUES (39,'BILLYBUNT','BILLYBUNT','',NULL,'','2004-11-30','WS',10,'Unit C Fatboy Industrial Estate','Donut Drive','Colchester','England','','','William Bunter Inc',0,'MUC','2004-11-30',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (40,'12345678','1234','FR12335',NULL,NULL,'2004-12-01','WS',10,'','','','','','','One Two Three Four Five Six Seven Eight',0,'DEN','2005-01-01',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (41,'12345678','1234','221114',NULL,NULL,'2004-12-01','WS',10,'','','','','','','One Two Three Four Five Six Seven Eight',0,'DEN','2004-12-02',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (42,'WALMON','WALM','',NULL,'','2004-12-06','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',0,'MEL','2004-12-06',1,'2004-12-06',0);
-INSERT INTO `salesorders` VALUES (43,'JOHNSON','JOHNTEMPE','',NULL,'','2005-02-05','WS',1,'654 Roberto Street','Tempe','Arizona','USA','56565 444 44','','Johnson Vehicles Tempe',0,'DEN','2005-02-07',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (44,'BILLYBUNT','BILLYBUNT','',NULL,'','2005-03-19','WS',10,'Unit C Fatboy Industrial Estate','Donut Drive','Colchester','England','','','William Bunter Inc',0,'MUC','2005-03-21',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (45,'WALMON','WALM','CF_44321',NULL,'','2005-03-03','EX',8,'','','','','+61 2 3546 8875','phyllis@WallMonterey.com.','Wallace Monterey - Sydney',0,'MEL','2005-03-03',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (46,'DSSAD','DSSAD','844321',NULL,' Inv 14','2005-03-26','WS',8,'133 Strasse Grunter','Berlin','Deutcshe','','','','Dressner und Dressner',0,'DEN','2005-03-28',0,'0000-00-00',0);
-INSERT INTO `salesorders` VALUES (47,'DSSAD','DSSAD','',NULL,'','2005-03-26','WS',8,'133 Strasse Grunter','Berlin','Deutcshe','','','','Dressner und Dressner',0,'DEN','2005-03-28',0,'0000-00-00',1);
+INSERT INTO `salesorders` VALUES (27,'WALMON','WALM','',NULL,' Inv 1','2004-07-13','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',1,0,'MEL','2004-07-13',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (28,'WATTSGRP','WATTLA','',NULL,' Inv 2 Inv 6','2004-07-29','WS',1,'922 Acton Lane','Reefston','Los Angeles','California','235 446 998','','Watts Group Los Angeles',1,0,'DEN','2004-07-30',1,'2004-07-29',0);
+INSERT INTO `salesorders` VALUES (29,'WALMON','WALM','',NULL,' Inv 3','2004-08-15','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',1,0,'MEL','2004-08-20',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (30,'WALMON','WALM','',NULL,' Inv 4','2004-09-20','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',1,0,'MEL','2004-09-21',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (31,'GRANHR','GRAN','',NULL,' Inv 5 Inv 7 Inv 8','2004-09-20','EX',1,'2 Growler Terraces','West Hemington','BE22 FD2','England','','','Gramtham Horton PLC',1,0,'MUC','2004-09-21',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (32,'WALMON','WALMOADEL','',NULL,'','2004-09-24','EX',1,'2-6 Devon Street','Clovelly Park','Adelaide South','Australia','+61 3544 2113','','Wallace Monterey - Adelaide',1,0,'MEL','2004-09-25',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (33,'GRANHR','GRAN','9887',NULL,' Inv 9','2004-09-24','EX',1,'2 Growler Terraces','West Hemington','BE22 FD2','England','','','Gramtham Horton PLC',1,0,'MUC','2004-09-25',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (34,'WATTSGRP','WATT','',NULL,' Inv 10','2004-09-24','WS',1,'81 Trimble Road','Gimlet Rock','Greater Hampton','Arizona','233 5442 3255','','Watts Motor Group Head Office and Admin',1,0,'MEL','2004-09-25',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (35,'JOHNSON','JOHNTEMPE','',NULL,' Inv 12 Inv 13','2004-09-24','WS',1,'654 Roberto Street','Tempe','Arizona','USA','56565 444 44','','Johnson Vehicles Tempe',1,0,'DEN','2004-09-25',1,'2031-10-20',0);
+INSERT INTO `salesorders` VALUES (36,'WALMON','WALM','',NULL,'','2004-11-19','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',1,0,'MEL','2004-11-19',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (37,'GRANHR','GRAN','',NULL,'','2004-11-28','EX',1,'2 Growler Terraces','West Hemington','BE22 FD2','England','','','Gramtham Horton PLC',1,0,'MUC','2004-11-29',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (38,'BILLYBUNT','BILLYBUNT','',NULL,'','2004-11-28','WS',10,'Unit C Fatboy Industrial Estate','Donut Drive','Colchester','England','','','William Bunter Inc',1,0,'MUC','2004-11-29',1,'2004-11-28',0);
+INSERT INTO `salesorders` VALUES (39,'BILLYBUNT','BILLYBUNT','',NULL,'','2004-11-30','WS',10,'Unit C Fatboy Industrial Estate','Donut Drive','Colchester','England','','','William Bunter Inc',1,0,'MUC','2004-11-30',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (40,'12345678','1234','FR12335',NULL,NULL,'2004-12-01','WS',10,'','','','','','','One Two Three Four Five Six Seven Eight',1,0,'DEN','2005-01-01',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (41,'12345678','1234','221114',NULL,NULL,'2004-12-01','WS',10,'','','','','','','One Two Three Four Five Six Seven Eight',1,0,'DEN','2004-12-02',0,'0000-00-00',0);
+INSERT INTO `salesorders` VALUES (42,'WALMON','WALM','',NULL,'','2004-12-06','EX',1,'309 Centennial Highway','Ballmain, Sydney','New South Wales','Australia','+61 2 3546 8875','','Wallace Monterey - Sydney',1,0,'MEL','2004-12-06',1,'2004-12-06',0);
 
 --
 -- Dumping data for table `salestypes`
@@ -4754,6 +4626,8 @@ INSERT INTO `scripts` VALUES (166,'PDFCustomerList.php','Creates a report of the
 -- Dumping data for table `securitygroups`
 --
 
+INSERT INTO `securitygroups` VALUES (1,1);
+INSERT INTO `securitygroups` VALUES (1,2);
 INSERT INTO `securitygroups` VALUES (2,1);
 INSERT INTO `securitygroups` VALUES (2,2);
 INSERT INTO `securitygroups` VALUES (2,11);
@@ -4775,8 +4649,10 @@ INSERT INTO `securitygroups` VALUES (6,2);
 INSERT INTO `securitygroups` VALUES (6,3);
 INSERT INTO `securitygroups` VALUES (6,4);
 INSERT INTO `securitygroups` VALUES (6,5);
+INSERT INTO `securitygroups` VALUES (6,6);
 INSERT INTO `securitygroups` VALUES (6,7);
 INSERT INTO `securitygroups` VALUES (6,8);
+INSERT INTO `securitygroups` VALUES (6,9);
 INSERT INTO `securitygroups` VALUES (6,10);
 INSERT INTO `securitygroups` VALUES (6,11);
 INSERT INTO `securitygroups` VALUES (7,1);
@@ -4795,13 +4671,12 @@ INSERT INTO `securitygroups` VALUES (8,12);
 INSERT INTO `securitygroups` VALUES (8,13);
 INSERT INTO `securitygroups` VALUES (8,14);
 INSERT INTO `securitygroups` VALUES (8,15);
-INSERT INTO `securitygroups` VALUES (10,1);
-INSERT INTO `securitygroups` VALUES (10,2);
 
 --
 -- Dumping data for table `securityroles`
 --
 
+INSERT INTO `securityroles` VALUES (1,'Inquiries/Order Entry');
 INSERT INTO `securityroles` VALUES (2,'Manufac/Stock Admin');
 INSERT INTO `securityroles` VALUES (3,'Purchasing Officer');
 INSERT INTO `securityroles` VALUES (4,'AP Clerk');
@@ -4809,27 +4684,26 @@ INSERT INTO `securityroles` VALUES (5,'AR Clerk');
 INSERT INTO `securityroles` VALUES (6,'Accountant');
 INSERT INTO `securityroles` VALUES (7,'Customer Log On Only');
 INSERT INTO `securityroles` VALUES (8,'System Administrator');
-INSERT INTO `securityroles` VALUES (10,'Inquiries Only');
 
 --
 -- Dumping data for table `securitytokens`
 --
 
-INSERT INTO `securitytokens` VALUES (1,'Menu and order entry only');
-INSERT INTO `securitytokens` VALUES (2,'Inventory, AR & AP inquiries & reports');
-INSERT INTO `securitytokens` VALUES (3,'AR setup customers, areas, receipts, allocations, credit notes, salesfolk, credit status');
-INSERT INTO `securitytokens` VALUES (4,'PO Entry, Purchasing data & reorder levels');
-INSERT INTO `securitytokens` VALUES (5,'AP Invoice, Credit, Payment entry. Supplier maintenance');
+INSERT INTO `securitytokens` VALUES (1,'Order Entry/Inquiries customer access only');
+INSERT INTO `securitytokens` VALUES (2,'Basic Reports and Inquiries with selection options');
+INSERT INTO `securitytokens` VALUES (3,'Credit notes and AR management');
+INSERT INTO `securitytokens` VALUES (4,'Purchasing data/PO Entry/Reorder Levels');
+INSERT INTO `securitytokens` VALUES (5,'Accounts Payable');
 INSERT INTO `securitytokens` VALUES (6,'Not Used');
-INSERT INTO `securitytokens` VALUES (7,'Bank reconciliations');
-INSERT INTO `securitytokens` VALUES (8,'General Ledger reports and inquiries');
+INSERT INTO `securitytokens` VALUES (7,'Bank Reconciliations');
+INSERT INTO `securitytokens` VALUES (8,'General ledger reports/inquiries');
 INSERT INTO `securitytokens` VALUES (9,'Not Used');
-INSERT INTO `securitytokens` VALUES (10,'GL Journals, COA, sales/COGS GL postings, terms, cost update, company prefs');
-INSERT INTO `securitytokens` VALUES (11,'Pricing & Inventory locations, categories, receiving & adjustments ');
-INSERT INTO `securitytokens` VALUES (12,'Not Used');
-INSERT INTO `securitytokens` VALUES (13,'Not Used');
-INSERT INTO `securitytokens` VALUES (14,'Not Used');
-INSERT INTO `securitytokens` VALUES (15,'User management, System Admin setup & utilities');
+INSERT INTO `securitytokens` VALUES (10,'General Ledger Maintenance, stock valuation & Configuration');
+INSERT INTO `securitytokens` VALUES (11,'Inventory Management and Pricing');
+INSERT INTO `securitytokens` VALUES (12,'Unknown');
+INSERT INTO `securitytokens` VALUES (13,'Unknown');
+INSERT INTO `securitytokens` VALUES (14,'Unknown');
+INSERT INTO `securitytokens` VALUES (15,'User Management and System Administration');
 
 --
 -- Dumping data for table `shipmentcharges`
@@ -4844,7 +4718,6 @@ INSERT INTO `shipmentcharges` VALUES (2,3,21,5,'125',-1.19000005722046);
 
 INSERT INTO `shipments` VALUES (3,'0','Bunga Testarossa','2004-08-31 00:00:00',0.0000,'BIGBISC',0);
 INSERT INTO `shipments` VALUES (8,'1225','Rotoiti','2005-02-23 00:00:00',0.0000,'GREGCA',0);
-INSERT INTO `shipments` VALUES (11,'V665','Esta Bandan','2005-05-31 00:00:00',0.0000,'GREGCA',0);
 
 --
 -- Dumping data for table `shippers`
@@ -4867,16 +4740,14 @@ INSERT INTO `stockcategory` VALUES ('SUSASS','Suspension Assemblie','F',722000,2
 -- Dumping data for table `stockcheckfreeze`
 --
 
-INSERT INTO `stockcheckfreeze` VALUES ('*19_1','MEL',0);
-INSERT INTO `stockcheckfreeze` VALUES ('*20_1','MEL',0);
-INSERT INTO `stockcheckfreeze` VALUES ('123','MEL',0);
-INSERT INTO `stockcheckfreeze` VALUES ('125','MEL',1200);
-INSERT INTO `stockcheckfreeze` VALUES ('127','MEL',0);
-INSERT INTO `stockcheckfreeze` VALUES ('130','MEL',0);
-INSERT INTO `stockcheckfreeze` VALUES ('140','MEL',532);
-INSERT INTO `stockcheckfreeze` VALUES ('HON90021','MEL',488);
-INSERT INTO `stockcheckfreeze` VALUES ('HON90022','MEL',0);
-INSERT INTO `stockcheckfreeze` VALUES ('HONShock','MEL',-5);
+INSERT INTO `stockcheckfreeze` VALUES ('123','DEN',-2);
+INSERT INTO `stockcheckfreeze` VALUES ('125','DEN',314);
+INSERT INTO `stockcheckfreeze` VALUES ('127','DEN',0);
+INSERT INTO `stockcheckfreeze` VALUES ('130','DEN',0);
+INSERT INTO `stockcheckfreeze` VALUES ('140','DEN',0);
+INSERT INTO `stockcheckfreeze` VALUES ('HON90021','DEN',7);
+INSERT INTO `stockcheckfreeze` VALUES ('HON90022','DEN',-7);
+INSERT INTO `stockcheckfreeze` VALUES ('HONShock','DEN',0);
 
 --
 -- Dumping data for table `stockcounts`
@@ -4895,8 +4766,7 @@ INSERT INTO `stockmaster` VALUES ('123','Steel','12.3mm Round Steel coil','X4k g
 INSERT INTO `stockmaster` VALUES ('125','Steel','12.5mm round steel','12.5mm diameter round steel X4K grade	','each','B','1800-01-01','0.0000','0.6200','0.6325','0.0000','0.0000',0,0,1,1200.00,'0.0210','1.0000','','',1,0,0);
 INSERT INTO `stockmaster` VALUES ('127','Steel','X3K 12.7mm spring steel','X3K 12.7mm spring steel','each','B','1800-01-01','0.0000','0.0000','0.0000','0.0000','0.0000',0,0,1,200.00,'0.0000','0.0000','','',1,0,3);
 INSERT INTO `stockmaster` VALUES ('130','Steel','13mm round spring steel X4K grade','13mm round spring steel X4K grade	','Kgs','B','1800-01-01','0.0000','0.0000','0.6200','0.0000','0.0000',0,0,0,1200.00,'0.0600','1.0000','','',1,0,0);
-INSERT INTO `stockmaster` VALUES ('140','Steel','14mm round steel X4k grade','14mm round steel X4k grade	','meters','B','1800-01-01','0.0000','0.0000','0.6200','0.0000','0.0000',0,0,0,1250.00,'0.0200','1.0000','','',1,0,0);
-INSERT INTO `stockmaster` VALUES ('FROOM','Steel','Frodo Omosis Experiment','Frodo Omosis Experiment','each','B','1800-01-01','0.0000','0.0000','36.2500','0.0000','0.0000',0,0,0,0.00,'0.0000','0.0000','','',1,0,0);
+INSERT INTO `stockmaster` VALUES ('140','Steel','14mm round steel X4k grade','14mm round steel X4k grade	','metres','B','1800-01-01','0.0000','0.0000','0.6200','0.0000','0.0000',0,0,0,1250.00,'0.0200','1.0000','','',1,0,0);
 INSERT INTO `stockmaster` VALUES ('HON90021','Coil','Honda Civic front coil spring 1990-94','Honda Civic front coil spring 1990-94	','each','M','1800-01-01','0.0000','0.0000','6.8900','1.6000','1.2000',0,0,1,50.00,'0.3000','3.0000','','SP',1,0,3);
 INSERT INTO `stockmaster` VALUES ('HON90022','Coil','Honda Civic rear coil spring 1990-94','Honda Civic rear coil spring 1990-94	','each','M','1800-01-01','0.0000','0.0000','2.1000','0.0000','0.0000',0,0,0,50.00,'0.0000','3.0000','','SP',5,0,0);
 INSERT INTO `stockmaster` VALUES ('HON92FrSus','SUSASS','Honda 92 Front suspension assembly','Honda 92 Front suspension assembly','each','A','1800-01-01','0.0000','0.0000','0.0000','0.0000','0.0000',0,0,0,0.00,'0.0000','0.0000','','',1,0,0);
@@ -4963,11 +4833,6 @@ INSERT INTO `stockmoves` VALUES (207,'140',17,5,'MEL','2004-12-01','','','0.0000
 INSERT INTO `stockmoves` VALUES (208,'125',17,6,'DEN','2004-12-01','','','0.0000',60,'',5.0000,0.0000,0.0000,1,314,0,0,'');
 INSERT INTO `stockmoves` VALUES (209,'125',16,8,'DEN','2004-12-02','','','0.0000',60,'To Melbourne Australia',-10.0000,0.0000,0.0000,1,304,0,0,'');
 INSERT INTO `stockmoves` VALUES (210,'125',16,8,'MEL','2004-12-02','','','0.0000',60,'From Denver',10.0000,0.0000,0.0000,1,1200,0,0,'');
-INSERT INTO `stockmoves` VALUES (211,'HON90021',10,14,'DEN','2005-03-28','DSSAD','DSSAD','0.0000',63,'Assembly: HON92FrSus Order: 46',-22.0000,0.0000,9.6900,0,56.2,0,0,'');
-INSERT INTO `stockmoves` VALUES (212,'HONShock',10,14,'DEN','2005-03-28','DSSAD','DSSAD','0.0000',63,'Assembly: HON92FrSus Order: 46',-22.0000,0.0000,8.5000,0,-22,0,0,'');
-INSERT INTO `stockmoves` VALUES (213,'HON92FrSus',10,14,'DEN','2005-03-28','DSSAD','DSSAD','53.2000',63,'46',-11.0000,0.0000,0.0000,1,0,0,0.1,'');
-INSERT INTO `stockmoves` VALUES (214,'130',17,7,'DEN','2005-03-26','','','0.0000',63,'',5.0000,0.0000,0.0000,1,5,0,0,'');
-INSERT INTO `stockmoves` VALUES (215,'130',17,8,'DEN','2005-03-26','','','0.0000',63,'',-5.0000,0.0000,0.0000,1,0,0,0,'');
 
 --
 -- Dumping data for table `stockserialitems`
@@ -5115,15 +4980,15 @@ INSERT INTO `supptrans` VALUES (17,20,'FREDBLOW','56444','2004-12-06','2005-01-2
 --
 
 INSERT INTO `systypes` VALUES (0,'Journal - GL',10);
-INSERT INTO `systypes` VALUES (1,'Payment - GL',19);
+INSERT INTO `systypes` VALUES (1,'Payment - GL',18);
 INSERT INTO `systypes` VALUES (2,'Receipt - GL',3);
 INSERT INTO `systypes` VALUES (3,'Standing Journal',0);
-INSERT INTO `systypes` VALUES (10,'Sales Invoice',14);
+INSERT INTO `systypes` VALUES (10,'Sales Invoice',13);
 INSERT INTO `systypes` VALUES (11,'Credit Note',11);
-INSERT INTO `systypes` VALUES (12,'Receipt',4);
+INSERT INTO `systypes` VALUES (12,'Receipt',3);
 INSERT INTO `systypes` VALUES (15,'Journal - Debtors',0);
 INSERT INTO `systypes` VALUES (16,'Location Transfer',8);
-INSERT INTO `systypes` VALUES (17,'Stock Adjustment',8);
+INSERT INTO `systypes` VALUES (17,'Stock Adjustment',6);
 INSERT INTO `systypes` VALUES (18,'Purchase Order',0);
 INSERT INTO `systypes` VALUES (20,'Purchase Invoice',17);
 INSERT INTO `systypes` VALUES (21,'Debit Note',8);
@@ -5134,7 +4999,7 @@ INSERT INTO `systypes` VALUES (26,'Work Order Receipt',0);
 INSERT INTO `systypes` VALUES (28,'Work Order Issue',0);
 INSERT INTO `systypes` VALUES (29,'Work Order Variance',0);
 INSERT INTO `systypes` VALUES (30,'Sales Order',0);
-INSERT INTO `systypes` VALUES (31,'Shipment Close',12);
+INSERT INTO `systypes` VALUES (31,'Shipment Close',8);
 INSERT INTO `systypes` VALUES (35,'Cost Update',6);
 INSERT INTO `systypes` VALUES (50,'Opening Balance',0);
 INSERT INTO `systypes` VALUES (500,'Auto Debtor Number',10000);
@@ -5177,12 +5042,12 @@ INSERT INTO `taxauthorities` VALUES (6,'UK VAT',890000,890000,'','','','');
 -- Dumping data for table `unitsofmeasure`
 --
 
-INSERT INTO `unitsofmeasure` VALUES (2,'meters');
+INSERT INTO `unitsofmeasure` VALUES (1,'each');
+INSERT INTO `unitsofmeasure` VALUES (2,'metres');
 INSERT INTO `unitsofmeasure` VALUES (3,'kgs');
 INSERT INTO `unitsofmeasure` VALUES (4,'litres');
-INSERT INTO `unitsofmeasure` VALUES (7,'length');
+INSERT INTO `unitsofmeasure` VALUES (5,'length');
 INSERT INTO `unitsofmeasure` VALUES (6,'pack');
-INSERT INTO `unitsofmeasure` VALUES (1,'each');
 
 --
 -- Dumping data for table `workcentres`
@@ -5199,11 +5064,12 @@ INSERT INTO `workcentres` VALUES ('ASSEM','DEN','Assembly',1.0000,'20.0000',5600
 -- Dumping data for table `www_users`
 --
 
-INSERT INTO `www_users` VALUES ('demo','f0f77a7f88e7c1e93ab4e316b4574c7843b00ea4','Demonstration user','','','','DEN',8,'2005-03-27 11:09:00','','A4','1,1,1,1,1,1,1,1,',0,50,'professional','en_GB');
-INSERT INTO `www_users` VALUES ('testy','f0f77a7f88e7c1e93ab4e316b4574c7843b00ea4','Test Remote User','GRANHR','','','DEN',7,'2005-02-10 21:11:20','GRAN','A4','0,0,0,0,0,0,0,0,',0,50,'fresh','pt_PT');
+INSERT INTO `www_users` VALUES ('demo','f0f77a7f88e7c1e93ab4e316b4574c7843b00ea4','Demonstration user','','','','DEN',8,'2005-04-23 16:03:39','','A4','1,1,1,1,1,1,1,1,',0,50,'professional','en','','');
+INSERT INTO `www_users` VALUES ('testy','weberp','Test Remote User','GRANHR','','','DEN',7,'2004-11-06 18:19:15','GRAN','A4','0,0,0,0,0,0,0,0,',0,0,'fresh','en','','');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 SET FOREIGN_KEY_CHECKS = 1;

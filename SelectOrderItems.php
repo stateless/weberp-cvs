@@ -1,6 +1,5 @@
 <?php
-
-/* $Revision: 1.22.2.4 $ */
+/* $Revision: 1.22.2.5 $ */
 
 require('includes/DefineCartClass.php');
 
@@ -18,6 +17,7 @@ if (isset($_GET['ModifyOrderNumber'])) {
 
 include('includes/header.inc');
 include('includes/GetPrice.inc');
+include('includes/SQL_CommonFunctions.inc');
 
 if (isset($_POST['QuickEntry'])){
    unset($_POST['PartSearch']);
@@ -101,7 +101,8 @@ if (isset($_GET['ModifyOrderNumber'])
 				salesorders.fromstkloc,
 				salesorders.printedpackingslip,
 				salesorders.datepackingslipprinted,
-				salesorders.quotation
+				salesorders.quotation,
+				salesorders.deliverblind
 			FROM salesorders, 
 				debtorsmaster, 
 				salestypes
@@ -142,7 +143,8 @@ if (isset($_GET['ModifyOrderNumber'])
 		$_SESSION['Items']->Orig_OrderDate = $myrow['orddate'];
 		$_SESSION['PrintedPackingSlip'] = $myrow['printedpackingslip'];
 		$_SESSION['DatePackingSlipPrinted'] = $myrow['datepackingslipprinted'];
-
+		$_SESSION['Items']->DeliverBlind = $myrow['deliverblind'];
+		
 /*need to look up customer name from debtors master then populate the line items array with the sales order details records */
 		$LineItemsSQL = "SELECT salesorderdetails.stkcode,
 				stockmaster.description,
@@ -345,7 +347,8 @@ if (isset($_POST['Select']) AND $_POST['Select']!='') {
 				custbranch.phoneno,
 				custbranch.email,
 				custbranch.defaultlocation,
-				custbranch.defaultshipvia
+				custbranch.defaultshipvia,
+				custbranch.deliverblind
 			FROM custbranch
 			WHERE custbranch.branchcode='" . $_SESSION['Items']->Branch . "'
 			AND custbranch.debtorno = '" . $_POST['Select'] . "'";
@@ -375,6 +378,19 @@ if (isset($_POST['Select']) AND $_POST['Select']!='') {
 		$_SESSION['Items']->Email = $myrow[6];
 		$_SESSION['Items']->Location = $myrow[7];
 		$_SESSION['Items']->ShipVia = $myrow[8];
+		$_SESSION['Items']->DeliverBlind = $myrow[9];
+		
+		if ($_SESSION['CheckCreditLimits'] > 0){  /*Check credit limits is 1 for warn and 2 for prohibit sales */
+			$_SESSION['Items']->CreditAvailable = GetCreditAvailable($_POST['Select'],$db);
+			
+			if ($_SESSION['CheckCreditLimits']==1 AND $_SESSION['Items']->CreditAvailable <=0){
+				prnMsg(_('The') . ' ' . $myrow[0] . ' ' . _('account is currently at or over their credit limit'),'warn');
+			} elseif ($_SESSION['CheckCreditLimits']==2 AND $_SESSION['Items']->CreditAvailable <=0){
+				prnMsg(_('No more orders can be placed by') . ' ' . $myrow[0] . ' ' . _(' their account is currently at or over their credit limit'),'warn');
+				include('includes/footer.inc');
+				exit;
+			}
+		}
 
 	} else {
 		prnMsg(_('The') . ' ' . $myrow[0] . ' ' . _('account is currently on hold please contact the credit control personnel to discuss'),'warn');
@@ -419,7 +435,8 @@ if (isset($_POST['Select']) AND $_POST['Select']!='') {
 			custbranch.braddress4,
 			custbranch.phoneno,
 			custbranch.email,
-			custbranch.defaultlocation
+			custbranch.defaultlocation,
+			custbranch.deliverblind
 			FROM custbranch
 			WHERE custbranch.branchcode='" . $_SESSION['Items']->Branch . "'
 			AND custbranch.debtorno = '" . $_SESSION['Items']->DebtorNo . "'";
@@ -437,6 +454,7 @@ if (isset($_POST['Select']) AND $_POST['Select']!='') {
 		$_SESSION['Items']->PhoneNo = $myrow[5];
 		$_SESSION['Items']->Email = $myrow[6];
 		$_SESSION['Items']->Location = $myrow[7];
+		$_SESSION['Items']->DeliverBlind = $myrow[8];
 
 	} else {
 		prnMsg(_('Sorry, your account has been put on hold for some reason, please contact the credit control personnel.'),'warn');
@@ -761,7 +779,6 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 					include('includes/SelectOrderItems_IntoCart.inc');
 				}
 			}
-
 	     } while ($i<=$_SESSION['QuickEntries']); /*loop to the next quick entry record */
 
 	     unset($NewItem);

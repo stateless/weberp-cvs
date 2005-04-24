@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.33.2.2 $ */
+
+/* $Revision: 1.33.2.3 $ */
+
 
 $PageSecurity = 1;
 
@@ -670,7 +672,7 @@ if (count($_SESSION['AllowedPageSecurityTokens'])==1){
 						<table>
 							<tr>
 							<td>
-								<?php echo "<img src=$rootpath/css/$theme/images/company.gif TITLE=" . _('General Setup Options') . '" ALT="">'; ?>
+								<?php echo "<img src=$rootpath/css/$theme/images/company.gif TITLE=\"" . _('General Setup Options') . '" ALT="">'; ?>
 							</td>
 							<td class="menu_group_headers_text">
 								<?php echo _('General'); ?>

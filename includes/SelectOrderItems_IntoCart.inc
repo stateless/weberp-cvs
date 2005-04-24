@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.13.2.4 $ */
+
+/* $Revision: 1.13.2.5 $ */
+
 /*SelectOrderItems_IntoCart.inc
 
 This snippet is used to enter order line items into the cart object:
@@ -94,10 +96,27 @@ if ($AlreadyOnThisOrder!=1){
 				$Discount = 0;
 			}
 			
-   			if ($_SESSION['Items']->add_to_cart ($NewItem,
+			$Price = GetPrice ($NewItem, $_SESSION['Items']->DebtorNo,$_SESSION['Items']->Branch, &$db);
+			
+			$WithinCreditLimit = true;
+			
+			if ($_SESSION['CheckCreditLimits'] > 0){  /*Check credit limits is 1 for warn 
+											and 2 for prohibit sales */
+				$_SESSION['Items']->CreditAvailable -= ($NewItemQty * $Price * (1-$Discount));
+			
+				if ($_SESSION['CheckCreditLimits']==1 AND $_SESSION['Items']->CreditAvailable <=0){
+					prnMsg(_('The customer account will breach their credit limit'),'warn');
+				} elseif ($_SESSION['CheckCreditLimits']==2 AND $_SESSION['Items']->CreditAvailable <=0){
+					prnMsg(_('No more lines can be added to this order the customer account is currently at or over their credit limit'),'warn');
+					$WithinCreditLimit = false;
+				}
+			}
+			
+			if ($WithinCreditLimit ==true){
+   				if ($_SESSION['Items']->add_to_cart ($NewItem,
 							$NewItemQty,
 							$myrow['description'],
-							GetPrice ($NewItem, $_SESSION['Items']->DebtorNo,$_SESSION['Items']->Branch, &$db),
+							$Price,
 							$Discount,
 							$myrow['units'],
 							$myrow['volume'],
@@ -116,10 +135,11 @@ if ($AlreadyOnThisOrder!=1){
 
 		      		$_SESSION['Items']->LineItems[($_SESSION['Items']->LineCounter -1)]->StandardCost = $myrow['standardcost'];
 			}
+		}
              } else {
 			prnMsg(_('The item code') . ' ' . $NewItem . ' ' . _('does not have a cost set up and order entry is set up to prohibit sales of items with no cost data entered'),'warn');
 	     }
-   }
+	}
 
 } /* end of if not already on the order */
 

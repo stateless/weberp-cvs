@@ -1,6 +1,8 @@
 <?php
 
-/* $Revision: 1.3.2.1 $ */
+
+/* $Revision: 1.3.2.2 $ */
+
 $PageSecurity = 3;
 include ('includes/session.inc');
 include('includes/SQL_CommonFunctions.inc');
@@ -88,7 +90,8 @@ if ($_POST['CategoryID']=='All' AND $_POST['Location']=='All'){
                      INNER JOIN stockmaster
                      ON salesorderdetails.stkcode = stockmaster.stockid
                 WHERE salesorders.orddate >='" . FormatDateForSQL($_POST['FromDate']) . "'
-                      AND salesorders.orddate <='" . FormatDateForSQL($_POST['ToDate']) . "'";
+                      AND salesorders.orddate <='" . FormatDateForSQL($_POST['ToDate']) . "'
+		      AND salesorders.quotation=0";
 
 } elseif ($_POST['CategoryID']!='All' AND $_POST['Location']=='All') {
 	$sql= "SELECT salesorders.orderno,
@@ -113,7 +116,8 @@ if ($_POST['CategoryID']=='All' AND $_POST['Location']=='All'){
                      ON salesorderdetails.stkcode = stockmaster.stockid
                 WHERE stockmaster.categoryid ='" . $_POST['CategoryID'] . "'
                       AND orddate >='" . FormatDateForSQL($_POST['FromDate']) . "'
-                      AND orddate <='" . FormatDateForSQL($_POST['ToDate']) . "'";
+                      AND orddate <='" . FormatDateForSQL($_POST['ToDate']) . "'
+		      AND salesorders.quotation=0";
 
 
 } elseif ($_POST['CategoryID']=='All' AND $_POST['Location']!='All') {
@@ -139,7 +143,8 @@ if ($_POST['CategoryID']=='All' AND $_POST['Location']=='All'){
                      ON salesorderdetails.stkcode = stockmaster.stockid
                 WHERE salesorders.fromstkloc ='" . $_POST['Location'] . "'
                       AND salesorders.orddate >='" . FormatDateForSQL($_POST['FromDate']) . "'
-                      AND salesorders.orddate <='" . FormatDateForSQL($_POST['ToDate']) . "'";
+                      AND salesorders.orddate <='" . FormatDateForSQL($_POST['ToDate']) . "'
+		      AND salesorders.quotation=0";
 
 
 } elseif ($_POST['CategoryID']!='All' AND $_POST['location']!='All'){
@@ -167,7 +172,8 @@ if ($_POST['CategoryID']=='All' AND $_POST['Location']=='All'){
                 WHERE stockmaster.categoryid ='" . $_POST['CategoryID'] . "'
                       AND salesorders.fromstkloc ='" . $_POST['Location'] . "'
                       AND salesorders.orddate >='" . FormatDateForSQL($_POST['FromDate']) . "'
-                      AND salesorders.orddate <='" . FormatDateForSQL($_POST['ToDate']) . "'";
+                      AND salesorders.orddate <='" . FormatDateForSQL($_POST['ToDate']) . "'
+		      AND salesorders.quotation=0";
 
 }
 

@@ -1,5 +1,6 @@
 <?php
-/* $Revision: 1.6.2.1 $ */
+
+/* $Revision: 1.6.2.2 $ */
 
 $PageSecurity = 2; /*viewing possible with inquiries but not mods */
 

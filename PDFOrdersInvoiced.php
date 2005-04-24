@@ -1,6 +1,8 @@
 <?php
 
-/* $Revision: 1.2.2.1 $ */
+
+/* $Revision: 1.2.2.2 $ */
+
 $PageSecurity = 3;
 include ('includes/session.inc');
 $title = _('Orders Invoiced Report');

@@ -1,5 +1,6 @@
 <?php
-/* $Revision: 1.9.2.1 $ */
+
+/* $Revision: 1.9.2.2 $ */
 
 $PageSecurity = 2;
 include('includes/session.inc');
@@ -250,7 +251,7 @@ If ($MakePDFThenDisplayIt OR $MakePDFThenEmailIt){
 	$mail->setText( _('Please find herewith our purchase order number').' ' . $OrderNo);
 	$mail->setSubject( _('Purchase Order Number').' ' . $OrderNo);
 	$mail->addAttachment($attachment, 'PurchOrder.pdf', 'application/pdf');
-	$mail->setFrom("$_SESSION['CompanyRecord']['coyname'] <'" . $_SESSION['CompanyRecord']['email'] ."'>");
+	$mail->setFrom($_SESSION['CompanyRecord']['coyname'] . "<'" . $_SESSION['CompanyRecord']['email'] ."'>");
 	$result = $mail->send(array($_POST['EmailTo']));
 	if ($result==1){
 		$failed = false;

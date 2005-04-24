@@ -1,6 +1,6 @@
 <?php
-/* $Revision: 1.29.2.1 $ */
- 
+
+/* $Revision: 1.29.2.2 $ */
     
 include('config.php');
 include('includes/ConnectDB.inc');
@@ -21,7 +21,6 @@ session_start();
 if (!isset($_SESSION['AttemptsCounter'])){
 	$_SESSION['AttemptsCounter'] = 0;
 }
-
     
 // 5 login attempts, show failed login screen
 if (!isset($_SESSION['AttemptsCounter'])) {
@@ -54,6 +53,7 @@ if (!isset($AllowAnyone)){ /* only do security checks if AllowAnyone is not true
 			include('includes/Login.php');
 			exit;
 		}
+		
 	
 		$sql = "SELECT www_users.fullaccess,
 				www_users.customerid,
@@ -129,8 +129,17 @@ if (!isset($AllowAnyone)){ /* only do security checks if AllowAnyone is not true
 	
 		} else {     // Incorrect password
 	
+			// 5 login attempts, show failed login screen
+			if (!isset($_SESSION['AttemptsCounter'])) {
+				$_SESSION['AttemptsCounter'] = 0;
+			} elseif ($_SESSION['AttemptsCounter'] >= 5 AND isset($_POST['UserNameEntryField'])) {
+				/*User blocked from future accesses until sysadmin releases */
+				$sql = "UPDATE www_users SET blocked=1 WHERE www_users.userid='" . $_POST['UserNameEntryField'] . "'";
+				$Auth_Result = DB_query($sql, $db);
+				die(include('includes/FailedLogin.php'));
+			}
 			$demo_text = '<FONT SIZE="3" COLOR="red"><b>' .  _('incorrect password') . '</B></FONT><BR><B>' . _('The user/password combination') . '<BR>' . _('is not a valid user of the system') . '</B>';
-			include('includes/Login.php');
+			die(include('includes/Login.php'));
 		}
 	}		// End of userid/password check
 } /* only do security checks if AllowAnyone is not true */
@@ -163,11 +172,12 @@ If (isset($_POST['Theme'])) {
 }
 
 if ($_SESSION['HTTPS_Only']==1){
-	if (!strstr('HTTPS',$_SERVER['SERVER_PROTOCOL'])){
+	if ($_SERVER['HTTPS']!='on'){
 		prnMsg('webERP is configured to allow only secure socket connections. Pages must be called with https:// ....','error');
 		exit;
 	}
 }
+
 
 /*Now users language has been set include the language setup script */
 include('includes/LanguageSetup.php');

@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.6.2.1 $ */
+
+/* $Revision: 1.6.2.2 $ */
+
 $PageSecurity = 2;
 
 include('includes/session.inc');
@@ -30,6 +32,7 @@ $sql = "SELECT salesorders.customerref,
 		salesorders.deladd2,
 		salesorders.deladd3,
 		salesorders.deladd4,
+		salesorders.deliverblind,
 		debtorsmaster.name,
 		debtorsmaster.address1,
 		debtorsmaster.address2,
@@ -65,6 +68,9 @@ if (DB_num_rows($result)==0){
 } elseif (DB_num_rows($result)==1){ /*There is only one order header returned - thats good! */
 
         $myrow = DB_fetch_array($result);
+        /* Place the deliver blind variable into a hold variable to used when
+        producing the packlist */
+        $DeliverBlind = $myrow['deliverblind'];
         if ($myrow['printedpackingslip']==1 AND ($_GET['Reprint']!='OK' OR !isset($_GET['Reprint']))){
                 $title = _('Print Packing Slip Error');
                 include('includes/header.inc');

@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.3.2.1 $ */
+
+/* $Revision: 1.3.2.2 $ */
+
 define ('LIKE','ILIKE');
 /* $PgConnStr = $PgConnStr = "host=".$host." dbname=".$DatabaseName; */
  $PgConnStr = 'dbname='.$DatabaseName;

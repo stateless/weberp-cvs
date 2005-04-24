@@ -1,5 +1,6 @@
 <?php
-/* $Revision: 1.8.2.1 $ */
+
+/* $Revision: 1.8.2.2 $ */
 
 
 $PageSecurity=15;
@@ -20,7 +21,10 @@ if (isset($_POST['submit'])) {
 
 	/* actions to take once the user has clicked the submit button
 	ie the page has called itself with some user input */
-
+	if ( trim( $_POST['Description'] ) == '' ) {
+		$InputError = 1;
+		prnMsg( _('The tax type description may not be empty'), 'error');
+	}
 
 	if (isset($SelectedTaxAuthID)) {
 
@@ -89,13 +93,14 @@ if (isset($_POST['submit'])) {
 			
 		}
 	}
-
-	unset($SelectedTaxAuthID);
-	unset($_POST['Description']);
-	unset($_POST['Bank']);
-	unset($_POST['BankAccType']);
-	unset($_POST['BankAcc']);
-	unset($_POST['BankSwift']);
+	//run the SQL from either of the above possibilites
+	if ($InputError !=1) {
+		unset( $_POST['TaxGLCode']);
+		unset( $_POST['PurchTaxGLCode']);
+		unset( $_POST['Description']);
+		unset( $SelectedTaxID );
+	}
+	echo "<P>$msg<BR>";
 
 	prnMsg($msg);
 		
@@ -248,7 +253,7 @@ while ($myrow = DB_fetch_array($result)) {
 	} else {
 		echo "<OPTION VALUE='";
 	}
-	echo $myrow['accountcode'] . "'>" . $myrow['accountname'];
+	echo $myrow['accountcode'] . "'>" . $myrow['accountname'] . ' ('.$myrow['accountcode'].')';
 
 } //end while loop
 
@@ -265,7 +270,7 @@ while ($myrow = DB_fetch_array($result)) {
 	} else {
 		echo '<OPTION VALUE=';
 	}
-	echo $myrow['accountcode'] . '>' . $myrow['accountname'];
+	echo $myrow['accountcode'] . '>' . $myrow['accountname'] . ' ('.$myrow['accountcode'].')';
 
 } //end while loop
 

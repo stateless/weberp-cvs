@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.6.2.1 $ */
+<
+/* $Revision: 1.6.2.2 $ */
+
 $PageSecurity = 2;
 
 include('includes/session.inc');
@@ -17,6 +19,8 @@ If (isset($_REQUEST['OrderNumber']) AND $_REQUEST['OrderNumber']!='') {
 	if (!is_numeric($_REQUEST['OrderNumber'])){
 		  echo '<BR><B>' . _('The Order Number entered MUST be numeric') . '</B><BR>';
 		  unset ($_REQUEST['OrderNumber']);
+		  include('includes/footer.inc');
+		  exit;
 	} else {
 		echo _('Order Number') . ' - ' . $_REQUEST['OrderNumber'];
 	}
@@ -434,7 +438,12 @@ If (isset($StockItemsResult)) {
 
 		$ModifyPage = $rootpath . "/SelectOrderItems.php?" . SID . '&ModifyOrderNumber=' . $myrow['orderno'];
 		$Confirm_Invoice = $rootpath . '/ConfirmDispatch_Invoice.php?' . SID . '&OrderNumber=' .$myrow['orderno'];
-		$PrintDispatchNote = $rootpath . '/PrintCustOrder.php?' . SID . '&TransNo=' . $myrow['orderno'];
+		
+		if ($_SESSION['PackNoteFormat']==1){ /*Laser printed A4 default */
+			$PrintDispatchNote = $rootpath . '/PrintCustOrder_generic.php?' . SID . '&TransNo=' . $myrow['orderno'];
+		} else { /*pre-printed stationery default */
+			$PrintDispatchNote = $rootpath . '/PrintCustOrder.php?' . SID . '&TransNo=' . $myrow['orderno'];
+		}
 		$PrintQuotation = $rootpath . '/PDFQuotation.php?' . SID . '&QuotationNo=' . $myrow['orderno'];
 		$FormatedDelDate = ConvertSQLDate($myrow['deliverydate']);
 		$FormatedOrderDate = ConvertSQLDate($myrow['orddate']);

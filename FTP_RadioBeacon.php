@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.5.2.1 $ */
+/* $Revision: 1.5.2.2 $ */
 
 /*Variables required to configure this script must be set in config.php */
 

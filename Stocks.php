@@ -1,5 +1,6 @@
 <?php
-/* $Revision: 1.16.2.4 $ */
+
+/* $Revision: 1.16.2.5 $ */
 
 
 $PageSecurity = 11;
@@ -648,6 +649,8 @@ $html_imagefile = $rootpath . '/' . $_SESSION['part_pics_dir'] . '/' . $StockID 
 $dir_imagefile = './' . $_SESSION['part_pics_dir'] . '/' . $StockID . '.jpg';
 
 
+echo '</TABLE></TD><TD><CENTER>' . _('Image') . '<BR>'.$StockImgLink . '</CENTER></TD></TR></TABLE>';
+
 if (function_exists('imagecreatefrompng')){
 	$StockImgLink = '<img src="GetStockImage.php?SID&automake=1&textcolor=FFFFFF&bgcolor=CCCCCC'.
 		'&stockid='.urlencode($StockID.'.jpg').
@@ -664,6 +667,9 @@ if (function_exists('imagecreatefrompng')){
 }
 
 echo '</TABLE></TD><TD><CENTER>' . _('Image') . '<BR>'.$StockImgLink . '</CENTER></TD></TR></TABLE>';
+	
+//echo '</TABLE></TD><TD><CENTER>' . _('Image') . '<BR><img src=' . $rootpath . '/' . $_SESSION['part_pics_dir'] . '/' . $StockID . '.jpg' . '>' . '</CENTER></TD></TR></TABLE>';
+
 
 
 if (isset($_POST['New']) OR $_POST['New']!="") {

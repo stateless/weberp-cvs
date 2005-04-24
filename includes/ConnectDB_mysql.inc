@@ -1,5 +1,7 @@
 <?php
-/* $Revision: 1.2.2.1 $ */
+
+/* $Revision: 1.2.2.2 $ */
+
 
 define ('LIKE','LIKE');
 

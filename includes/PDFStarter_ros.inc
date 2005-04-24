@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.8 $ */
+/* $Revision: 1.8.2.1 $ */
 include ('includes/class.pdf.php');
 
 if (isset($SessionSavePath)){
@@ -7,6 +7,26 @@ if (isset($SessionSavePath)){
 }
 
 session_start();
+include('includes/GetConfig.php');
+
+If (isset($_POST['Theme'])) {
+	$_SESSION['Theme'] = $_POST['Theme'];
+	$theme = $_POST['Theme'];
+} elseif (!isset($_SESSION['Theme'])) {
+	$theme = $_SESSION['DefaultTheme'];
+	$_SESSION['Theme'] = $_SESSION['DefaultTheme'];
+	
+} else {
+	$theme = $_SESSION['Theme'];
+}
+
+if ($_SESSION['HTTPS_Only']==1){
+	if ($_SERVER['HTTPS']!='on'){
+		prnMsg('webERP is configured to allow only secure socket connections. Pages must be called with https:// ....','error');
+		exit;
+	}
+}
+
 include('includes/LanguageSetup.php');
 
 /* Standard PDF file creation header stuff */
@@ -110,8 +130,9 @@ switch ($PaperSize) {
 
 $PageSize = array(0,0,$Page_Width,$Page_Height);
 $pdf = & new Cpdf($PageSize);
-$pdf->selectFont('./fonts/Helvetica.afm');
+
 $pdf->addinfo('Author','webERP ' . $Version);
-$pdf->addinfo('Creator','webERP http://www.weberp.org - R&OS PHP-PDF http://www.ros.co.nz');
+$pdf->addinfo('Creator','webERP http://www.weberp.org');
+$pdf->selectFont('helvetica');
 
 ?>
