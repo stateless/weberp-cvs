@@ -192,7 +192,7 @@ function addTextWrap($xb, $yb, $w, $h, $txt, $align='J', $border=0, $fill=0) {
     $wmax=($w-2*$this->cMargin)*1000/$this->FontSize;
     $s=str_replace("\r",'',$txt);
     $s=str_replace("\n",' ',$s);
-    $s = rtrim($s);
+    $s = trim($s).' ';
     $nb=strlen($s);
     $b=0;
     if ($border) {
