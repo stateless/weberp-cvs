@@ -2915,6 +2915,7 @@ INSERT INTO `config` VALUES ('UpdateCurrencyRatesDaily','0');
 INSERT INTO `config` VALUES ('WeightedAverageCosting','1');
 INSERT INTO `config` VALUES ('WikiApp','Disabled');
 INSERT INTO `config` VALUES ('WikiPath','wiki');
+INSERT INTO `config` VALUES ('WikiAddress','');
 INSERT INTO `config` VALUES ('YearEnd','3');
 
 --

@@ -200,6 +200,9 @@ if (isset($_POST['submit'])) {
 		if ($_SESSION['WikiPath'] != $_POST['X_WikiPath'] ) {
 			$sql[] = "UPDATE config SET confvalue = '". $_POST['X_WikiPath']."' WHERE confname = 'WikiPath'";
 		}
+		if ($_SESSION['WikiAddress'] != $_POST['X_WikiAddress'] ) {
+			$sql[] = "UPDATE config SET confvalue = '". $_POST['X_WikiAddress']."' WHERE confname = 'WikiAddress'";
+		}
 		if ($_SESSION['ProhibitJournalsToControlAccounts'] != $_POST['X_ProhibitJournalsToControlAccounts'] ) {
 			$sql[] = "UPDATE config SET confvalue = '". $_POST['X_ProhibitJournalsToControlAccounts']."' WHERE confname = 'ProhibitJournalsToControlAccounts'";
 		}
@@ -696,7 +699,8 @@ echo '<TR><TD>' . _('Perform Database Maintenance At Logon') . ':</TD>
 
 $WikiApplications = array( _('Disabled'),
 					_('WackoWiki'),
-					_('MediaWiki') );
+					_('MediaWiki'),
+					_('Deki') );
 
 echo '<TR><TD>' . _('Wiki application') . ':</TD>
 	<TD><SELECT Name="X_WikiApp">';
@@ -709,6 +713,10 @@ echo '</SELECT></TD>
 echo '<TR><TD>' . _('Wiki Path') . ':</TD>
 	<TD><input type="Text" Name="X_WikiPath" SIZE=40 MAXLENGTH=40 value="' . $_SESSION['WikiPath'] . '"></TD>
 	<TD>' . _('The path to the wiki installation to form the basis of wiki URLs - this should be the directory on the web-server where the wiki is installed. The wiki must be installed on the same web-server as webERP') .'</TD></TR>';
+
+echo '<TR><TD>' . _('Wiki Address') . ':</TD>
+	<TD><input type="Text" Name="X_WikiAddress" SIZE=40 MAXLENGTH=40 value="' . $_SESSION['WikiAddress'] . '"></TD>
+	<TD>' . _('The address to the wiki to form the basis of wiki URLs - this should be the directory on the web-server where the wiki is installed. The wiki must be installed on the same web-server as webERP') .'</TD></TR>';
 
 echo '<TR><TD>' . _('Geocode Customers and Suppliers:') . ':</TD>
         <TD><SELECT Name="X_geocode_integration">';
