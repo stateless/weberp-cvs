@@ -80,19 +80,3 @@ INSERT INTO `config` ( `confname` , `confvalue` ) VALUES ('Extended_SupplierInfo
 ALTER TABLE salesglpostings MODIFY COLUMN area VARCHAR(3) NOT NULL;
 ALTER TABLE salesanalysis MODIFY COLUMN area VARCHAR(3) NOT NULL;
 ALTER TABLE factorcompanies AUTO_INCREMENT = 1;
-
-CREATE TABLE `deliverynotes` (
- `deliverynotenumber` int(11) NOT NULL,
- `deliverynotelineno` tinyint(4) NOT NULL,
- `salesorderno` int(11) NOT NULL,
- `salesorderlineno` int(11) NOT NULL,
- `qtydelivered` double NOT NULL default '0',
- `printed` tinyint(4) NOT NULL default '0',
- `invoiced` tinyint(4) NOT NULL default '0',
- `deliverydate` date NOT NULL default '0000-00-00',
- PRIMARY KEY (`deliverynotenumber`,`deliverynotelineno`),
- KEY `deliverynotes_ibfk_2` (`salesorderno`,`salesorderlineno`),
- CONSTRAINT `deliverynotes_ibfk_1` FOREIGN KEY (`salesorderno`) REFERENCES `salesorders` (`orderno`),
- CONSTRAINT `deliverynotes_ibfk_2` FOREIGN KEY (`salesorderno`, `salesorderlineno`) REFERENCES `salesorderdetails` (`orderno`,  `orderlineno`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
