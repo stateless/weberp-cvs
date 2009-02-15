@@ -655,28 +655,6 @@ CREATE TABLE `debtortypenotes` (
 SET character_set_client = @saved_cs_client;
 
 --
--- Table structure for table `deliverynotes`
---
-
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-CREATE TABLE `deliverynotes` (
-  `deliverynotenumber` int(11) NOT NULL,
-  `deliverynotelineno` tinyint(4) NOT NULL,
-  `salesorderno` int(11) NOT NULL,
-  `salesorderlineno` int(11) NOT NULL,
-  `qtydelivered` double NOT NULL default '0',
-  `printed` tinyint(4) NOT NULL default '0',
-  `invoiced` tinyint(4) NOT NULL default '0',
-  `deliverydate` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`deliverynotenumber`,`deliverynotelineno`),
-  KEY `deliverynotes_ibfk_2` (`salesorderno`,`salesorderlineno`),
-  CONSTRAINT `deliverynotes_ibfk_1` FOREIGN KEY (`salesorderno`) REFERENCES `salesorders` (`orderno`),
-  CONSTRAINT `deliverynotes_ibfk_2` FOREIGN KEY (`salesorderno`, `salesorderlineno`) REFERENCES `salesorderdetails` (`orderno`, `orderlineno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-SET character_set_client = @saved_cs_client;
-
---
 -- Table structure for table `discountmatrix`
 --
 
