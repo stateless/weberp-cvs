@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.37 $ */
+/* $Revision: 1.39 $ */
 
 $PageSecurity = 1;
 
@@ -36,7 +36,7 @@ If (!isset($_POST['ToTransNo'])
 
 $FirstTrans = $FromTransNo; /*Need to start a new page only on subsequent transactions */
 
-If (isset($PrintPDF)
+If (isset($PrintPDF) or isset($_GET['PrintPDF'])
 	AND $PrintPDF!=''
 	AND isset($FromTransNo)
 	AND isset($InvOrCredit)
@@ -162,7 +162,7 @@ If (isset($PrintPDF)
 			AND custbranch.salesman=salesman.salesmancode
 			AND salesorders.fromstkloc=locations.loccode';
 
-		if ($_POST['PrintEDI']=='No'){
+		if (isset($_POST['PrintEDI']) and $_POST['PrintEDI']=='No'){
 			$sql = $sql . ' AND debtorsmaster.ediinvoices=0';
 		}
 	} else {
@@ -392,6 +392,8 @@ If (isset($PrintPDF)
 	/* Print out the payment terms */
 
   		$pdf->addTextWrap($Left_Margin+5,$YPos+3,280,$FontSize,_('Payment Terms') . ': ' . $myrow['terms']);
+            $pdf->addText($Page_Width-$Right_Margin-392, $YPos - ($line_height*3)+22,$FontSize, _('Bank Code:***** Bank Account:*****'));
+                        $FontSize=10;
 
 		$FontSize =8;
 		$LeftOvers = $pdf->addTextWrap($Left_Margin+5,$YPos-12,280,$FontSize,$myrow['invtext']);
@@ -433,7 +435,6 @@ If (isset($PrintPDF)
 			$pdf->addJpegFromFile('companies/' . $_SESSION['DatabaseName'] . '/payment.jpg',$Page_Width/2 -280,$YPos-20,0,40);
 		}
 			$pdf->addText($Page_Width-$Right_Margin-472, $YPos - ($line_height*3)+32,$FontSize, '');
-
 
 			$FontSize=10;
 		} else {
@@ -504,35 +505,41 @@ if (isset($_GET['FromTransNo'])){
 $result=DB_query($sql,$db);
 // Loop the result set and add appendfile if the field is not 0
 while ($row=DB_fetch_array($result)){
-if ($row['appendfile'] !='0' AND $row['appendfile'] !=='none') {
-$pdf->setFiles(array('invoice.pdf','pdf_append/' . $row['appendfile']));
-$pdf->concat();
-$pdf->Output('newpdf.pdf','I');
-exit;
-// If the appendfile field is empty, just print the invoice without any appended pages
-} else {
-$pdf->setFiles(array('invoice.pdf'));
-$pdf->concat();
-$pdf->Output('newpdf.pdf','D');
-exit;
-}
+    if ($row['appendfile'] !='0' AND $row['appendfile'] !=='none') {
+        $pdf->setFiles(array('invoice.pdf','pdf_append/' . $row['appendfile']));
+        $pdf->concat();
+        $pdf->Output('newpdf.pdf','I');
+        exit;
+        // If the appendfile field is empty, just print the invoice without any appended pages
+    } else if (isset($_GET['Email'])) {
+        $pdf->setFiles(array('invoice.pdf'));
+        $pdf->concat();
+        $pdfcode = $pdf->Output();
+    } else {
+        // If the appendfile field is empty, just print the invoice without any appended pages
+        $pdf->setFiles(array('invoice.pdf'));
+        $pdf->concat();
+        $pdf->Output('newpdf.pdf','D');
+        exit;
+    }
 }
 //End FPDI Concat
 
-	if ($len <1020){
+/*	if ($len <1020){
 		include('includes/header.inc');
 		echo '<P>' . _('There were no transactions to print in the range selected');
 		include('includes/footer.inc');
 		exit;
-	}
+	}*/
 
 	if (isset($_GET['Email'])){ //email the invoice to address supplied
+		include('includes/header.inc');
 
 		include ('includes/htmlMimeMail.php');
 
 		$mail = new htmlMimeMail();
-		$filename = $_SESSION['reports_dir'] . '/' . $InvOrCredit . $_GET['FromTransNo'] . '.pdf';
-		$fp = fopen($filename, 'wb');
+		$filename = $_SESSION['reports_dir'] . '/Invoice.pdf';
+    	$fp = fopen( $_SESSION['reports_dir'] . '/Invoice.pdf','wb');
 		fwrite ($fp, $pdfcode);
 		fclose ($fp);
 
@@ -571,9 +578,8 @@ exit;
 
 
 	/*if FromTransNo is not set then show a form to allow input of either a single invoice number or a range of invoices to be printed. Also get the last invoice number created to show the user where the current range is up to */
-
 		echo "<FORM ACTION='" . $_SERVER['PHP_SELF'] . '?' . SID . "' METHOD='POST'><CENTER><TABLE>";
-
+                echo '<CENTER><P CLASS="page_title_text"><img src="'.$rootpath.'/css/'.$theme.'/images/printer.png" TITLE="' . _('Print') . '" ALT="">' . ' ' . _('Print Invoices or Credit Notes (Landscape Mode)') . '';
 		echo '<TR><TD>' . _('Print Invoices or Credit Notes') . '</TD><TD><SELECT name=InvOrCredit>';
 		if ($InvOrCredit=='Invoice' OR !isset($InvOrCredit)){
 
@@ -613,14 +619,14 @@ exit;
 		$result = DB_query($sql,$db);
 		$myrow = DB_fetch_row($result);
 
-		echo '<P>' . _('The last invoice created was number') . ' ' . $myrow[0] . '<BR>' . _('If only a single invoice is required') . ', ' . _('enter the invoice number to print in the Start transaction number to print field and leave the End transaction number to print field blank') . '. ' . _('Only use the end invoice to print field if you wish to print a sequential range of invoices');
+		echo '<DIV CLASS="page_help_text"><B>' . _('The last invoice created was number') . ' ' . $myrow[0] . '</B><BR>' . _('If only a single invoice is required') . ', ' . _('enter the invoice number to print in the Start transaction number to print field and leave the End transaction number to print field blank') . '. ' . _('Only use the end invoice to print field if you wish to print a sequential range of invoices') . '';
 
-		$sql = 'SELECT typeno FROM systypes WHERE typeid=11';
+                $sql = 'SELECT typeno FROM systypes WHERE typeid=11';
 
-		$result = DB_query($sql,$db);
-		$myrow = DB_fetch_row($result);
+                $result = DB_query($sql,$db);
+                $myrow = DB_fetch_row($result);
 
-		echo '<P>' . _('The last credit note created was number') . ' ' . $myrow[0] . '<BR>' . _('A sequential range can be printed using the same method as for invoices above') . '. ' . _('A single credit note can be printed by only entering a start transaction number');
+                echo '<BR><B>' . _('The last credit note created was number') . ' ' . $myrow[0] . '</B><BR>' . _('A sequential range can be printed using the same method as for invoices above') . '. ' . _('A single credit note can be printed by only entering a start transaction number') . '</DIV';
 
 	} else {
 
