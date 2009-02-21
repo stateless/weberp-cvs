@@ -12,7 +12,7 @@ $allow_demo_mode = True;
 
 // webERP version
 
-$Version = '3.09cvs';
+$Version = '3.10.NL';
 
 // The timezone of the business - this allows the possibility of having
 // the web-server on a overseas machine but record local time

@@ -49,6 +49,7 @@ PRIMARY KEY (`typeid`)
 ) ENGINE=InnoDB;
 
 INSERT INTO `debtortype` ( `typeid` , `typename` ) VALUES (1, 'Default');
+INSERT INTO `factorcompanies` ( `id` , `coyname` ) VALUES (null, 'None');
 
 ALTER TABLE `debtorsmaster` ADD `typeid` tinyint(4) NOT NULL default '1';
 ALTER TABLE `debtorsmaster` ADD CONSTRAINT `debtorsmaster_ibfk_5` FOREIGN KEY (`typeid`) REFERENCES `debtortype` (`typeid`);
