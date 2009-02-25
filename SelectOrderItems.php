@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.82 $ */
+/* $Revision: 1.84 $ */
 
 include('includes/DefineCartClass.php');
 $PageSecurity = 1;
