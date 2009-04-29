@@ -297,7 +297,7 @@ If (isset($_POST['PrintPDF'])
 
 		$SuggestedTopUpOrder = $IdealStockHolding - $InventoryPlan['qoh'] + $TotalDemand - $OnOrdRow['qtyonorder'];
 		if ($SuggestedTopUpOrder <=0){
-			$LeftOvers = $pdf->addTextWrap(720, $YPos, 40,$FontSize,_('Nil'),'centre');
+			$LeftOvers = $pdf->addTextWrap(720, $YPos, 40,$FontSize,_('Nil'),'right');
 
 		} else {
 
@@ -382,7 +382,10 @@ If (isset($_POST['PrintPDF'])
 		echo '</SELECT></TD></TR>';
 
 		echo '<TR><TD>' . _('Maximum No Months Holding') . ":</TD><TD><SELECT name='NumberMonthsHolding'>";
-		echo '<OPTION SELECTED Value=3>' . _('Three Months');
+		echo '<OPTION SELECTED Value=1>' . _('One Month');
+		echo '<OPTION Value=1.5>' . _('One Month and a half');
+		echo '<OPTION Value=2>' . _('Two Months');
+		echo '<OPTION Value=3>' . _('Three Months');
 		echo '<OPTION Value=4>' . _('Four Months');
 		echo '</SELECT></TD></TR>';
 
