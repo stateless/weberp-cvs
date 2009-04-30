@@ -3,6 +3,8 @@
 <P>
 <P><B>Version 3.10-Stable
 <P>
+<p>30/4/09 Phil: DeliveryDetails.php and RecurringSalesOrdersProcess.php made it so sales order headers use the order number from GetNextTransNo (30) as well as the sales order details - and avoiding the inconsistency issues where the auto-increment was out of sync with the systypes typeid=30 typeno 
+<p>30/4/09 Phil: Add field to Stocks.php for NextSerialNo - where > 0 and Serialised then automatically allocates serial numbers for quantities on new work orders - and work orders will not allow quantities to change once created
 <p>29/04/09 Tim: StockCategories.php - Change default behaviour to show Stock GL Code
 <p>29/04/09 Ricard Andreu: InventoryPlanning.php - InventoryPlanning.php now allowing 1, 1.5, 2, 3 and 4 months of 'Maximum number of Months Holding' instead of 3 or 4 as used to be. Also the .Nil. on Suggested order column gets right justified as all the other fields.
 <p>30/04/09 daintree: OrderNo relying on auto-increment for the header but using the systypes GetNextTransNo for the salesorderdetails modified to us the GetNextTransNo 
