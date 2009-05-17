@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.39 $ */
+/* $Revision: 1.38 $ */
 
 $PageSecurity = 3;
 
@@ -10,8 +10,6 @@ $title = _('Customer Maintenance');
 
 include('includes/header.inc');
 include('includes/SQL_CommonFunctions.inc');
-
-echo '<P CLASS="page_title_text"><img src="'.$rootpath.'/css/'.$theme.'/images/customer.png" TITLE="' . _('Customer') . '" ALT="">' . ' ' . _('Customer Maintenance') . '';
 
 if (isset($Errors)) {
 	unset($Errors);

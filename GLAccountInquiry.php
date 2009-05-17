@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.26 $ */
+/* $Revision: 1.25 $ */
 
 
 $PageSecurity = 8;
@@ -22,8 +22,6 @@ if (isset($_POST['Period'])){
 }
 
 echo '<P CLASS="page_title_text"><img src="'.$rootpath.'/css/'.$theme.'/images/transactions.png" TITLE="' . _('General Ledger Account Inquiry') . '" ALT="">' . ' ' . _('General Ledger Account Inquiry') . '</P>';
-
-echo '<DIV CLASS="page_help_text">' . _('Use the keyboard Shift key to select multiple periods') . '</DIV><BR>';
 
 echo "<FORM METHOD='POST' ACTION=" . $_SERVER['PHP_SELF'] . '?' . SID . '>';
 
