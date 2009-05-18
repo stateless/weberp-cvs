@@ -50,10 +50,6 @@ font.bad {
     font-weight: bold;
     color:red;
 }
-/* In Jelly theme we don't want the page title text in the menu bar */
-font.header_title {
-    display:none
-}
 input{
   	background: url(images/input.png) #eee;
 	color:#000;
@@ -90,7 +86,7 @@ table {
 .dpTbl {
 	border: solid navy 1px;
 }
-div.center {
+div.centre {
   margin: 0 auto;
   text-align:center;
 }
@@ -98,7 +94,7 @@ div.center {
 td {
 	font-family: Verdana, Arial, Helvetica;
 	font-size: 12px;
-	text-align:left;
+	text-align: left;
 }
 .dpTD {
 	border: 0;
