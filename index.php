@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.79 $ */
+/* $Revision: 1.81 $ */
 
 
 $PageSecurity = 1;
@@ -546,6 +546,16 @@ if (count($_SESSION['AllowedPageSecurityTokens'])==1){
 							</td>
 							</tr>
 							<tr>
+                                                        <td class="menu_group_item">
+                                                                <?php echo "<A HREF='" . $rootpath . '/InventoryQuantities.php?' . SID . "'><LI>" . _('Inventory Quantities') . '</LI></A>'; ?>
+                                                        </td>
+                                                        </tr>
+							<tr>
+                                                        <td class="menu_group_item">
+                                                                <?php echo "<A HREF='" . $rootpath . '/ReorderLevel.php?' . SID . "'><LI>" . _('Reorder Level') . '</LI></A>'; ?>
+                                                        </td>
+                                                        </tr>
+							<tr>
 							<td class="menu_group_item">
 								<?php echo "<A HREF='" . $rootpath . '/InventoryValuation.php?' . SID . "'><LI>" . _('Inventory Valuation Report') . '</LI></A>'; ?>
 							</td>
@@ -553,6 +563,11 @@ if (count($_SESSION['AllowedPageSecurityTokens'])==1){
 							<tr>
 							<td class="menu_group_item">
 								<?php echo "<A HREF='" . $rootpath . '/InventoryPlanning.php?' . SID . "'><LI>" . _('Inventory Planning Report') . '</LI></A>'; ?>
+							</td>
+							</tr>
+							<tr>
+							<td class="menu_group_item">
+								<?php echo "<A HREF='" . $rootpath . '/InventoryPlanningPrefSupplier.php?' . SID . "'><LI>" . _('Inventory Planning Based On Preferred Supplier Data') . '</LI></A>'; ?>
 							</td>
 							</tr>
 							<tr>
