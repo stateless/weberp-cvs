@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.20 $ */
+/* $Revision: 1.19 $ */
 
 /* PeterMoulding.com
 20071102 Change from mysql to mysqli;
@@ -9,7 +9,7 @@
 
 define ('LIKE','LIKE');
 
-$db = mysqli_connect($host , $dbuser, $dbpassword,$_SESSION['DatabaseName'], $mysqlport);
+$db = mysqli_connect($host , $dbuser, $dbpassword);
 
 /* check connection */
 if (mysqli_connect_errno()) {
