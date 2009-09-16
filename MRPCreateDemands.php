@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.5 $ */
+/* $Revision: 1.6 $ */
 // MRPCreateDemands.php - Create mrpdemands based on sales order history
 
 $PageSecurity=9;
@@ -90,7 +90,7 @@ if (strpos($FormatedDistdate,"/")) {
     list($yyyy,$mm,$dd) = explode("/",$FormatedDistdate);
 } else if (strpos($FormatedDistdate,"-")) {
     list($yyyy,$mm,$dd) = explode("-",$FormatedDistdate);
-} else else if (strpos($FormatedDistdate,".")) {
+} else if (strpos($FormatedDistdate,".")) {
     list($yyyy,$mm,$dd) = explode(".",$FormatedDistdate);
 }
 $datearray[0] = $FormatedDistdate;
@@ -142,7 +142,7 @@ while ($myrow = DB_fetch_array($result)) {
      if (($myrow['totqty'] >= $excludeqty) and ($myrow['totextqty'] >= $excludeamt)) {
 		unset($periodqty);
 		$periodqty[] = " ";
-		$totalqty = $myrow['totqty'] * $multiplier;
+		$totalqty = $myrow['totqtyinvoiced'] * $multiplier;
 		$wholenumber = floor($totalqty / $_POST['PeriodNumber']);
 		$remainder = ($totalqty % $_POST['PeriodNumber']);
 		if ($wholenumber > 0) {
