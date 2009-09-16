@@ -18,3 +18,5 @@ CREATE TABLE `assetmanager` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 ALTER TABLE `currencies` ADD `decimalplaces` tinyint(3) NOT NULL default 2 AFTER `hundredsname`;
+
+UPDATE `www_users` SET `modulesallowed`=(SELECT insert(`modulesallowed`, 15,0,"1,"));
