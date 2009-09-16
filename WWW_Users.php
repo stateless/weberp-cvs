@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.35 $ */
+/* $Revision: 1.36 $ */
 
 $PageSecurity=15;
 
@@ -18,6 +18,7 @@ $ModuleList = array(_('Orders'),
 					_('Inventory'), 
 					_('Manufacturing'), 
 					_('General Ledger'), 
+					_('Asset Manager'), 
 					_('Setup'));
 
 $title = _('User Maintenance');
