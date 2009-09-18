@@ -3,7 +3,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 --
 -- Host: localhost    Database: weberp
 -- ------------------------------------------------------
--- Server version	5.0.45
+-- Server version	5.0.75-0ubuntu10.2
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -15,6 +15,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Table structure for table `accountgroups`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `accountgroups` (
   `groupname` char(30) NOT NULL default '',
   `sectioninaccounts` int(11) NOT NULL default '0',
@@ -24,61 +26,76 @@ CREATE TABLE `accountgroups` (
   PRIMARY KEY  (`groupname`),
   KEY `SequenceInTB` (`sequenceintb`),
   KEY `sectioninaccounts` (`sectioninaccounts`),
-  KEY `parentgroupname` (`parentgroupname`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `parentgroupname` (`parentgroupname`),
+  CONSTRAINT `accountgroups_ibfk_1` FOREIGN KEY (`sectioninaccounts`) REFERENCES `accountsection` (`sectionid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `accountsection`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `accountsection` (
   `sectionid` int(11) NOT NULL default '0',
   `sectionname` text NOT NULL,
   PRIMARY KEY  (`sectionid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `areas`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `areas` (
   `areacode` char(3) NOT NULL,
   `areadescription` varchar(25) NOT NULL default '',
   PRIMARY KEY  (`areacode`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `assetmanager`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `assetmanager` (
   `id` int(11) NOT NULL auto_increment,
+  `stockid` varchar(20) NOT NULL default '',
   `serialno` varchar(30) NOT NULL default '',
-  `assetglcode` int(11) NOT NULL default '0',
-  `depnglcode` int(11) NOT NULL default '0',
-  `description` varchar(30) NOT NULL default '',
-  `lifetime` int(11) NOT NULL default '0',
   `location` varchar(15) NOT NULL default '',
   `cost` double NOT NULL default '0',
   `depn` double NOT NULL default '0',
+  `datepurchased` date NOT NULL default '0000-00-00',
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `audittrail`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `audittrail` (
   `transactiondate` datetime NOT NULL default '0000-00-00 00:00:00',
   `userid` varchar(20) NOT NULL default '',
   `querystring` text,
-  KEY `UserID` (`userid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `UserID` (`userid`),
+  CONSTRAINT `audittrail_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `www_users` (`userid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `bankaccounts`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `bankaccounts` (
   `accountcode` int(11) NOT NULL default '0',
   `currcode` char(3) NOT NULL,
@@ -90,13 +107,17 @@ CREATE TABLE `bankaccounts` (
   PRIMARY KEY  (`accountcode`),
   KEY `currcode` (`currcode`),
   KEY `BankAccountName` (`bankaccountname`),
-  KEY `BankAccountNumber` (`bankaccountnumber`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `BankAccountNumber` (`bankaccountnumber`),
+  CONSTRAINT `bankaccounts_ibfk_1` FOREIGN KEY (`accountcode`) REFERENCES `chartmaster` (`accountcode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `banktrans`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `banktrans` (
   `banktransid` bigint(20) NOT NULL auto_increment,
   `type` smallint(6) NOT NULL default '0',
@@ -115,13 +136,18 @@ CREATE TABLE `banktrans` (
   KEY `TransDate` (`transdate`),
   KEY `TransType` (`banktranstype`),
   KEY `Type` (`type`,`transno`),
-  KEY `CurrCode` (`currcode`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `CurrCode` (`currcode`),
+  CONSTRAINT `banktrans_ibfk_1` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
+  CONSTRAINT `banktrans_ibfk_2` FOREIGN KEY (`bankact`) REFERENCES `bankaccounts` (`accountcode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `bom`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `bom` (
   `parent` char(20) NOT NULL default '',
   `component` char(20) NOT NULL default '',
@@ -138,26 +164,37 @@ CREATE TABLE `bom` (
   KEY `LocCode` (`loccode`),
   KEY `Parent` (`parent`,`effectiveafter`,`effectiveto`,`loccode`),
   KEY `Parent_2` (`parent`),
-  KEY `WorkCentreAdded` (`workcentreadded`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `WorkCentreAdded` (`workcentreadded`),
+  CONSTRAINT `bom_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `bom_ibfk_2` FOREIGN KEY (`component`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `bom_ibfk_3` FOREIGN KEY (`workcentreadded`) REFERENCES `workcentres` (`code`),
+  CONSTRAINT `bom_ibfk_4` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `buckets`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `buckets` (
   `workcentre` char(5) NOT NULL default '',
   `availdate` datetime NOT NULL default '0000-00-00 00:00:00',
   `capacity` double NOT NULL default '0',
   PRIMARY KEY  (`workcentre`,`availdate`),
   KEY `WorkCentre` (`workcentre`),
-  KEY `AvailDate` (`availdate`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `AvailDate` (`availdate`),
+  CONSTRAINT `buckets_ibfk_1` FOREIGN KEY (`workcentre`) REFERENCES `workcentres` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `chartdetails`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `chartdetails` (
   `accountcode` int(11) NOT NULL default '0',
   `period` smallint(6) NOT NULL default '0',
@@ -166,13 +203,18 @@ CREATE TABLE `chartdetails` (
   `bfwd` double NOT NULL default '0',
   `bfwdbudget` double NOT NULL default '0',
   PRIMARY KEY  (`accountcode`,`period`),
-  KEY `Period` (`period`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Period` (`period`),
+  CONSTRAINT `chartdetails_ibfk_1` FOREIGN KEY (`accountcode`) REFERENCES `chartmaster` (`accountcode`),
+  CONSTRAINT `chartdetails_ibfk_2` FOREIGN KEY (`period`) REFERENCES `periods` (`periodno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `chartmaster`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `chartmaster` (
   `accountcode` int(11) NOT NULL default '0',
   `accountname` char(50) NOT NULL default '',
@@ -180,13 +222,17 @@ CREATE TABLE `chartmaster` (
   PRIMARY KEY  (`accountcode`),
   KEY `AccountCode` (`accountcode`),
   KEY `AccountName` (`accountname`),
-  KEY `Group_` (`group_`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Group_` (`group_`),
+  CONSTRAINT `chartmaster_ibfk_1` FOREIGN KEY (`group_`) REFERENCES `accountgroups` (`groupname`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `cogsglpostings`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `cogsglpostings` (
   `id` int(11) NOT NULL auto_increment,
   `area` char(2) NOT NULL default '',
@@ -199,12 +245,15 @@ CREATE TABLE `cogsglpostings` (
   KEY `StkCat` (`stkcat`),
   KEY `GLCode` (`glcode`),
   KEY `SalesType` (`salestype`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `companies`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `companies` (
   `coycode` int(11) NOT NULL default '1',
   `coyname` varchar(50) NOT NULL default '',
@@ -233,22 +282,28 @@ CREATE TABLE `companies` (
   `gllink_stock` tinyint(1) default '1',
   `freightact` int(11) NOT NULL default '0',
   PRIMARY KEY  (`coycode`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `config`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `config` (
   `confname` varchar(35) NOT NULL default '',
   `confvalue` text NOT NULL,
   PRIMARY KEY  (`confname`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `contractbom`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `contractbom` (
   `contractref` char(20) NOT NULL default '',
   `component` char(20) NOT NULL default '',
@@ -260,13 +315,19 @@ CREATE TABLE `contractbom` (
   KEY `LocCode` (`loccode`),
   KEY `ContractRef` (`contractref`),
   KEY `WorkCentreAdded` (`workcentreadded`),
-  KEY `WorkCentreAdded_2` (`workcentreadded`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `WorkCentreAdded_2` (`workcentreadded`),
+  CONSTRAINT `contractbom_ibfk_1` FOREIGN KEY (`workcentreadded`) REFERENCES `workcentres` (`code`),
+  CONSTRAINT `contractbom_ibfk_2` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`),
+  CONSTRAINT `contractbom_ibfk_3` FOREIGN KEY (`component`) REFERENCES `stockmaster` (`stockid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `contractreqts`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `contractreqts` (
   `contractreqid` int(11) NOT NULL auto_increment,
   `contract` char(20) NOT NULL default '',
@@ -274,13 +335,17 @@ CREATE TABLE `contractreqts` (
   `quantity` double NOT NULL default '1',
   `priceperunit` decimal(20,4) NOT NULL default '0.0000',
   PRIMARY KEY  (`contractreqid`),
-  KEY `Contract` (`contract`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Contract` (`contract`),
+  CONSTRAINT `contractreqts_ibfk_1` FOREIGN KEY (`contract`) REFERENCES `contracts` (`contractref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `contracts`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `contracts` (
   `contractref` varchar(20) NOT NULL default '',
   `contractdescription` varchar(50) NOT NULL default '',
@@ -307,27 +372,37 @@ CREATE TABLE `contracts` (
   KEY `Status` (`status`),
   KEY `TypeAbbrev` (`typeabbrev`),
   KEY `WORef` (`woref`),
-  KEY `DebtorNo` (`debtorno`,`branchcode`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `DebtorNo` (`debtorno`,`branchcode`),
+  CONSTRAINT `contracts_ibfk_1` FOREIGN KEY (`debtorno`, `branchcode`) REFERENCES `custbranch` (`debtorno`, `branchcode`),
+  CONSTRAINT `contracts_ibfk_2` FOREIGN KEY (`categoryid`) REFERENCES `stockcategory` (`categoryid`),
+  CONSTRAINT `contracts_ibfk_3` FOREIGN KEY (`typeabbrev`) REFERENCES `salestypes` (`typeabbrev`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `currencies`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `currencies` (
   `currency` char(20) NOT NULL default '',
   `currabrev` char(3) NOT NULL default '',
   `country` char(50) NOT NULL default '',
   `hundredsname` char(15) NOT NULL default 'Cents',
+  `decimalplaces` tinyint(3) NOT NULL default '2',
   `rate` double NOT NULL default '1',
   PRIMARY KEY  (`currabrev`),
   KEY `Country` (`country`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `custallocns`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `custallocns` (
   `id` int(11) NOT NULL auto_increment,
   `amt` decimal(20,4) NOT NULL default '0.0000',
@@ -337,13 +412,18 @@ CREATE TABLE `custallocns` (
   PRIMARY KEY  (`id`),
   KEY `DateAlloc` (`datealloc`),
   KEY `TransID_AllocFrom` (`transid_allocfrom`),
-  KEY `TransID_AllocTo` (`transid_allocto`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `TransID_AllocTo` (`transid_allocto`),
+  CONSTRAINT `custallocns_ibfk_1` FOREIGN KEY (`transid_allocfrom`) REFERENCES `debtortrans` (`id`),
+  CONSTRAINT `custallocns_ibfk_2` FOREIGN KEY (`transid_allocto`) REFERENCES `debtortrans` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `custbranch`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `custbranch` (
   `branchcode` varchar(10) NOT NULL default '',
   `debtorno` varchar(10) NOT NULL default '',
@@ -384,13 +464,22 @@ CREATE TABLE `custbranch` (
   KEY `Area` (`area`),
   KEY `DefaultLocation` (`defaultlocation`),
   KEY `DefaultShipVia` (`defaultshipvia`),
-  KEY `taxgroupid` (`taxgroupid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `taxgroupid` (`taxgroupid`),
+  CONSTRAINT `custbranch_ibfk_1` FOREIGN KEY (`debtorno`) REFERENCES `debtorsmaster` (`debtorno`),
+  CONSTRAINT `custbranch_ibfk_2` FOREIGN KEY (`area`) REFERENCES `areas` (`areacode`),
+  CONSTRAINT `custbranch_ibfk_3` FOREIGN KEY (`salesman`) REFERENCES `salesman` (`salesmancode`),
+  CONSTRAINT `custbranch_ibfk_4` FOREIGN KEY (`defaultlocation`) REFERENCES `locations` (`loccode`),
+  CONSTRAINT `custbranch_ibfk_6` FOREIGN KEY (`defaultshipvia`) REFERENCES `shippers` (`shipper_id`),
+  CONSTRAINT `custbranch_ibfk_7` FOREIGN KEY (`taxgroupid`) REFERENCES `taxgroups` (`taxgroupid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `custcontacts`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `custcontacts` (
   `contid` int(11) NOT NULL auto_increment,
   `debtorno` varchar(10) NOT NULL,
@@ -399,12 +488,15 @@ CREATE TABLE `custcontacts` (
   `phoneno` varchar(20) NOT NULL,
   `notes` varchar(255) NOT NULL,
   PRIMARY KEY  (`contid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `custnotes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `custnotes` (
   `noteid` tinyint(4) NOT NULL auto_increment,
   `debtorno` varchar(10) NOT NULL default '0',
@@ -414,11 +506,14 @@ CREATE TABLE `custnotes` (
   `priority` varchar(20) NOT NULL,
   PRIMARY KEY  (`noteid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `debtorsmaster`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `debtorsmaster` (
   `debtorno` varchar(10) NOT NULL default '',
   `name` varchar(40) NOT NULL default '',
@@ -458,13 +553,21 @@ CREATE TABLE `debtorsmaster` (
   KEY `SalesType` (`salestype`),
   KEY `EDIInvoices` (`ediinvoices`),
   KEY `EDIOrders` (`ediorders`),
-  KEY `debtorsmaster_ibfk_5` (`typeid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `debtorsmaster_ibfk_5` (`typeid`),
+  CONSTRAINT `debtorsmaster_ibfk_1` FOREIGN KEY (`holdreason`) REFERENCES `holdreasons` (`reasoncode`),
+  CONSTRAINT `debtorsmaster_ibfk_2` FOREIGN KEY (`currcode`) REFERENCES `currencies` (`currabrev`),
+  CONSTRAINT `debtorsmaster_ibfk_3` FOREIGN KEY (`paymentterms`) REFERENCES `paymentterms` (`termsindicator`),
+  CONSTRAINT `debtorsmaster_ibfk_4` FOREIGN KEY (`salestype`) REFERENCES `salestypes` (`typeabbrev`),
+  CONSTRAINT `debtorsmaster_ibfk_5` FOREIGN KEY (`typeid`) REFERENCES `debtortype` (`typeid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `debtortrans`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `debtortrans` (
   `id` int(11) NOT NULL auto_increment,
   `transno` int(11) NOT NULL default '0',
@@ -498,35 +601,49 @@ CREATE TABLE `debtortrans` (
   KEY `TranDate` (`trandate`),
   KEY `TransNo` (`transno`),
   KEY `Type_2` (`type`,`transno`),
-  KEY `EDISent` (`edisent`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `EDISent` (`edisent`),
+  CONSTRAINT `debtortrans_ibfk_1` FOREIGN KEY (`debtorno`) REFERENCES `custbranch` (`debtorno`),
+  CONSTRAINT `debtortrans_ibfk_2` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
+  CONSTRAINT `debtortrans_ibfk_3` FOREIGN KEY (`prd`) REFERENCES `periods` (`periodno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `debtortranstaxes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `debtortranstaxes` (
   `debtortransid` int(11) NOT NULL default '0',
   `taxauthid` tinyint(4) NOT NULL default '0',
   `taxamount` double NOT NULL default '0',
   PRIMARY KEY  (`debtortransid`,`taxauthid`),
-  KEY `taxauthid` (`taxauthid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `taxauthid` (`taxauthid`),
+  CONSTRAINT `debtortranstaxes_ibfk_1` FOREIGN KEY (`taxauthid`) REFERENCES `taxauthorities` (`taxid`),
+  CONSTRAINT `debtortranstaxes_ibfk_2` FOREIGN KEY (`debtortransid`) REFERENCES `debtortrans` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `debtortype`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `debtortype` (
   `typeid` tinyint(4) NOT NULL auto_increment,
   `typename` varchar(100) NOT NULL,
   PRIMARY KEY  (`typeid`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `debtortypenotes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `debtortypenotes` (
   `noteid` tinyint(4) NOT NULL auto_increment,
   `typeid` tinyint(4) NOT NULL default '0',
@@ -536,11 +653,14 @@ CREATE TABLE `debtortypenotes` (
   `priority` varchar(20) NOT NULL,
   PRIMARY KEY  (`noteid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `deliverynotes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `deliverynotes` (
   `deliverynotenumber` int(11) NOT NULL,
   `deliverynotelineno` tinyint(4) NOT NULL,
@@ -551,13 +671,18 @@ CREATE TABLE `deliverynotes` (
   `invoiced` tinyint(4) NOT NULL default '0',
   `deliverydate` date NOT NULL default '0000-00-00',
   PRIMARY KEY  (`deliverynotenumber`,`deliverynotelineno`),
-  KEY `deliverynotes_ibfk_2` (`salesorderno`,`salesorderlineno`)
+  KEY `deliverynotes_ibfk_2` (`salesorderno`,`salesorderlineno`),
+  CONSTRAINT `deliverynotes_ibfk_1` FOREIGN KEY (`salesorderno`) REFERENCES `salesorders` (`orderno`),
+  CONSTRAINT `deliverynotes_ibfk_2` FOREIGN KEY (`salesorderno`, `salesorderlineno`) REFERENCES `salesorderdetails` (`orderno`, `orderlineno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `discountmatrix`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `discountmatrix` (
   `salestype` char(2) NOT NULL default '',
   `discountcategory` char(2) NOT NULL default '',
@@ -566,24 +691,31 @@ CREATE TABLE `discountmatrix` (
   PRIMARY KEY  (`salestype`,`discountcategory`,`quantitybreak`),
   KEY `QuantityBreak` (`quantitybreak`),
   KEY `DiscountCategory` (`discountcategory`),
-  KEY `SalesType` (`salestype`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `SalesType` (`salestype`),
+  CONSTRAINT `discountmatrix_ibfk_1` FOREIGN KEY (`salestype`) REFERENCES `salestypes` (`typeabbrev`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `edi_orders_seg_groups`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `edi_orders_seg_groups` (
   `seggroupno` tinyint(4) NOT NULL default '0',
   `maxoccur` int(4) NOT NULL default '0',
   `parentseggroup` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`seggroupno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `edi_orders_segs`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `edi_orders_segs` (
   `id` int(11) NOT NULL auto_increment,
   `segtag` char(3) NOT NULL default '',
@@ -592,12 +724,15 @@ CREATE TABLE `edi_orders_segs` (
   PRIMARY KEY  (`id`),
   KEY `SegTag` (`segtag`),
   KEY `SegNo` (`seggroup`)
-) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `ediitemmapping`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `ediitemmapping` (
   `supporcust` varchar(4) NOT NULL default '',
   `partnercode` varchar(10) NOT NULL default '',
@@ -608,12 +743,15 @@ CREATE TABLE `ediitemmapping` (
   KEY `StockID` (`stockid`),
   KEY `PartnerStockID` (`partnerstockid`),
   KEY `SuppOrCust` (`supporcust`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `edimessageformat`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `edimessageformat` (
   `id` int(11) NOT NULL auto_increment,
   `partnercode` varchar(10) NOT NULL default '',
@@ -624,12 +762,15 @@ CREATE TABLE `edimessageformat` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `PartnerCode` (`partnercode`,`messagetype`,`sequenceno`),
   KEY `Section` (`section`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `factorcompanies`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `factorcompanies` (
   `id` int(11) NOT NULL auto_increment,
   `coyname` varchar(50) NOT NULL default '',
@@ -645,12 +786,28 @@ CREATE TABLE `factorcompanies` (
   `email` varchar(55) NOT NULL default '',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `factor_name` (`coyname`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `fixedassetlocations`
+--
+
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `fixedassetlocations` (
+  `locationid` char(6) NOT NULL default '',
+  `locationdescription` char(20) NOT NULL default '',
+  PRIMARY KEY  (`locationid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `freightcosts`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `freightcosts` (
   `shipcostfromid` int(11) NOT NULL auto_increment,
   `locationfrom` varchar(5) NOT NULL default '',
@@ -666,13 +823,18 @@ CREATE TABLE `freightcosts` (
   KEY `Destination` (`destination`),
   KEY `LocationFrom` (`locationfrom`),
   KEY `ShipperID` (`shipperid`),
-  KEY `Destination_2` (`destination`,`locationfrom`,`shipperid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Destination_2` (`destination`,`locationfrom`,`shipperid`),
+  CONSTRAINT `freightcosts_ibfk_1` FOREIGN KEY (`locationfrom`) REFERENCES `locations` (`loccode`),
+  CONSTRAINT `freightcosts_ibfk_2` FOREIGN KEY (`shipperid`) REFERENCES `shippers` (`shipper_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `geocode_param`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `geocode_param` (
   `geocodeid` tinyint(4) NOT NULL auto_increment,
   `geocode_key` varchar(200) NOT NULL default '',
@@ -683,11 +845,14 @@ CREATE TABLE `geocode_param` (
   `map_host` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`geocodeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `gltrans`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `gltrans` (
   `counterindex` int(11) NOT NULL auto_increment,
   `type` smallint(6) NOT NULL default '0',
@@ -709,13 +874,19 @@ CREATE TABLE `gltrans` (
   KEY `TranDate` (`trandate`),
   KEY `TypeNo` (`typeno`),
   KEY `Type_and_Number` (`type`,`typeno`),
-  KEY `JobRef` (`jobref`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `JobRef` (`jobref`),
+  CONSTRAINT `gltrans_ibfk_1` FOREIGN KEY (`account`) REFERENCES `chartmaster` (`accountcode`),
+  CONSTRAINT `gltrans_ibfk_2` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
+  CONSTRAINT `gltrans_ibfk_3` FOREIGN KEY (`periodno`) REFERENCES `periods` (`periodno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `grns`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `grns` (
   `grnbatch` smallint(6) NOT NULL default '0',
   `grnno` int(11) NOT NULL auto_increment,
@@ -731,13 +902,18 @@ CREATE TABLE `grns` (
   KEY `DeliveryDate` (`deliverydate`),
   KEY `ItemCode` (`itemcode`),
   KEY `PODetailItem` (`podetailitem`),
-  KEY `SupplierID` (`supplierid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `SupplierID` (`supplierid`),
+  CONSTRAINT `grns_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `suppliers` (`supplierid`),
+  CONSTRAINT `grns_ibfk_2` FOREIGN KEY (`podetailitem`) REFERENCES `purchorderdetails` (`podetailitem`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `holdreasons`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `holdreasons` (
   `reasoncode` smallint(6) NOT NULL default '1',
   `reasondescription` char(30) NOT NULL default '',
@@ -745,12 +921,15 @@ CREATE TABLE `holdreasons` (
   PRIMARY KEY  (`reasoncode`),
   KEY `ReasonCode` (`reasoncode`),
   KEY `ReasonDescription` (`reasondescription`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `lastcostrollup`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `lastcostrollup` (
   `stockid` char(20) NOT NULL default '',
   `totalonhand` double NOT NULL default '0',
@@ -763,12 +942,15 @@ CREATE TABLE `lastcostrollup` (
   `newmatcost` decimal(20,4) NOT NULL default '0.0000',
   `newlabcost` decimal(20,4) NOT NULL default '0.0000',
   `newoheadcost` decimal(20,4) NOT NULL default '0.0000'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `locations`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `locations` (
   `loccode` varchar(5) NOT NULL default '',
   `locationname` varchar(50) NOT NULL default '',
@@ -785,26 +967,35 @@ CREATE TABLE `locations` (
   `taxprovinceid` tinyint(4) NOT NULL default '1',
   `managed` int(11) default '0',
   PRIMARY KEY  (`loccode`),
-  KEY `taxprovinceid` (`taxprovinceid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `taxprovinceid` (`taxprovinceid`),
+  CONSTRAINT `locations_ibfk_1` FOREIGN KEY (`taxprovinceid`) REFERENCES `taxprovinces` (`taxprovinceid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `locstock`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `locstock` (
   `loccode` varchar(5) NOT NULL default '',
   `stockid` varchar(20) NOT NULL default '',
   `quantity` double NOT NULL default '0',
   `reorderlevel` bigint(20) NOT NULL default '0',
   PRIMARY KEY  (`loccode`,`stockid`),
-  KEY `StockID` (`stockid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `StockID` (`stockid`),
+  CONSTRAINT `locstock_ibfk_1` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`),
+  CONSTRAINT `locstock_ibfk_2` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `loctransfers`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `loctransfers` (
   `reference` int(11) NOT NULL default '0',
   `stockid` varchar(20) NOT NULL default '',
@@ -817,25 +1008,34 @@ CREATE TABLE `loctransfers` (
   KEY `Reference` (`reference`,`stockid`),
   KEY `ShipLoc` (`shiploc`),
   KEY `RecLoc` (`recloc`),
-  KEY `StockID` (`stockid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Stores Shipments To And From Locations';
+  KEY `StockID` (`stockid`),
+  CONSTRAINT `loctransfers_ibfk_1` FOREIGN KEY (`shiploc`) REFERENCES `locations` (`loccode`),
+  CONSTRAINT `loctransfers_ibfk_2` FOREIGN KEY (`recloc`) REFERENCES `locations` (`loccode`),
+  CONSTRAINT `loctransfers_ibfk_3` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Stores Shipments To And From Locations';
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `mrpcalendar`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `mrpcalendar` (
   `calendardate` date NOT NULL,
   `daynumber` int(6) NOT NULL,
   `manufacturingflag` smallint(6) NOT NULL default '1',
   PRIMARY KEY  (`calendardate`),
   KEY `daynumber` (`daynumber`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `mrpdemands`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `mrpdemands` (
   `demandid` int(11) NOT NULL auto_increment,
   `stockid` varchar(20) NOT NULL default '',
@@ -844,24 +1044,32 @@ CREATE TABLE `mrpdemands` (
   `duedate` date NOT NULL default '0000-00-00',
   PRIMARY KEY  (`demandid`),
   KEY `StockID` (`stockid`),
-  KEY `mrpdemands_ibfk_1` (`mrpdemandtype`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `mrpdemands_ibfk_1` (`mrpdemandtype`),
+  CONSTRAINT `mrpdemands_ibfk_1` FOREIGN KEY (`mrpdemandtype`) REFERENCES `mrpdemandtypes` (`mrpdemandtype`),
+  CONSTRAINT `mrpdemands_ibfk_2` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `mrpdemandtypes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `mrpdemandtypes` (
   `mrpdemandtype` varchar(6) NOT NULL default '',
   `description` char(30) NOT NULL default '',
   PRIMARY KEY  (`mrpdemandtype`),
   KEY `mrpdemandtype` (`mrpdemandtype`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `orderdeliverydifferenceslog`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `orderdeliverydifferenceslog` (
   `orderno` int(11) NOT NULL default '0',
   `invoiceno` int(11) NOT NULL default '0',
@@ -874,25 +1082,34 @@ CREATE TABLE `orderdeliverydifferenceslog` (
   KEY `StockID` (`stockid`),
   KEY `DebtorNo` (`debtorno`,`branch`),
   KEY `Can_or_BO` (`can_or_bo`),
-  KEY `OrderNo` (`orderno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `OrderNo` (`orderno`),
+  CONSTRAINT `orderdeliverydifferenceslog_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `orderdeliverydifferenceslog_ibfk_2` FOREIGN KEY (`debtorno`, `branch`) REFERENCES `custbranch` (`debtorno`, `branchcode`),
+  CONSTRAINT `orderdeliverydifferenceslog_ibfk_3` FOREIGN KEY (`orderno`) REFERENCES `salesorders` (`orderno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `paymentmethods`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `paymentmethods` (
   `paymentid` tinyint(4) NOT NULL auto_increment,
   `paymentname` varchar(15) NOT NULL default '',
   `paymenttype` int(11) NOT NULL default '1',
   `receipttype` int(11) NOT NULL default '1',
   PRIMARY KEY  (`paymentid`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `paymentterms`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `paymentterms` (
   `termsindicator` char(2) NOT NULL default '',
   `terms` char(40) NOT NULL default '',
@@ -901,23 +1118,29 @@ CREATE TABLE `paymentterms` (
   PRIMARY KEY  (`termsindicator`),
   KEY `DaysBeforeDue` (`daysbeforedue`),
   KEY `DayInFollowingMonth` (`dayinfollowingmonth`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `periods`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `periods` (
   `periodno` smallint(6) NOT NULL default '0',
   `lastdate_in_period` date NOT NULL default '0000-00-00',
   PRIMARY KEY  (`periodno`),
   KEY `LastDate_in_Period` (`lastdate_in_period`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `prices`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `prices` (
   `stockid` varchar(20) NOT NULL default '',
   `typeabbrev` char(2) NOT NULL default '',
@@ -929,13 +1152,19 @@ CREATE TABLE `prices` (
   KEY `CurrAbrev` (`currabrev`),
   KEY `DebtorNo` (`debtorno`),
   KEY `StockID` (`stockid`),
-  KEY `TypeAbbrev` (`typeabbrev`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `TypeAbbrev` (`typeabbrev`),
+  CONSTRAINT `prices_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `prices_ibfk_2` FOREIGN KEY (`currabrev`) REFERENCES `currencies` (`currabrev`),
+  CONSTRAINT `prices_ibfk_3` FOREIGN KEY (`typeabbrev`) REFERENCES `salestypes` (`typeabbrev`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `purchdata`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `purchdata` (
   `supplierno` char(10) NOT NULL default '',
   `stockid` char(20) NOT NULL default '',
@@ -950,13 +1179,18 @@ CREATE TABLE `purchdata` (
   PRIMARY KEY  (`supplierno`,`stockid`,`effectivefrom`),
   KEY `StockID` (`stockid`),
   KEY `SupplierNo` (`supplierno`),
-  KEY `Preferred` (`preferred`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Preferred` (`preferred`),
+  CONSTRAINT `purchdata_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `purchdata_ibfk_2` FOREIGN KEY (`supplierno`) REFERENCES `suppliers` (`supplierid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `purchorderauth`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `purchorderauth` (
   `userid` varchar(20) NOT NULL default '',
   `currabrev` char(3) NOT NULL default '',
@@ -964,11 +1198,14 @@ CREATE TABLE `purchorderauth` (
   `authlevel` int(11) NOT NULL default '0',
   PRIMARY KEY  (`userid`,`currabrev`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `purchorderdetails`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `purchorderdetails` (
   `podetailitem` int(11) NOT NULL auto_increment,
   `orderno` int(11) NOT NULL default '0',
@@ -1003,13 +1240,17 @@ CREATE TABLE `purchorderdetails` (
   KEY `JobRef` (`jobref`),
   KEY `OrderNo` (`orderno`),
   KEY `ShiptRef` (`shiptref`),
-  KEY `Completed` (`completed`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Completed` (`completed`),
+  CONSTRAINT `purchorderdetails_ibfk_1` FOREIGN KEY (`orderno`) REFERENCES `purchorders` (`orderno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `purchorders`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `purchorders` (
   `orderno` int(11) NOT NULL auto_increment,
   `supplierno` varchar(10) NOT NULL default '',
@@ -1039,13 +1280,18 @@ CREATE TABLE `purchorders` (
   KEY `OrdDate` (`orddate`),
   KEY `SupplierNo` (`supplierno`),
   KEY `IntoStockLocation` (`intostocklocation`),
-  KEY `AllowPrintPO` (`allowprint`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `AllowPrintPO` (`allowprint`),
+  CONSTRAINT `purchorders_ibfk_1` FOREIGN KEY (`supplierno`) REFERENCES `suppliers` (`supplierid`),
+  CONSTRAINT `purchorders_ibfk_2` FOREIGN KEY (`intostocklocation`) REFERENCES `locations` (`loccode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `recurringsalesorders`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `recurringsalesorders` (
   `recurrorderno` int(11) NOT NULL auto_increment,
   `debtorno` varchar(10) NOT NULL default '',
@@ -1076,13 +1322,17 @@ CREATE TABLE `recurringsalesorders` (
   KEY `orddate` (`orddate`),
   KEY `ordertype` (`ordertype`),
   KEY `locationindex` (`fromstkloc`),
-  KEY `branchcode` (`branchcode`,`debtorno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `branchcode` (`branchcode`,`debtorno`),
+  CONSTRAINT `recurringsalesorders_ibfk_1` FOREIGN KEY (`branchcode`, `debtorno`) REFERENCES `custbranch` (`branchcode`, `debtorno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `recurrsalesorderdetails`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `recurrsalesorderdetails` (
   `recurrorderno` int(11) NOT NULL default '0',
   `stkcode` varchar(20) NOT NULL default '',
@@ -1091,13 +1341,18 @@ CREATE TABLE `recurrsalesorderdetails` (
   `discountpercent` double NOT NULL default '0',
   `narrative` text NOT NULL,
   KEY `orderno` (`recurrorderno`),
-  KEY `stkcode` (`stkcode`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `stkcode` (`stkcode`),
+  CONSTRAINT `recurrsalesorderdetails_ibfk_1` FOREIGN KEY (`recurrorderno`) REFERENCES `recurringsalesorders` (`recurrorderno`),
+  CONSTRAINT `recurrsalesorderdetails_ibfk_2` FOREIGN KEY (`stkcode`) REFERENCES `stockmaster` (`stockid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `reportcolumns`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `reportcolumns` (
   `reportid` smallint(6) NOT NULL default '0',
   `colno` smallint(6) NOT NULL default '0',
@@ -1113,13 +1368,17 @@ CREATE TABLE `reportcolumns` (
   `budgetoractual` tinyint(1) NOT NULL default '0',
   `valformat` char(1) NOT NULL default 'N',
   `constant` double NOT NULL default '0',
-  PRIMARY KEY  (`reportid`,`colno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY  (`reportid`,`colno`),
+  CONSTRAINT `reportcolumns_ibfk_1` FOREIGN KEY (`reportid`) REFERENCES `reportheaders` (`reportid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `reportfields`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `reportfields` (
   `id` int(8) NOT NULL auto_increment,
   `reportid` int(5) NOT NULL default '0',
@@ -1132,12 +1391,15 @@ CREATE TABLE `reportfields` (
   `params` text,
   PRIMARY KEY  (`id`),
   KEY `reportid` (`reportid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1805 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `reportheaders`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `reportheaders` (
   `reportid` smallint(6) NOT NULL auto_increment,
   `reportheading` varchar(80) NOT NULL default '',
@@ -1159,22 +1421,28 @@ CREATE TABLE `reportheaders` (
   `lower4` varchar(10) NOT NULL default '',
   PRIMARY KEY  (`reportid`),
   KEY `ReportHeading` (`reportheading`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `reportlinks`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `reportlinks` (
   `table1` varchar(25) NOT NULL default '',
   `table2` varchar(25) NOT NULL default '',
   `equation` varchar(75) NOT NULL default ''
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `reports`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `reports` (
   `id` int(5) NOT NULL auto_increment,
   `reportname` varchar(30) NOT NULL default '',
@@ -1237,12 +1505,15 @@ CREATE TABLE `reports` (
   `table6criteria` varchar(75) default NULL,
   PRIMARY KEY  (`id`),
   KEY `name` (`reportname`,`groupname`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=136 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `salesanalysis`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `salesanalysis` (
   `typeabbrev` char(2) NOT NULL default '',
   `periodno` smallint(6) NOT NULL default '0',
@@ -1267,36 +1538,48 @@ CREATE TABLE `salesanalysis` (
   KEY `TypeAbbrev` (`typeabbrev`),
   KEY `Area` (`area`),
   KEY `BudgetOrActual` (`budgetoractual`),
-  KEY `Salesperson` (`salesperson`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Salesperson` (`salesperson`),
+  CONSTRAINT `salesanalysis_ibfk_1` FOREIGN KEY (`periodno`) REFERENCES `periods` (`periodno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `salescat`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `salescat` (
   `salescatid` tinyint(4) NOT NULL auto_increment,
   `parentcatid` tinyint(4) default NULL,
   `salescatname` varchar(30) default NULL,
   PRIMARY KEY  (`salescatid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `salescatprod`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `salescatprod` (
   `salescatid` tinyint(4) NOT NULL default '0',
   `stockid` varchar(20) NOT NULL default '',
   PRIMARY KEY  (`salescatid`,`stockid`),
   KEY `salescatid` (`salescatid`),
-  KEY `stockid` (`stockid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `stockid` (`stockid`),
+  CONSTRAINT `salescatprod_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `salescatprod_ibfk_2` FOREIGN KEY (`salescatid`) REFERENCES `salescat` (`salescatid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `salesglpostings`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `salesglpostings` (
   `id` int(11) NOT NULL auto_increment,
   `area` varchar(3) NOT NULL,
@@ -1309,12 +1592,15 @@ CREATE TABLE `salesglpostings` (
   KEY `Area` (`area`),
   KEY `StkCat` (`stkcat`),
   KEY `SalesType` (`salestype`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `salesman`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `salesman` (
   `salesmancode` char(3) NOT NULL default '',
   `salesmanname` char(30) NOT NULL default '',
@@ -1324,12 +1610,15 @@ CREATE TABLE `salesman` (
   `breakpoint` decimal(10,0) NOT NULL default '0',
   `commissionrate2` double NOT NULL default '0',
   PRIMARY KEY  (`salesmancode`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `salesorderdetails`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `salesorderdetails` (
   `orderlineno` int(11) NOT NULL default '0',
   `orderno` int(11) NOT NULL default '0',
@@ -1347,110 +1636,90 @@ CREATE TABLE `salesorderdetails` (
   PRIMARY KEY  (`orderlineno`,`orderno`),
   KEY `OrderNo` (`orderno`),
   KEY `StkCode` (`stkcode`),
-  KEY `Completed` (`completed`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `salesorders`
---
-
-CREATE TABLE `salesorders` (
-  `orderno` int(11) NOT NULL,
-  `debtorno` varchar(10) NOT NULL default '',
-  `branchcode` varchar(10) NOT NULL default '',
-  `customerref` varchar(50) NOT NULL default '',
-  `buyername` varchar(50) default NULL,
-  `comments` longblob,
-  `orddate` date NOT NULL default '0000-00-00',
-  `ordertype` char(2) NOT NULL default '',
-  `shipvia` int(11) NOT NULL default '0',
-  `deladd1` varchar(40) NOT NULL default '',
-  `deladd2` varchar(40) NOT NULL default '',
-  `deladd3` varchar(40) NOT NULL default '',
-  `deladd4` varchar(40) default NULL,
-  `deladd5` varchar(20) NOT NULL default '',
-  `deladd6` varchar(15) NOT NULL default '',
-  `contactphone` varchar(25) default NULL,
-  `contactemail` varchar(40) default NULL,
-  `deliverto` varchar(40) NOT NULL default '',
-  `deliverblind` tinyint(1) default '1',
-  `freightcost` double NOT NULL default '0',
-  `fromstkloc` varchar(5) NOT NULL default '',
-  `deliverydate` date NOT NULL default '0000-00-00',
-  `quotedate` date NOT NULL default '0000-00-00',
-  `confirmeddate` date NOT NULL default '0000-00-00',
-  `printedpackingslip` tinyint(4) NOT NULL default '0',
-  `datepackingslipprinted` date NOT NULL default '0000-00-00',
-  `quotation` tinyint(4) NOT NULL default '0',
-  PRIMARY KEY  (`orderno`),
-  KEY `DebtorNo` (`debtorno`),
-  KEY `OrdDate` (`orddate`),
-  KEY `OrderType` (`ordertype`),
-  KEY `LocationIndex` (`fromstkloc`),
-  KEY `BranchCode` (`branchcode`,`debtorno`),
-  KEY `ShipVia` (`shipvia`),
-  KEY `quotation` (`quotation`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Completed` (`completed`),
+  CONSTRAINT `salesorderdetails_ibfk_1` FOREIGN KEY (`orderno`) REFERENCES `salesorders` (`orderno`),
+  CONSTRAINT `salesorderdetails_ibfk_2` FOREIGN KEY (`stkcode`) REFERENCES `stockmaster` (`stockid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `salestypes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `salestypes` (
   `typeabbrev` char(2) NOT NULL default '',
   `sales_type` char(20) NOT NULL default '',
   PRIMARY KEY  (`typeabbrev`),
   KEY `Sales_Type` (`sales_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `scripts`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `scripts` (
   `pageid` smallint(4) NOT NULL auto_increment,
   `filename` varchar(50) NOT NULL default '',
   `pagedescription` text NOT NULL,
   PRIMARY KEY  (`pageid`),
   KEY `FileName` (`filename`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Index of all scripts';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Index of all scripts';
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `securitygroups`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `securitygroups` (
   `secroleid` int(11) NOT NULL default '0',
   `tokenid` int(11) NOT NULL default '0',
   PRIMARY KEY  (`secroleid`,`tokenid`),
   KEY `secroleid` (`secroleid`),
-  KEY `tokenid` (`tokenid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `tokenid` (`tokenid`),
+  CONSTRAINT `securitygroups_secroleid_fk` FOREIGN KEY (`secroleid`) REFERENCES `securityroles` (`secroleid`),
+  CONSTRAINT `securitygroups_tokenid_fk` FOREIGN KEY (`tokenid`) REFERENCES `securitytokens` (`tokenid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `securityroles`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `securityroles` (
   `secroleid` int(11) NOT NULL auto_increment,
   `secrolename` text NOT NULL,
   PRIMARY KEY  (`secroleid`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `securitytokens`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `securitytokens` (
   `tokenid` int(11) NOT NULL default '0',
   `tokenname` text NOT NULL,
   PRIMARY KEY  (`tokenid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `shipmentcharges`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `shipmentcharges` (
   `shiptchgid` int(11) NOT NULL auto_increment,
   `shiptref` int(11) NOT NULL default '0',
@@ -1462,13 +1731,18 @@ CREATE TABLE `shipmentcharges` (
   KEY `TransType` (`transtype`,`transno`),
   KEY `ShiptRef` (`shiptref`),
   KEY `StockID` (`stockid`),
-  KEY `TransType_2` (`transtype`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `TransType_2` (`transtype`),
+  CONSTRAINT `shipmentcharges_ibfk_1` FOREIGN KEY (`shiptref`) REFERENCES `shipments` (`shiptref`),
+  CONSTRAINT `shipmentcharges_ibfk_2` FOREIGN KEY (`transtype`) REFERENCES `systypes` (`typeid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `shipments`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `shipments` (
   `shiptref` int(11) NOT NULL default '0',
   `voyageref` varchar(20) NOT NULL default '0',
@@ -1481,24 +1755,31 @@ CREATE TABLE `shipments` (
   KEY `ETA` (`eta`),
   KEY `SupplierID` (`supplierid`),
   KEY `ShipperRef` (`voyageref`),
-  KEY `Vessel` (`vessel`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Vessel` (`vessel`),
+  CONSTRAINT `shipments_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `suppliers` (`supplierid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `shippers`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `shippers` (
   `shipper_id` int(11) NOT NULL auto_increment,
   `shippername` char(40) NOT NULL default '',
   `mincharge` double NOT NULL default '0',
   PRIMARY KEY  (`shipper_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockcategory`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockcategory` (
   `categoryid` char(6) NOT NULL default '',
   `categorydescription` char(20) NOT NULL default '',
@@ -1511,12 +1792,15 @@ CREATE TABLE `stockcategory` (
   PRIMARY KEY  (`categoryid`),
   KEY `CategoryDescription` (`categorydescription`),
   KEY `StockType` (`stocktype`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockcatproperties`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockcatproperties` (
   `stkcatpropid` int(11) NOT NULL auto_increment,
   `categoryid` char(6) NOT NULL,
@@ -1526,24 +1810,32 @@ CREATE TABLE `stockcatproperties` (
   `reqatsalesorder` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`stkcatpropid`),
   KEY `categoryid` (`categoryid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockcheckfreeze`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockcheckfreeze` (
   `stockid` varchar(20) NOT NULL default '',
   `loccode` varchar(5) NOT NULL default '',
   `qoh` double NOT NULL default '0',
   PRIMARY KEY  (`stockid`,`loccode`),
-  KEY `LocCode` (`loccode`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `LocCode` (`loccode`),
+  CONSTRAINT `stockcheckfreeze_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `stockcheckfreeze_ibfk_2` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockcounts`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockcounts` (
   `id` int(11) NOT NULL auto_increment,
   `stockid` varchar(20) NOT NULL default '',
@@ -1552,13 +1844,18 @@ CREATE TABLE `stockcounts` (
   `reference` varchar(20) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `StockID` (`stockid`),
-  KEY `LocCode` (`loccode`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `LocCode` (`loccode`),
+  CONSTRAINT `stockcounts_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `stockcounts_ibfk_2` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockitemproperties`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockitemproperties` (
   `stockid` varchar(20) NOT NULL,
   `stkcatpropid` int(11) NOT NULL,
@@ -1566,12 +1863,15 @@ CREATE TABLE `stockitemproperties` (
   PRIMARY KEY  (`stockid`,`stkcatpropid`),
   KEY `stockid` (`stockid`),
   KEY `value` (`value`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockmaster`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockmaster` (
   `stockid` varchar(20) NOT NULL default '',
   `categoryid` varchar(6) NOT NULL default '',
@@ -1598,9 +1898,9 @@ CREATE TABLE `stockmaster` (
   `appendfile` varchar(40) NOT NULL default 'none',
   `perishable` tinyint(1) NOT NULL default '0',
   `decimalplaces` tinyint(4) NOT NULL default '0',
-  `nextserialno` bigint(20) NOT NULL default '0',
   `pansize` double NOT NULL default '0',
   `shrinkfactor` double NOT NULL default '0',
+  `nextserialno` bigint(20) NOT NULL default '0',
   `netweight` decimal(20,4) NOT NULL default '0.0000',
   PRIMARY KEY  (`stockid`),
   KEY `CategoryID` (`categoryid`),
@@ -1610,13 +1910,18 @@ CREATE TABLE `stockmaster` (
   KEY `StockID` (`stockid`,`categoryid`),
   KEY `Controlled` (`controlled`),
   KEY `DiscountCategory` (`discountcategory`),
-  KEY `taxcatid` (`taxcatid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `taxcatid` (`taxcatid`),
+  CONSTRAINT `stockmaster_ibfk_1` FOREIGN KEY (`categoryid`) REFERENCES `stockcategory` (`categoryid`),
+  CONSTRAINT `stockmaster_ibfk_2` FOREIGN KEY (`taxcatid`) REFERENCES `taxcategories` (`taxcatid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockmoves`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockmoves` (
   `stkmoveno` int(11) NOT NULL auto_increment,
   `stockid` varchar(20) NOT NULL default '',
@@ -1646,13 +1951,20 @@ CREATE TABLE `stockmoves` (
   KEY `Type` (`type`),
   KEY `Show_On_Inv_Crds` (`show_on_inv_crds`),
   KEY `Hide` (`hidemovt`),
-  KEY `reference` (`reference`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `reference` (`reference`),
+  CONSTRAINT `stockmoves_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `stockmoves_ibfk_2` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
+  CONSTRAINT `stockmoves_ibfk_3` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`),
+  CONSTRAINT `stockmoves_ibfk_4` FOREIGN KEY (`prd`) REFERENCES `periods` (`periodno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockmovestaxes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockmovestaxes` (
   `stkmoveno` int(11) NOT NULL default '0',
   `taxauthid` tinyint(4) NOT NULL default '0',
@@ -1661,13 +1973,17 @@ CREATE TABLE `stockmovestaxes` (
   `taxcalculationorder` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`stkmoveno`,`taxauthid`),
   KEY `taxauthid` (`taxauthid`),
-  KEY `calculationorder` (`taxcalculationorder`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `calculationorder` (`taxcalculationorder`),
+  CONSTRAINT `stockmovestaxes_ibfk_1` FOREIGN KEY (`taxauthid`) REFERENCES `taxauthorities` (`taxid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockserialitems`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockserialitems` (
   `stockid` varchar(20) NOT NULL default '',
   `loccode` varchar(5) NOT NULL default '',
@@ -1678,13 +1994,18 @@ CREATE TABLE `stockserialitems` (
   PRIMARY KEY  (`stockid`,`serialno`,`loccode`),
   KEY `StockID` (`stockid`),
   KEY `LocCode` (`loccode`),
-  KEY `serialno` (`serialno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `serialno` (`serialno`),
+  CONSTRAINT `stockserialitems_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `stockserialitems_ibfk_2` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `stockserialmoves`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `stockserialmoves` (
   `stkitmmoveno` int(11) NOT NULL auto_increment,
   `stockmoveno` int(11) NOT NULL default '0',
@@ -1694,13 +2015,18 @@ CREATE TABLE `stockserialmoves` (
   PRIMARY KEY  (`stkitmmoveno`),
   KEY `StockMoveNo` (`stockmoveno`),
   KEY `StockID_SN` (`stockid`,`serialno`),
-  KEY `serialno` (`serialno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `serialno` (`serialno`),
+  CONSTRAINT `stockserialmoves_ibfk_1` FOREIGN KEY (`stockmoveno`) REFERENCES `stockmoves` (`stkmoveno`),
+  CONSTRAINT `stockserialmoves_ibfk_2` FOREIGN KEY (`stockid`, `serialno`) REFERENCES `stockserialitems` (`stockid`, `serialno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `suppallocs`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `suppallocs` (
   `id` int(11) NOT NULL auto_increment,
   `amt` double NOT NULL default '0',
@@ -1710,13 +2036,18 @@ CREATE TABLE `suppallocs` (
   PRIMARY KEY  (`id`),
   KEY `TransID_AllocFrom` (`transid_allocfrom`),
   KEY `TransID_AllocTo` (`transid_allocto`),
-  KEY `DateAlloc` (`datealloc`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `DateAlloc` (`datealloc`),
+  CONSTRAINT `suppallocs_ibfk_1` FOREIGN KEY (`transid_allocfrom`) REFERENCES `supptrans` (`id`),
+  CONSTRAINT `suppallocs_ibfk_2` FOREIGN KEY (`transid_allocto`) REFERENCES `supptrans` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `suppliercontacts`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `suppliercontacts` (
   `supplierid` varchar(10) NOT NULL default '',
   `contact` varchar(30) NOT NULL default '',
@@ -1728,13 +2059,17 @@ CREATE TABLE `suppliercontacts` (
   `ordercontact` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`supplierid`,`contact`),
   KEY `Contact` (`contact`),
-  KEY `SupplierID` (`supplierid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `SupplierID` (`supplierid`),
+  CONSTRAINT `suppliercontacts_ibfk_1` FOREIGN KEY (`supplierid`) REFERENCES `suppliers` (`supplierid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `suppliers`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `suppliers` (
   `supplierid` varchar(10) NOT NULL default '',
   `suppname` varchar(40) NOT NULL default '',
@@ -1766,13 +2101,20 @@ CREATE TABLE `suppliers` (
   KEY `SupplierID` (`supplierid`),
   KEY `SuppName` (`suppname`),
   KEY `taxgroupid` (`taxgroupid`),
-  KEY `suppliers_ibfk_4` (`factorcompanyid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `suppliers_ibfk_4` (`factorcompanyid`),
+  CONSTRAINT `suppliers_ibfk_1` FOREIGN KEY (`currcode`) REFERENCES `currencies` (`currabrev`),
+  CONSTRAINT `suppliers_ibfk_2` FOREIGN KEY (`paymentterms`) REFERENCES `paymentterms` (`termsindicator`),
+  CONSTRAINT `suppliers_ibfk_3` FOREIGN KEY (`taxgroupid`) REFERENCES `taxgroups` (`taxgroupid`),
+  CONSTRAINT `suppliers_ibfk_4` FOREIGN KEY (`factorcompanyid`) REFERENCES `factorcompanies` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `supptrans`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `supptrans` (
   `transno` int(11) NOT NULL default '0',
   `type` smallint(6) NOT NULL default '0',
@@ -1799,47 +2141,63 @@ CREATE TABLE `supptrans` (
   KEY `SuppReference` (`suppreference`),
   KEY `TranDate` (`trandate`),
   KEY `TransNo` (`transno`),
-  KEY `Type` (`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Type` (`type`),
+  CONSTRAINT `supptrans_ibfk_1` FOREIGN KEY (`type`) REFERENCES `systypes` (`typeid`),
+  CONSTRAINT `supptrans_ibfk_2` FOREIGN KEY (`supplierno`) REFERENCES `suppliers` (`supplierid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `supptranstaxes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `supptranstaxes` (
   `supptransid` int(11) NOT NULL default '0',
   `taxauthid` tinyint(4) NOT NULL default '0',
   `taxamount` double NOT NULL default '0',
   PRIMARY KEY  (`supptransid`,`taxauthid`),
-  KEY `taxauthid` (`taxauthid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `taxauthid` (`taxauthid`),
+  CONSTRAINT `supptranstaxes_ibfk_1` FOREIGN KEY (`taxauthid`) REFERENCES `taxauthorities` (`taxid`),
+  CONSTRAINT `supptranstaxes_ibfk_2` FOREIGN KEY (`supptransid`) REFERENCES `supptrans` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `systypes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `systypes` (
   `typeid` smallint(6) NOT NULL default '0',
   `typename` char(50) NOT NULL default '',
   `typeno` int(11) NOT NULL default '1',
   PRIMARY KEY  (`typeid`),
   KEY `TypeNo` (`typeno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `tags`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `tags` (
   `tagref` tinyint(4) NOT NULL auto_increment,
   `tagdescription` varchar(50) NOT NULL,
   PRIMARY KEY  (`tagref`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `taxauthorities`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `taxauthorities` (
   `taxid` tinyint(4) NOT NULL auto_increment,
   `description` varchar(20) NOT NULL default '',
@@ -1851,13 +2209,18 @@ CREATE TABLE `taxauthorities` (
   `bankswift` varchar(30) NOT NULL default '',
   PRIMARY KEY  (`taxid`),
   KEY `TaxGLCode` (`taxglcode`),
-  KEY `PurchTaxGLAccount` (`purchtaxglaccount`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
+  KEY `PurchTaxGLAccount` (`purchtaxglaccount`),
+  CONSTRAINT `taxauthorities_ibfk_1` FOREIGN KEY (`taxglcode`) REFERENCES `chartmaster` (`accountcode`),
+  CONSTRAINT `taxauthorities_ibfk_2` FOREIGN KEY (`purchtaxglaccount`) REFERENCES `chartmaster` (`accountcode`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `taxauthrates`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `taxauthrates` (
   `taxauthority` tinyint(4) NOT NULL default '1',
   `dispatchtaxprovince` tinyint(4) NOT NULL default '1',
@@ -1866,33 +2229,45 @@ CREATE TABLE `taxauthrates` (
   PRIMARY KEY  (`taxauthority`,`dispatchtaxprovince`,`taxcatid`),
   KEY `TaxAuthority` (`taxauthority`),
   KEY `dispatchtaxprovince` (`dispatchtaxprovince`),
-  KEY `taxcatid` (`taxcatid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `taxcatid` (`taxcatid`),
+  CONSTRAINT `taxauthrates_ibfk_1` FOREIGN KEY (`taxauthority`) REFERENCES `taxauthorities` (`taxid`),
+  CONSTRAINT `taxauthrates_ibfk_2` FOREIGN KEY (`taxcatid`) REFERENCES `taxcategories` (`taxcatid`),
+  CONSTRAINT `taxauthrates_ibfk_3` FOREIGN KEY (`dispatchtaxprovince`) REFERENCES `taxprovinces` (`taxprovinceid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `taxcategories`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `taxcategories` (
   `taxcatid` tinyint(4) NOT NULL auto_increment,
   `taxcatname` varchar(30) NOT NULL default '',
   PRIMARY KEY  (`taxcatid`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `taxgroups`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `taxgroups` (
   `taxgroupid` tinyint(4) NOT NULL auto_increment,
   `taxgroupdescription` varchar(30) NOT NULL default '',
   PRIMARY KEY  (`taxgroupid`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `taxgrouptaxes`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `taxgrouptaxes` (
   `taxgroupid` tinyint(4) NOT NULL default '0',
   `taxauthid` tinyint(4) NOT NULL default '0',
@@ -1900,33 +2275,44 @@ CREATE TABLE `taxgrouptaxes` (
   `taxontax` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`taxgroupid`,`taxauthid`),
   KEY `taxgroupid` (`taxgroupid`),
-  KEY `taxauthid` (`taxauthid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `taxauthid` (`taxauthid`),
+  CONSTRAINT `taxgrouptaxes_ibfk_1` FOREIGN KEY (`taxgroupid`) REFERENCES `taxgroups` (`taxgroupid`),
+  CONSTRAINT `taxgrouptaxes_ibfk_2` FOREIGN KEY (`taxauthid`) REFERENCES `taxauthorities` (`taxid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `taxprovinces`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `taxprovinces` (
   `taxprovinceid` tinyint(4) NOT NULL auto_increment,
   `taxprovincename` varchar(30) NOT NULL default '',
   PRIMARY KEY  (`taxprovinceid`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `unitsofmeasure`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `unitsofmeasure` (
   `unitid` tinyint(4) NOT NULL auto_increment,
   `unitname` varchar(15) NOT NULL default '',
   PRIMARY KEY  (`unitid`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `woitems`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `woitems` (
   `wo` int(11) NOT NULL,
   `stockid` char(20) NOT NULL default '',
@@ -1935,13 +2321,18 @@ CREATE TABLE `woitems` (
   `stdcost` double NOT NULL,
   `nextlotsnref` varchar(20) default '',
   PRIMARY KEY  (`wo`,`stockid`),
-  KEY `stockid` (`stockid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `stockid` (`stockid`),
+  CONSTRAINT `woitems_ibfk_1` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `woitems_ibfk_2` FOREIGN KEY (`wo`) REFERENCES `workorders` (`wo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `worequirements`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `worequirements` (
   `wo` int(11) NOT NULL,
   `parentstockid` varchar(20) NOT NULL,
@@ -1951,13 +2342,19 @@ CREATE TABLE `worequirements` (
   `autoissue` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`wo`,`parentstockid`,`stockid`),
   KEY `stockid` (`stockid`),
-  KEY `worequirements_ibfk_3` (`parentstockid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `worequirements_ibfk_3` (`parentstockid`),
+  CONSTRAINT `worequirements_ibfk_1` FOREIGN KEY (`wo`) REFERENCES `workorders` (`wo`),
+  CONSTRAINT `worequirements_ibfk_2` FOREIGN KEY (`stockid`) REFERENCES `stockmaster` (`stockid`),
+  CONSTRAINT `worequirements_ibfk_3` FOREIGN KEY (`wo`, `parentstockid`) REFERENCES `woitems` (`wo`, `stockid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `workcentres`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `workcentres` (
   `code` char(5) NOT NULL default '',
   `location` char(5) NOT NULL default '',
@@ -1968,13 +2365,17 @@ CREATE TABLE `workcentres` (
   `setuphrs` decimal(10,0) NOT NULL default '0',
   PRIMARY KEY  (`code`),
   KEY `Description` (`description`),
-  KEY `Location` (`location`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `Location` (`location`),
+  CONSTRAINT `workcentres_ibfk_1` FOREIGN KEY (`location`) REFERENCES `locations` (`loccode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `workorders`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `workorders` (
   `wo` int(11) NOT NULL,
   `loccode` char(5) NOT NULL default '',
@@ -1985,13 +2386,17 @@ CREATE TABLE `workorders` (
   PRIMARY KEY  (`wo`),
   KEY `LocCode` (`loccode`),
   KEY `StartDate` (`startdate`),
-  KEY `RequiredBy` (`requiredby`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `RequiredBy` (`requiredby`),
+  CONSTRAINT `worksorders_ibfk_1` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `woserialnos`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `woserialnos` (
   `wo` int(11) NOT NULL,
   `stockid` varchar(20) NOT NULL,
@@ -1999,12 +2404,15 @@ CREATE TABLE `woserialnos` (
   `quantity` double NOT NULL default '1',
   `qualitytext` text NOT NULL,
   PRIMARY KEY  (`wo`,`stockid`,`serialno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `www_users`
 --
 
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
 CREATE TABLE `www_users` (
   `userid` varchar(20) NOT NULL default '',
   `password` text NOT NULL,
@@ -2025,8 +2433,10 @@ CREATE TABLE `www_users` (
   `language` varchar(5) NOT NULL default 'en_GB',
   PRIMARY KEY  (`userid`),
   KEY `CustomerID` (`customerid`),
-  KEY `DefaultLocation` (`defaultlocation`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `DefaultLocation` (`defaultlocation`),
+  CONSTRAINT `www_users_ibfk_1` FOREIGN KEY (`defaultlocation`) REFERENCES `locations` (`loccode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -2034,12 +2444,12 @@ CREATE TABLE `www_users` (
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-08-31  8:54:17
+-- Dump completed on 2009-09-18  6:38:09
 -- MySQL dump 10.11
 --
 -- Host: localhost    Database: weberpdemo
 -- ------------------------------------------------------
--- Server version	5.0.45
+-- Server version	5.0.75-0ubuntu10.2
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -2242,11 +2652,11 @@ INSERT INTO `cogsglpostings` VALUES (3,'AN','ANY',5000,'AN');
 -- Dumping data for table `currencies`
 --
 
-INSERT INTO `currencies` VALUES ('Australian Dollars','AUD','Australia','cents',1);
-INSERT INTO `currencies` VALUES ('Swiss Francs','CHF','Swizerland','centimes',1);
-INSERT INTO `currencies` VALUES ('Euro','EUR','Euroland','cents',0.44);
-INSERT INTO `currencies` VALUES ('Pounds','GBP','England','Pence',0.8);
-INSERT INTO `currencies` VALUES ('US Dollars','USD','United States','Cents',1);
+INSERT INTO `currencies` VALUES ('Australian Dollars','AUD','Australia','cents',2,1);
+INSERT INTO `currencies` VALUES ('Swiss Francs','CHF','Swizerland','centimes',2,1);
+INSERT INTO `currencies` VALUES ('Euro','EUR','Euroland','cents',2,0.44);
+INSERT INTO `currencies` VALUES ('Pounds','GBP','England','Pence',2,0.8);
+INSERT INTO `currencies` VALUES ('US Dollars','USD','United States','Cents',2,1);
 
 --
 -- Dumping data for table `holdreasons`
@@ -2287,8 +2697,8 @@ INSERT INTO `systypes` VALUES (0,'Journal - GL',2);
 INSERT INTO `systypes` VALUES (1,'Payment - GL',2);
 INSERT INTO `systypes` VALUES (2,'Receipt - GL',0);
 INSERT INTO `systypes` VALUES (3,'Standing Journal',0);
-INSERT INTO `systypes` VALUES (10,'Sales Invoice',2);
-INSERT INTO `systypes` VALUES (11,'Credit Note',3);
+INSERT INTO `systypes` VALUES (10,'Sales Invoice',1);
+INSERT INTO `systypes` VALUES (11,'Credit Note',1);
 INSERT INTO `systypes` VALUES (12,'Receipt',3);
 INSERT INTO `systypes` VALUES (15,'Journal - Debtors',0);
 INSERT INTO `systypes` VALUES (16,'Location Transfer',22);
@@ -2299,14 +2709,14 @@ INSERT INTO `systypes` VALUES (21,'Debit Note',3);
 INSERT INTO `systypes` VALUES (22,'Creditors Payment',4);
 INSERT INTO `systypes` VALUES (23,'Creditors Journal',0);
 INSERT INTO `systypes` VALUES (25,'Purchase Order Delivery',31);
-INSERT INTO `systypes` VALUES (26,'Work Order Receipt',7);
-INSERT INTO `systypes` VALUES (28,'Work Order Issue',7);
+INSERT INTO `systypes` VALUES (26,'Work Order Receipt',3);
+INSERT INTO `systypes` VALUES (28,'Work Order Issue',5);
 INSERT INTO `systypes` VALUES (29,'Work Order Variance',1);
-INSERT INTO `systypes` VALUES (30,'Sales Order',11);
+INSERT INTO `systypes` VALUES (30,'Sales Order',2);
 INSERT INTO `systypes` VALUES (31,'Shipment Close',26);
-INSERT INTO `systypes` VALUES (35,'Cost Update',19);
+INSERT INTO `systypes` VALUES (35,'Cost Update',17);
 INSERT INTO `systypes` VALUES (36,'Exchange Difference',1);
-INSERT INTO `systypes` VALUES (40,'Work Order',14);
+INSERT INTO `systypes` VALUES (40,'Work Order',9);
 INSERT INTO `systypes` VALUES (50,'Opening Balance',0);
 INSERT INTO `systypes` VALUES (500,'Auto Debtor Number',0);
 
@@ -2367,7 +2777,7 @@ INSERT INTO `taxprovinces` VALUES (1,'Default Tax province');
 -- Dumping data for table `www_users`
 --
 
-INSERT INTO `www_users` VALUES ('admin','weberp','Demonstration user','','','','','MEL',8,'2009-05-17 14:03:53','','A4','1,1,1,1,1,1,1,1,',0,50,'professional','en_GB');
+INSERT INTO `www_users` VALUES ('admin','weberp','Demonstration user','','','','','MEL',8,'2005-04-29 21:34:05','','A4','1,1,1,1,1,1,1,1,1,',0,50,'jelly','en_GB');
 
 --
 -- Dumping data for table `edi_orders_segs`
@@ -2527,7 +2937,7 @@ INSERT INTO `config` VALUES ('Check_Qty_Charged_vs_Del_Qty','1');
 INSERT INTO `config` VALUES ('CountryOfOperation','AUD');
 INSERT INTO `config` VALUES ('CreditingControlledItems_MustExist','0');
 INSERT INTO `config` VALUES ('DB_Maintenance','30');
-INSERT INTO `config` VALUES ('DB_Maintenance_LastRun','2009-04-25');
+INSERT INTO `config` VALUES ('DB_Maintenance_LastRun','2009-01-29');
 INSERT INTO `config` VALUES ('DefaultBlindPackNote','1');
 INSERT INTO `config` VALUES ('DefaultCreditLimit','1000');
 INSERT INTO `config` VALUES ('DefaultCustomerType','1');
@@ -2548,7 +2958,7 @@ INSERT INTO `config` VALUES ('EDI_MsgPending','companies/weberp/EDI_MsgPending')
 INSERT INTO `config` VALUES ('EDI_MsgSent','companies/weberp/EDI_Sent');
 INSERT INTO `config` VALUES ('Extended_CustomerInfo','0');
 INSERT INTO `config` VALUES ('Extended_SupplierInfo','0');
-INSERT INTO `config` VALUES ('FactoryManagerEmail','phil@logicworks.co.nz');
+INSERT INTO `config` VALUES ('FactoryManagerEmail','manager@company.com');
 INSERT INTO `config` VALUES ('FreightChargeAppliesIfLessThan','1000');
 INSERT INTO `config` VALUES ('FreightTaxCategory','1');
 INSERT INTO `config` VALUES ('geocode_integration','0');
@@ -2561,13 +2971,13 @@ INSERT INTO `config` VALUES ('OverChargeProportion','30');
 INSERT INTO `config` VALUES ('OverReceiveProportion','20');
 INSERT INTO `config` VALUES ('PackNoteFormat','1');
 INSERT INTO `config` VALUES ('PageLength','48');
-INSERT INTO `config` VALUES ('part_pics_dir','companies/weberpdemo/part_pics');
+INSERT INTO `config` VALUES ('part_pics_dir','companies/weberp/part_pics');
 INSERT INTO `config` VALUES ('PastDueDays1','30');
 INSERT INTO `config` VALUES ('PastDueDays2','60');
 INSERT INTO `config` VALUES ('PO_AllowSameItemMultipleTimes','1');
 INSERT INTO `config` VALUES ('ProhibitJournalsToControlAccounts','1');
 INSERT INTO `config` VALUES ('ProhibitNegativeStock','1');
-INSERT INTO `config` VALUES ('ProhibitPostingsBefore','2009-03-31');
+INSERT INTO `config` VALUES ('ProhibitPostingsBefore','2006-06-30');
 INSERT INTO `config` VALUES ('QuickEntries','10');
 INSERT INTO `config` VALUES ('RadioBeaconFileCounter','/home/RadioBeacon/FileCounter');
 INSERT INTO `config` VALUES ('RadioBeaconFTP_user_name','RadioBeacon ftp server user name');
@@ -2576,14 +2986,14 @@ INSERT INTO `config` VALUES ('RadioBeaconStockLocation','BL');
 INSERT INTO `config` VALUES ('RadioBraconFTP_server','192.168.2.2');
 INSERT INTO `config` VALUES ('RadioBreaconFilePrefix','ORDXX');
 INSERT INTO `config` VALUES ('RadionBeaconFTP_user_pass','Radio Beacon remote ftp server password');
-INSERT INTO `config` VALUES ('reports_dir','companies/weberpdemo/reportwriter');
+INSERT INTO `config` VALUES ('reports_dir','companies/weberp/reports');
 INSERT INTO `config` VALUES ('RomalpaClause','Ownership will not pass to the buyer until the goods have been paid for in full.');
 INSERT INTO `config` VALUES ('Show_Settled_LastMonth','1');
 INSERT INTO `config` VALUES ('SO_AllowSameItemMultipleTimes','1');
 INSERT INTO `config` VALUES ('TaxAuthorityReferenceName','Tax Ref');
 INSERT INTO `config` VALUES ('UpdateCurrencyRatesDaily','0');
 INSERT INTO `config` VALUES ('WeightedAverageCosting','1');
-INSERT INTO `config` VALUES ('WikiApp','WackoWiki');
+INSERT INTO `config` VALUES ('WikiApp','Disabled');
 INSERT INTO `config` VALUES ('WikiPath','wiki');
 INSERT INTO `config` VALUES ('YearEnd','3');
 
@@ -2707,7 +3117,7 @@ INSERT INTO `accountsection` VALUES (50,'Financed By');
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-08-31  8:54:18
+-- Dump completed on 2009-09-18  6:38:09
 SET FOREIGN_KEY_CHECKS = 1;
 UPDATE systypes SET typeno=0;
 INSERT INTO shippers VALUES (1,'Default Shipper',0);
