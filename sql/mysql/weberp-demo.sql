@@ -1645,6 +1645,54 @@ CREATE TABLE `salesorderdetails` (
 SET character_set_client = @saved_cs_client;
 
 --
+-- Table structure for table `salesorders`
+--
+
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `salesorders` (
+  `orderno` int(11) NOT NULL,
+  `debtorno` varchar(10) NOT NULL default '',
+  `branchcode` varchar(10) NOT NULL default '',
+  `customerref` varchar(50) NOT NULL default '',
+  `buyername` varchar(50) default NULL,
+  `comments` longblob,
+  `orddate` date NOT NULL default '0000-00-00',
+  `ordertype` char(2) NOT NULL default '',
+  `shipvia` int(11) NOT NULL default '0',
+  `deladd1` varchar(40) NOT NULL default '',
+  `deladd2` varchar(40) NOT NULL default '',
+  `deladd3` varchar(40) NOT NULL default '',
+  `deladd4` varchar(40) default NULL,
+  `deladd5` varchar(20) NOT NULL default '',
+  `deladd6` varchar(15) NOT NULL default '',
+  `contactphone` varchar(25) default NULL,
+  `contactemail` varchar(40) default NULL,
+  `deliverto` varchar(40) NOT NULL default '',
+  `deliverblind` tinyint(1) default '1',
+  `freightcost` double NOT NULL default '0',
+  `fromstkloc` varchar(5) NOT NULL default '',
+  `deliverydate` date NOT NULL default '0000-00-00',
+  `confirmeddate` date NOT NULL default '0000-00-00',
+  `printedpackingslip` tinyint(4) NOT NULL default '0',
+  `datepackingslipprinted` date NOT NULL default '0000-00-00',
+  `quotation` tinyint(4) NOT NULL default '0',
+  `quotedate` date NOT NULL default '0000-00-00',
+  PRIMARY KEY  (`orderno`),
+  KEY `DebtorNo` (`debtorno`),
+  KEY `OrdDate` (`orddate`),
+  KEY `OrderType` (`ordertype`),
+  KEY `LocationIndex` (`fromstkloc`),
+  KEY `BranchCode` (`branchcode`,`debtorno`),
+  KEY `ShipVia` (`shipvia`),
+  KEY `quotation` (`quotation`),
+  CONSTRAINT `salesorders_ibfk_1` FOREIGN KEY (`branchcode`, `debtorno`) REFERENCES `custbranch` (`branchcode`, `debtorno`),
+  CONSTRAINT `salesorders_ibfk_2` FOREIGN KEY (`shipvia`) REFERENCES `shippers` (`shipper_id`),
+  CONSTRAINT `salesorders_ibfk_3` FOREIGN KEY (`fromstkloc`) REFERENCES `locations` (`loccode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Table structure for table `salestypes`
 --
 
@@ -2446,7 +2494,7 @@ SET character_set_client = @saved_cs_client;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-09-18  6:38:09
+-- Dump completed on 2009-09-18  7:27:12
 -- MySQL dump 10.11
 --
 -- Host: localhost    Database: weberpdemo
@@ -7144,6 +7192,11 @@ INSERT INTO `salesman` VALUES ('PHO','Phone Contact','','',0,'0',0);
 
 
 --
+-- Dumping data for table `salesorders`
+--
+
+
+--
 -- Dumping data for table `salestypes`
 --
 
@@ -7733,5 +7786,5 @@ INSERT INTO `www_users` VALUES ('admin','weberp','Demonstration user','','','','
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-09-18  6:38:10
+-- Dump completed on 2009-09-18  7:27:12
 SET FOREIGN_KEY_CHECKS = 1;
