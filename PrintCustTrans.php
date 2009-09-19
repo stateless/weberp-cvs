@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.49 $ */
+/* $Revision: 1.50 $ */
 
 $PageSecurity = 1;
 
@@ -46,21 +46,6 @@ If (isset($PrintPDF) or isset($_GET['PrintPDF'])
 //	define('FPDF_FONTPATH','font/');
 	require('fpdi/fpdi.php');
 
-	/*
-	All this lot unnecessary if session.inc included at the start
-	previously it was not possible to start a session before initiating a class
-	include('config.php');
-	include('includes/ConnectDB.inc');
-	include('includes/GetConfig.php');
-	include('includes/DateFunctions.inc');
-	if (isset($SessionSavePath)){
-		session_save_path($SessionSavePath);
-	}
-	ini_set('session.gc_Maxlifetime',$SessionLifeTime);
-	ini_set('max_execution_time',$MaximumExecutionTime);
-
-	session_start();
-	*/
 
 	/*This invoice is hard coded for A4 Landscape invoices or credit notes  so can't use PDFStarter.inc*/
 	$Page_Width=842;
@@ -434,11 +419,10 @@ If (isset($PrintPDF) or isset($_GET['PrintPDF'])
 				$LeftOvers = $pdf->addTextWrap($Left_Margin+300,$YPos,245,$FontSize,$LeftOvers);
 			}
 			/* Add Images for Visa / Mastercard / Paypal */
-		if (file_exists('companies/' . $_SESSION['DatabaseName'] . '/payment.jpg')) {
-			$pdf->addJpegFromFile('companies/' . $_SESSION['DatabaseName'] . '/payment.jpg',$Page_Width/2 -280,$YPos-20,0,40);
-		}
+			if (file_exists('companies/' . $_SESSION['DatabaseName'] . '/payment.jpg')) {
+				$pdf->addJpegFromFile('companies/' . $_SESSION['DatabaseName'] . '/payment.jpg',$Page_Width/2 -280,$YPos-20,0,40);
+			}
 			$pdf->addText($Page_Width-$Right_Margin-472, $YPos - ($line_height*3)+32,$FontSize, '');
-
 			$FontSize=10;
 		} else {
 			$pdf->addText($Page_Width-$Right_Margin-220, $YPos-($line_height*3),$FontSize, _('TOTAL CREDIT'));

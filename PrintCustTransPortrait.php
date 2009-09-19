@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.34 $ */
+/* $Revision: 1.35 $ */
 
 $PageSecurity = 1;
 
@@ -76,73 +76,70 @@ If (isset($PrintPDF)
 
 		if ($InvOrCredit=='Invoice') {
 			$sql = 'SELECT debtortrans.trandate,
-				bankaccounts.bankaccountnumber,
-				bankaccounts.bankaccountcode,
-				debtortrans.ovamount,
-				debtortrans.ovdiscount,
-				debtortrans.ovfreight,
-				debtortrans.ovgst,
-				debtortrans.rate,
-				debtortrans.invtext,
-				debtortrans.consignment,
-				debtorsmaster.name,
-				debtorsmaster.address1,
-				debtorsmaster.address2,
-				debtorsmaster.address3,
-				debtorsmaster.address4,
-				debtorsmaster.address5,
-				debtorsmaster.address6,
-				debtorsmaster.currcode,
-				debtorsmaster.invaddrbranch,
-				debtorsmaster.taxref,
-				paymentterms.terms,
-				salesorders.deliverto,
-				salesorders.deladd1,
-				salesorders.deladd2,
-				salesorders.deladd3,
-				salesorders.deladd4,
-				salesorders.deladd5,
-				salesorders.deladd6,
-				salesorders.customerref,
-				salesorders.orderno,
-				salesorders.orddate,
-				locations.locationname,
-				shippers.shippername,
-				custbranch.brname,
-				custbranch.braddress1,
-				custbranch.braddress2,
-				custbranch.braddress3,
-				custbranch.braddress4,
-				custbranch.braddress5,
-				custbranch.braddress6,
-				custbranch.brpostaddr1,
-				custbranch.brpostaddr2,
-				custbranch.brpostaddr3,
-				custbranch.brpostaddr4,
-				custbranch.brpostaddr5,
-				custbranch.brpostaddr6,
-				salesman.salesmanname,
-				debtortrans.debtorno,
-				debtortrans.branchcode
-			FROM debtortrans,
-				debtorsmaster,
-				custbranch,
-				salesorders,
-				shippers,
-				salesman,
-				locations,
-				paymentterms,
-				bankaccounts
-			WHERE debtortrans.order_ = salesorders.orderno
-			AND debtortrans.type=10
-			AND debtortrans.transno=' . $FromTransNo . '
-			AND debtortrans.shipvia=shippers.shipper_id
-			AND debtortrans.debtorno=debtorsmaster.debtorno
-			AND debtorsmaster.paymentterms=paymentterms.termsindicator
-			AND debtortrans.debtorno=custbranch.debtorno
-			AND debtortrans.branchcode=custbranch.branchcode
-			AND custbranch.salesman=salesman.salesmancode
-			AND salesorders.fromstkloc=locations.loccode';
+					debtortrans.ovamount,
+					debtortrans.ovdiscount,
+					debtortrans.ovfreight,
+					debtortrans.ovgst,
+					debtortrans.rate,
+					debtortrans.invtext,
+					debtortrans.consignment,
+					debtorsmaster.name,
+					debtorsmaster.address1,
+					debtorsmaster.address2,
+					debtorsmaster.address3,
+					debtorsmaster.address4,
+					debtorsmaster.address5,
+					debtorsmaster.address6,
+					debtorsmaster.currcode,
+					debtorsmaster.invaddrbranch,
+					debtorsmaster.taxref,
+					paymentterms.terms,
+					salesorders.deliverto,
+					salesorders.deladd1,
+					salesorders.deladd2,
+					salesorders.deladd3,
+					salesorders.deladd4,
+					salesorders.deladd5,
+					salesorders.deladd6,
+					salesorders.customerref,
+					salesorders.orderno,
+					salesorders.orddate,
+					locations.locationname,
+					shippers.shippername,
+					custbranch.brname,
+					custbranch.braddress1,
+					custbranch.braddress2,
+					custbranch.braddress3,
+					custbranch.braddress4,
+					custbranch.braddress5,
+					custbranch.braddress6,
+					custbranch.brpostaddr1,
+					custbranch.brpostaddr2,
+					custbranch.brpostaddr3,
+					custbranch.brpostaddr4,
+					custbranch.brpostaddr5,
+					custbranch.brpostaddr6,
+					salesman.salesmanname,
+					debtortrans.debtorno,
+					debtortrans.branchcode
+				FROM debtortrans,
+					debtorsmaster,
+					custbranch,
+					salesorders,
+					shippers,
+					salesman,
+					locations,
+					paymentterms
+				WHERE debtortrans.order_ = salesorders.orderno
+				AND debtortrans.type=10
+				AND debtortrans.transno=' . $FromTransNo . '
+				AND debtortrans.shipvia=shippers.shipper_id
+				AND debtortrans.debtorno=debtorsmaster.debtorno
+				AND debtorsmaster.paymentterms=paymentterms.termsindicator
+				AND debtortrans.debtorno=custbranch.debtorno
+				AND debtortrans.branchcode=custbranch.branchcode
+				AND custbranch.salesman=salesman.salesmancode
+				AND salesorders.fromstkloc=locations.loccode';
 
 		if (isset($_POST['PrintEDI']) and $_POST['PrintEDI']=='No'){
 			$sql = $sql . ' AND debtorsmaster.ediinvoices=0';
@@ -461,7 +458,6 @@ If (isset($PrintPDF)
 			if (file_exists('companies/' . $_SESSION['DatabaseName'] . '/payment.jpg')) {
             	$pdf->addJpegFromFile('companies/' . $_SESSION['DatabaseName'] . '/payment.jpg',$Page_Width/2 -60,$YPos-15,0,20);
 			}
-            $pdf->addText($Page_Width-$Right_Margin-392, $YPos - ($line_height*3)+22,$FontSize, _('Bank Code:') . $myrow['bankaccountcode'] . _(' Bank Account:') . $myrow['bankaccountnumber']);
 			$FontSize=10;
 		} else {
 			$pdf->addText($Page_Width-$Right_Margin-220, $YPos-($line_height*3)-6,$FontSize, _('TOTAL CREDIT'));
