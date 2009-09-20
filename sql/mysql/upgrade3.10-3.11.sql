@@ -170,3 +170,4 @@ ALTER TABLE `www_users` ADD `salesman` CHAR( 3 ) NOT NULL AFTER `customerid`;
 
 --Alter definition of column `shipvia` in `debtortrans` table
 ALTER TABLE debtortrans CHANGE shipvia shipvia int(11) NOT NULL DEFAULT 0;
+

@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.55 $ */
+/* $Revision: 1.56 $ */
 
 $PageSecurity =15;
 
@@ -80,6 +80,9 @@ if (isset($_POST['submit'])) {
 	}elseif (!IsEmailAddress($_POST['X_FactoryManagerEmail'])){
 		$InputError = 1;
 		prnMsg(_('The Factory Manager Email address does not appear to be valid'),'error');
+	}elseif (strlen($_POST['X_FrequentlyOrderedItems']) > 2 || !is_numeric($_POST['X_FrequentlyOrderedItems'])) {
+		$InputError = 1;
+		prnMsg(_('The number of frequently ordered items to display must be numeric'),'error');
 	}
 
 	if ($InputError !=1){
@@ -255,6 +258,9 @@ if (isset($_POST['submit'])) {
 		if ($_SESSION['DefineControlledOnWOEntry'] != $_POST['X_DefineControlledOnWOEntry']){
 			$sql[] = "UPDATE config SET confvalue='" . $_POST['X_DefineControlledOnWOEntry'] . "' WHERE confname='DefineControlledOnWOEntry'";
 		}
+		if ($_SESSION['FrequentlyOrderedItems'] != $_POST['X_FrequentlyOrderedItems']){
+			$sql[] = "UPDATE config SET confvalue='" . $_POST['X_FrequentlyOrderedItems'] . "' WHERE confname='FrequentlyOrderedItems'";
+		}
 		$ErrMsg =  _('The system configuration could not be updated because');
 		if (sizeof($sql) > 1 ) {
 			$result = DB_Txn_Begin($db);
@@ -356,6 +362,11 @@ echo '<tr><td>' . _('Romalpa Clause') . ':</td>
 echo '<tr><td>' . _('Quick Entries') . ':</td>
 	<td><input type="Text" class="number" Name="X_QuickEntries" value="' . $_SESSION['QuickEntries'] . '" size=3 maxlength=2></td>
 	<td>' . _('This parameter defines the layout of the sales order entry screen. The number of fields available for quick entries. Any number from 1 to 99 can be entered.') . '</td></tr>';
+
+// Frequently Ordered Items
+echo '<tr><td>' . _('Frequently Ordered Items') . ':</td>
+	<td><input type="Text" class="number" Name="X_FrequentlyOrderedItems" value="' . $_SESSION['FrequentlyOrderedItems'] . '" size=3 maxlength=2></td>
+	<td>' . _('To show the most frequently ordered items enter the number of frequently ordered items you wish to display from 1 to 99. If you do not wish to display the frequently ordered item list enter 0.') . '</td></tr>';
 
 //'AllowOrderLineItemNarrative'
 echo '<tr><td>' . _('Order Entry allows Line Item Narrative') . ':</td>

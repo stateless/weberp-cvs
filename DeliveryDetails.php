@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.73 $ */
+/* $Revision: 1.74 $ */
 
 /*
 This is where the delivery details are confirmed/entered/modified and the order committed to the database once the place order/modify order button is hit.
@@ -461,6 +461,7 @@ if (isset($OK_to_PROCESS) and $OK_to_PROCESS == 1 && $_SESSION['ExistingOrder']=
 					FROM woitems INNER JOIN workorders
 					ON woitems.wo=workorders.wo
 					WHERE woitems.stockid = '" . $StockItem->StockID . "'
+					AND woitems.qtyreqd > woitems.qtyrecd
 					AND workorders.closed = 0";
 			$WorkOrdersResult = DB_query($SQL,$db);
 			$WorkOrdersRow = DB_fetch_row($WorkOrdersResult);
