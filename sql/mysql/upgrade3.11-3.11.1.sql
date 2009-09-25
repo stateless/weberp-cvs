@@ -1,3 +1,4 @@
+SET FOREIGN_KEY_CHECKS=0;
   ALTER TABLE accountgroups ADD CONSTRAINT `accountgroups_ibfk_1` FOREIGN KEY (`sectioninaccounts`) REFERENCES `accountsection` (`sectionid`);
   ALTER TABLE audittrail ADD CONSTRAINT `audittrail_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `www_users` (`userid`);
   ALTER TABLE bankaccounts ADD CONSTRAINT `bankaccounts_ibfk_1` FOREIGN KEY (`accountcode`) REFERENCES `chartmaster` (`accountcode`);
@@ -123,3 +124,4 @@
   ALTER TABLE workcentres ADD CONSTRAINT `workcentres_ibfk_1` FOREIGN KEY (`location`) REFERENCES `locations` (`loccode`);
   ALTER TABLE workorders ADD CONSTRAINT `worksorders_ibfk_1` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`);
   ALTER TABLE www_users ADD CONSTRAINT `www_users_ibfk_1` FOREIGN KEY (`defaultlocation`) REFERENCES `locations` (`loccode`);
+  SET FOREIGN_KEY_CHECKS=1;

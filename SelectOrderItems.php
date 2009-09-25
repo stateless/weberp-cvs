@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.111 $ */
+/* $Revision: 1.112 $ */
 
 include('includes/DefineCartClass.php');
 $PageSecurity = 1;
@@ -1272,11 +1272,9 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 
 			if (in_array(2,$_SESSION['AllowedPageSecurityTokens'])){
 				/*OK to display with discount if it is an internal user with appropriate permissions */
-
 				echo '<td><input class="number" onKeyPress="return restrictToNumbers(this, event)"  type=text name="Price_' . $OrderLine->LineNumber . '" size=16 maxlength=16 value=' . $OrderLine->Price . '></td>
 					<td><input class="number" onKeyPress="return restrictToNumbers(this, event)"  type=text name="Discount_' . $OrderLine->LineNumber . '" size=5 maxlength=4 value=' . ($OrderLine->DiscountPercent * 100) . '></td>
 					<td><input class="number" onKeyPress="return restrictToNumbers(this, event)"  type=text name="GPPercent_' . $OrderLine->LineNumber . '" size=3 maxlength=40 value=' . $OrderLine->GPPercent . '></td>';	
-
 			} else {
 				echo '<td align=right>' . $OrderLine->Price . '</td><td></td>';
 				echo '<input type=hidden name="Price_' . $OrderLine->LineNumber . '" value=' . $OrderLine->Price . '>';
@@ -1330,7 +1328,6 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 
 		echo '<br><div class="centre"><input type=submit name="Recalculate" Value="' . _('Re-Calculate') . '">
                 <input type=submit name="DeliveryDetails" value="' . _('Enter Delivery Details and Confirm Order') . '"></div><hr>';
-
 	} # end of if lines
 
 /* Now show the stock item selection search stuff below */
@@ -1712,6 +1709,5 @@ echo '<script  type="text/javascript">defaultControl(document.SelectParts.part_1
 if (isset($_GET['NewOrder']) and $_GET['NewOrder']!='') {
 	echo '<script  type="text/javascript">defaultControl(document.SelectCustomer.CustKeywords);</script>';	
 }
-
 include('includes/footer.inc');
 ?>
