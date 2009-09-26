@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `fixedassetlocations` (
   `locationid` char(6) NOT NULL default '',
   `locationdescription` char(20) NOT NULL default '',
   PRIMARY KEY  (`locationid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 DROP TABLE `assetmanager`;
 
