@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.15 $ */
+/* $Revision: 1.16 $ */
 $PageSecurity = 2;
 include('includes/session.inc');
 
@@ -37,6 +37,10 @@ If (isset($_POST['PrintPDF'])
 			GROUP BY stockmaster.categoryid,
 				stockcategory.categorydescription,
 				unitcost,
+				stockmaster.units,
+				stockmaster.materialcost,
+				stockmaster.labourcost,
+				stockmaster.overheadcost,
 				stockmaster.stockid,
 				stockmaster.description
 			HAVING SUM(locstock.quantity)!=0
