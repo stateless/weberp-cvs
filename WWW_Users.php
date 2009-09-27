@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.36 $ */
+/* $Revision: 1.37 $ */
 
 $PageSecurity=15;
 
@@ -439,10 +439,10 @@ if (!isset($_POST['BranchCode'])) {
 	$_POST['BranchCode']='';
 }
 echo '<tr><td>' . _('Customer Code') . ':</td>
-	<td><input type="text" name="Cust" size=10 maxlength=8 value="' . $_POST['Cust'] . '"></td></tr>';
+	<td><input type="text" name="Cust" size=10 maxlength=10 value="' . $_POST['Cust'] . '"></td></tr>';
 
 echo '<tr><td>' . _('Branch Code') . ':</td>
-	<td><input type="text" name="BranchCode" size=10 maxlength=8 VALUE="' . $_POST['BranchCode'] .'"></td></tr>';
+	<td><input type="text" name="BranchCode" size=10 maxlength=10 VALUE="' . $_POST['BranchCode'] .'"></td></tr>';
 
 echo '<tr><td>' . _('Restrict to Sales Person') . ':</td>
 	<td><select name="Salesman">';
