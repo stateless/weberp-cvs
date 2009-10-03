@@ -2478,7 +2478,7 @@ CREATE TABLE `www_users` (
   `blocked` tinyint(4) NOT NULL DEFAULT '0',
   `displayrecordsmax` int(11) NOT NULL DEFAULT '0',
   `theme` varchar(30) NOT NULL DEFAULT 'fresh',
-  `language` varchar(5) NOT NULL DEFAULT 'en_GB',
+  `language` varchar(10) NOT NULL DEFAULT 'en_GB',
   PRIMARY KEY (`userid`),
   KEY `CustomerID` (`customerid`),
   KEY `DefaultLocation` (`defaultlocation`),
