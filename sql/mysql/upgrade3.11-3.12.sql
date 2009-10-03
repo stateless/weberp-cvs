@@ -19,3 +19,4 @@ CREATE TABLE `assetmanager` (
 
 UPDATE `www_users` SET `modulesallowed`=(SELECT insert(`modulesallowed`, 15,0,"1,"));
 INSERT INTO config (confname, confvalue) VALUES ('FrequentlyOrderedItems',0);
+ALTER TABLE `www_users` CHANGE COLUMN `language` `language` varchar(10) NOT NULL DEFAULT 'en_GB';
