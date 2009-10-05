@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.36 $ */
+/* $Revision: 1.37 $ */
 
 $PageSecurity = 1;
 
@@ -79,12 +79,13 @@ If (isset($PrintPDF)
 				from bankaccounts
 				WHERE bankaccounts.invoice = 1';
 		$result=DB_query($sql,$db,'','',false,false);
-	        	if (DB_error_no($db)!=1) {
-		if (DB_num_rows($result)==1){
-                $myrow = DB_fetch_array($result);
-                $DefaultBankAccountNumber = _('Account:') .' ' .$myrow['bankaccountnumber'];
-                $DefaultBankAccountCode =  _('Bank Code:') .' ' .$myrow['bankaccountcode'];
-		}}
+		if (DB_error_no($db)!=1) {
+			if (DB_num_rows($result)==1){
+				$myrow = DB_fetch_array($result);
+				$DefaultBankAccountNumber = _('Account:') .' ' .$myrow['bankaccountnumber'];
+				$DefaultBankAccountCode =  _('Bank Code:') .' ' .$myrow['bankaccountcode'];
+			}
+		}
 // gather the invoice data
 		if ($InvOrCredit=='Invoice') {
 			$sql = 'SELECT debtortrans.trandate,
