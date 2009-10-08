@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.85 $ */
+/* $Revision: 1.86 $ */
 
 
 $PageSecurity = 1;
@@ -171,6 +171,11 @@ if (count($_SESSION['AllowedPageSecurityTokens'])==1){
 							<tr>
 							<td class="menu_group_item">
 								<?php echo "<a href='" . $rootpath . '/SalesInquiry.php?' . SID . "'><LI>" . _('Sales Order Detail Or Summary Inquiries') . '</LI></a>'; ?>
+							</td>
+							</tr>
+							<tr>
+							<td class="menu_group_item">
+								<?php echo "<a href='" . $rootpath . '/TopItems.php?' . SID . "'><LI>" . _('Top Sales Items Report') . '</LI></a>'; ?>
 							</td>
 							</tr>
 							<tr>
