@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.6 $ */
+/* $Revision: 1.7 $ */
 // MRPCreateDemands.php - Create mrpdemands based on sales order history
 
 $PageSecurity=9;
@@ -139,7 +139,7 @@ for ($i = 1; $i <= ( $_POST['PeriodNumber'] - 1); $i++) {
 
 $totalrecords = 0;
 while ($myrow = DB_fetch_array($result)) {
-     if (($myrow['totqty'] >= $excludeqty) and ($myrow['totextqty'] >= $excludeamt)) {
+	if (($myrow['totqty'] >= $excludeqty) and ($myrow['totextqty'] >= $excludeamt)) {
 		unset($periodqty);
 		$periodqty[] = " ";
 		$totalqty = $myrow['totqtyinvoiced'] * $multiplier;
@@ -155,7 +155,7 @@ while ($myrow = DB_fetch_array($result)) {
 				$periodqty[$i] += 1;
 			}
 		}
-		
+
 		$i = 0;
 		foreach ($periodqty as $demandqty) {
 				$sql = "INSERT INTO mrpdemands (stockid,
@@ -215,11 +215,11 @@ prnMsg( $totalrecords . ' ' . _('records have been created'),'success');
     }
     echo '</select></td></tr>';
 	echo '<tr><td>' . _('From Sales Date') . 
-	  ":</td><td><input type ='text' name='FromDate' size='10' value='" . $_POST['FromDate'] . "'>";
+	  ":</td><td><input type ='text' class=date alt='".$_SESSION['DefaultDateFormat']."' name='FromDate' size='10' value='" . $_POST['FromDate'] . "'>";
 	echo '<td>' . _('To Sales Date') . 
-	  ":</td><td><input type ='text' name='ToDate' size='10' value='" . $_POST['ToDate'] . "'></tr>";
+	  ":</td><td><input type ='text' class=date alt='".$_SESSION['DefaultDateFormat']."' name='ToDate' size='10' value='" . $_POST['ToDate'] . "'></tr>";
 	echo '<tr><td>' . _('Start Date For Distribution') . 
-	     ":</td><td><input type ='text' name='DistDate' size='10' value='" . $_POST['DistDate'] . "'></tr>";
+	     ":</td><td><input type ='text' class=date alt='".$_SESSION['DefaultDateFormat']."' name='DistDate' size='10' value='" . $_POST['DistDate'] . "'></tr>";
 	echo '<tr><td>' . _('Distribution Period') . ":</td><td><select name='Period'>";
 	echo "<option selected value='weekly'>" . _('Weekly');
 	echo "<option value='monthly'>" . _('Monthly');
