@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.12 $ */
+/* $Revision: 1.13 $ */
 
 $PageSecurity = 2;
 
@@ -212,8 +212,8 @@ If ($StockItemsResult) {
 
 		printf("<td><input type=submit name='SelectedStockItem' VALUE='%s'</td>
 		        <td>%s</td>
-			<td align=right>%s</td>
-			<td align=right>%s</td>
+			<td class=number>%s</td>
+			<td class=number>%s</td>
 			<td>%s</td>
 			</tr>",
 			$myrow['stockid'],
@@ -403,7 +403,7 @@ If ($StockItemsResult) {
 				<td>%s</td>
 				<td>%s</td>
 				<td>%s</td>
-				<td align=right>%s</td>
+				<td class=number>%s</td>
 				</tr>",
 				$ViewPurchOrder,
 				$myrow['orderno'],
