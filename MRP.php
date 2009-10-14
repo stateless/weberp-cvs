@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.5 $ */
+/* $Revision: 1.6 $ */
 
 $PageSecurity=9;
 
@@ -357,15 +357,18 @@ if (isset($_POST['submit'])) {
 						 mrpdate,
 						 updateflag)
 			   SELECT Null,
-					  itemcode,
-					  deliverydate,
+					  purchorderdetails.itemcode,
+					  purchorderdetails.deliverydate,
 					  (quantityord - quantityrecd) AS netqty,
 					  "PO",
-					  orderno,
-					  deliverydate,
+					  purchorderdetails.orderno,
+					  purchorderdetails.deliverydate,
 					  0
-				  FROM purchorderdetails
-			  WHERE (quantityord - quantityrecd) > 0';
+				  FROM purchorderdetails,
+				       purchorders
+			  WHERE purchorderdetails.orderno = purchorders.orderno
+			    AND purchorders.status != "Cancelled"
+			    AND(quantityord - quantityrecd) > 0';
 	$result = DB_query($sql,$db);
 	
 	prnMsg(_('Loading supplies from inventory on hand'),'info');
