@@ -2494,7 +2494,7 @@ CREATE TABLE `www_users` (
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-09-27  8:53:00
+-- Dump completed on 2009-10-03  8:20:38
 -- MySQL dump 10.13  Distrib 5.1.35, for pc-linux-gnu (i686)
 --
 -- Host: localhost    Database: weberpdemo
@@ -7787,5 +7787,5 @@ INSERT INTO `www_users` VALUES ('admin','weberp','Demonstration user','','','','
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-09-27  8:53:02
+-- Dump completed on 2009-10-03  8:20:40
 SET FOREIGN_KEY_CHECKS = 1;

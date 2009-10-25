@@ -2492,7 +2492,7 @@ CREATE TABLE `www_users` (
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-09-27  8:53:00
+-- Dump completed on 2009-10-03  8:20:38
 -- MySQL dump 10.13  Distrib 5.1.35, for pc-linux-gnu (i686)
 --
 -- Host: localhost    Database: weberpdemo
@@ -3166,7 +3166,7 @@ INSERT INTO `accountsection` VALUES (50,'Financed By');
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-09-27  8:53:00
+-- Dump completed on 2009-10-03  8:20:39
 SET FOREIGN_KEY_CHECKS = 1;
 UPDATE systypes SET typeno=0;
 INSERT INTO shippers VALUES (1,'Default Shipper',0);
