@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.2 $ */
+/* $Revision: 1.3 $ */
 // MRPReport.php - Shows supply and demand for a part as determined by MRP
 $PageSecurity = 2;
 include('includes/session.inc');
@@ -477,7 +477,7 @@ If (isset($_POST['PrintPDF']) AND $_POST['Part']!='') {
 			header('Cache-Control: private, post-check=0, pre-check=0');
 			header('Pragma: public');
 	
-			$pdf->Stream();
+			$pdf->Output('MRPReport.pdf', 'I');
 	}
 	
 } else { /*The option to print PDF was not hit so display form */
