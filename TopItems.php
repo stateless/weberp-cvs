@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.2 $ */
+/* $Revision: 1.3 $ */
 
 $PageSecurity = 2;
 
@@ -167,11 +167,11 @@ else{
 								<th><strong>' . _('On Hand') . '</strong></th>';
 			echo $TableHeader;
 			echo'	
-			<input type="hidden" value='.$_POST["Location"].' name='. _('location').' />
-			<input type="hidden" value='.$_POST["order"].' name='. _('order').' />
-			<input type="hidden" value='.$_POST["NumberOfDays"].' name='. _('numberofdays').' />
-			<input type="hidden" value='.$_POST["Customers"].' name='. _('customers').' />
-			<input type="hidden" value='.$_POST["NumberOfTopItems"].' name='. _('NumberOfTopItems').' />
+			<input type="hidden" value='.$_POST["Location"].' name=location />
+			<input type="hidden" value='.$_POST["order"].' name=order />
+			<input type="hidden" value='.$_POST["NumberOfDays"].' name=numberofdays />
+			<input type="hidden" value='.$_POST["Customers"].' name=customers />
+			<input type="hidden" value='.$_POST["NumberOfTopItems"].' name=NumberOfTopItems />
 			';
 
 
