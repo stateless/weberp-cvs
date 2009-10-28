@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.2 $ */
+/* $Revision: 1.3 $ */
 // BOMIndented.php - Indented Bill of Materials
 $PageSecurity = 2;
 include('includes/session.inc');
@@ -240,7 +240,7 @@ If (isset($_POST['PrintPDF'])) {
 			header('Cache-Control: private, post-check=0, pre-check=0');
 			header('Pragma: public');
 	
-			$pdf->Stream();
+			$pdf->Output('BOMIndented.pdf', 'I');
 	}
 	
 } else { /*The option to print PDF was not hit so display form */
