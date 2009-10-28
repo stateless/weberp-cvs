@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.56 $ */
+/* $Revision: 1.57 $ */
 
 $PageSecurity =15;
 
@@ -843,7 +843,7 @@ echo '<tr><td>' . _('Months of Audit Trail to Retain') . ':</td>
 </tr>';
 
 //DefineControlledOnWOEntry
-echo '<tr><td>' . _('Controlled Items Defined At Work Order Entrry') . ':</td>
+echo '<tr><td>' . _('Controlled Items Defined At Work Order Entry') . ':</td>
 	<td><select Name="X_DefineControlledOnWOEntry">
 	<option '.($_SESSION['DefineControlledOnWOEntry']?'selected ':'').'value="1">'._('Yes').'
 	<option '.(!$_SESSION['DefineControlledOnWOEntry']?'selected ':'').'value="0">'._('No').'
