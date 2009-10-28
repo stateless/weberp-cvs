@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.2 $ */
+/* $Revision: 1.3 $ */
 // StockDispatch.php - Report of parts with overstock at one location that can be transferred
 // to another location to cover shortage based on reorder level. Creates loctransfer records 
 // that can be processed using Bulk Inventory Transfer - Receive.
@@ -164,7 +164,7 @@ If (isset($_POST['PrintPDF'])) {
 			header('Cache-Control: private, post-check=0, pre-check=0');
 			header('Pragma: public');
 	
-			$pdf->Stream();
+			$pdf->Output('StockDispatch.pdf', 'I');
 	}
 	
 } else { /*The option to print PDF was not hit so display form */
