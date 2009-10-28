@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.1 $ */
+/* $Revision: 1.2 $ */
 
 $PageSecurity = 11;
 
@@ -92,7 +92,7 @@ if (isset($_POST['submit'])) {
 							defaultvalue = '"	. $_POST['PropDefault' .$i] . "',
 							reqatsalesorder = " . $_POST['PropReqSO' .$i] . "
 						WHERE stkcatpropid =" . $_POST['PropID' .$i];
-				$ErrMsg = _('Updated the stock category property for') . ' ' . $_POST['PropLabel' . $i];
+				$ErrMsg = _('Updated the asset category property for') . ' ' . $_POST['PropLabel' . $i];
 				$result = DB_query($sql,$db,$ErrMsg);
 			}
 
@@ -102,7 +102,7 @@ if (isset($_POST['submit'])) {
 
 	} elseif ($InputError !=1) {
 
-	/*Selected category is null cos no item selected on first time round so must be adding a	record must be submitting new entries in the new stock category form */
+	/*Selected category is null cos no item selected on first time round so must be adding a	record must be submitting new entries in the new asset category form */
 
 		$sql = "INSERT INTO stockcategory (categoryid,
                                        stocktype,
@@ -119,9 +119,9 @@ if (isset($_POST['submit'])) {
                                        " . $_POST['AdjGLAct'] . ",
                                        " . $_POST['MaterialUseageVarAc'] . ",
                                        " . $_POST['WIPAct'] . ")";
-        $ErrMsg = _('Could not insert the new stock category') . $_POST['CategoryDescription'] . _('because');
+        $ErrMsg = _('Could not insert the new asset category') . $_POST['CategoryDescription'] . _('because');
         $result = DB_query($sql,$db,$ErrMsg);
-		prnMsg(_('A new stock category record has been added for') . ' ' . $_POST['CategoryDescription'],'success');
+		prnMsg(_('A new asset category record has been added for') . ' ' . $_POST['CategoryDescription'],'success');
 		$sql="INSERT INTO stockcatproperties 
 				VALUES(
 					NULL, 
@@ -136,6 +136,15 @@ if (isset($_POST['submit'])) {
 					NULL, 
 					'".$_POST['CategoryID']."', 
 					'"._('Annual Depreciation Percentage')."',
+					'0',
+					'5',
+					'0')";
+		$result=DB_query($sql,$db);
+		$sql="INSERT INTO stockcatproperties 
+				VALUES(
+					NULL, 
+					'".$_POST['CategoryID']."', 
+					'"._('Annual Internal Depreciation Percentage')."',
 					'0',
 					'5',
 					'0')";
@@ -161,35 +170,35 @@ if (isset($_POST['submit'])) {
 	$result = DB_query($sql,$db);
 	$myrow = DB_fetch_row($result);
 	if ($myrow[0]>0) {
-		prnMsg(_('Cannot delete this stock category because stock items have been created using this stock category') .
-			'<br> ' . _('There are') . ' ' . $myrow[0] . ' ' . _('items referring to this stock category code'),'warn');
+		prnMsg(_('Cannot delete this asset category because stock items have been created using this asset category') .
+			'<br> ' . _('There are') . ' ' . $myrow[0] . ' ' . _('items referring to this asset category code'),'warn');
 
 	} else {
 		$sql = "SELECT COUNT(*) FROM salesglpostings WHERE stkcat='$SelectedCategory'";
 		$result = DB_query($sql,$db);
 		$myrow = DB_fetch_row($result);
 		if ($myrow[0]>0) {
-			prnMsg(_('Cannot delete this stock category because it is used by the sales') . ' - ' . _('GL posting interface') . '. ' . _('Delete any records in the Sales GL Interface set up using this stock category first'),'warn');
+			prnMsg(_('Cannot delete this asset category because it is used by the sales') . ' - ' . _('GL posting interface') . '. ' . _('Delete any records in the Sales GL Interface set up using this asset category first'),'warn');
 		} else {
 			$sql = "SELECT COUNT(*) FROM cogsglpostings WHERE stkcat='$SelectedCategory'";
 			$result = DB_query($sql,$db);
 			$myrow = DB_fetch_row($result);
 			if ($myrow[0]>0) {
-				prnMsg(_('Cannot delete this stock category because it is used by the cost of sales') . ' - ' . _('GL posting interface') . '. ' . _('Delete any records in the Cost of Sales GL Interface set up using this stock category first'),'warn');
+				prnMsg(_('Cannot delete this asset category because it is used by the cost of sales') . ' - ' . _('GL posting interface') . '. ' . _('Delete any records in the Cost of Sales GL Interface set up using this asset category first'),'warn');
 			} else {
 				$sql="DELETE FROM stockcategory WHERE categoryid='$SelectedCategory'";
 				$result = DB_query($sql,$db);
-				prnMsg(_('The stock category') . ' ' . $SelectedCategory . ' ' . _('has been deleted') . ' !','success');
+				prnMsg(_('The asset category') . ' ' . $SelectedCategory . ' ' . _('has been deleted') . ' !','success');
 				unset ($SelectedCategory);
 			}
 		}
-	} //end if stock category used in debtor transactions
+	} //end if asset category used in debtor transactions
 }
 
 if (!isset($SelectedCategory)) {
 
 /* It could still be the second time the page has been run and a record has been selected for modification - SelectedCategory will exist because it was sent with the new call. If its the first time the page has been displayed with no parameters
-then none of the above are true and the list of stock categorys will be displayed with
+then none of the above are true and the list of asset categorys will be displayed with
 links to delete or edit each. These will call the same page again and allow update/input
 or deletion of the records*/
 
@@ -223,7 +232,7 @@ or deletion of the records*/
             		<td align=right>%s</td>
             		<td align=right>%s</td>
             		<td><a href=\"%sSelectedCategory=%s\">" . _('Edit') . "</td>
-            		<td><a href=\"%sSelectedCategory=%s&delete=yes\" onclick=\"return confirm('" . _('Are you sure you wish to delete this stock category? Additional checks will be performed before actual deletion to ensure data integrity is not compromised.') . "');\">" . _('Delete') . "</td>
+            		<td><a href=\"%sSelectedCategory=%s&delete=yes\" onclick=\"return confirm('" . _('Are you sure you wish to delete this asset category? Additional checks will be performed before actual deletion to ensure data integrity is not compromised.') . "');\">" . _('Delete') . "</td>
             		</tr>",
             		$myrow[0],
             		$myrow[1],
@@ -261,7 +270,7 @@ if (! isset($_GET['delete'])) {
 	echo '<form name="CategoryForm" method="post" action="' . $_SERVER['PHP_SELF'] . '?' . SID . '">';
 
 	if (isset($SelectedCategory)) {
-		//editing an existing stock category
+		//editing an existing asset category
 		if (!isset($_POST['UpdateTypes'])) {
 			$sql = "SELECT categoryid,
 						stocktype,
@@ -288,13 +297,13 @@ if (! isset($_GET['delete'])) {
 		}
 		echo '<input type=hidden name="SelectedCategory" value="' . $SelectedCategory . '">';
 		echo '<input type=hidden name="CategoryID" value="' . $_POST['CategoryID'] . '">';
-		echo '<table><tr><td>' . _('Category Code') . ':</td><td>' . $_POST['CategoryID'] . '</td></tr>';
+		echo '<table><tr><td>' . _('Asset Category Code') . ':</td><td>' . $_POST['CategoryID'] . '</td></tr>';
 
 	} else { //end of if $SelectedCategory only do the else when a new record is being entered
 		if (!isset($_POST['CategoryID'])) {
 			$_POST['CategoryID'] = '';
 		}
-		echo '<table><tr><td>' . _('Category Code') . ':</td>
+		echo '<table><tr><td>' . _('Asset Category Code') . ':</td>
                              <td><input type="Text" name="CategoryID" size=7 maxlength=6 value="' . $_POST['CategoryID'] . '"></td></tr>';
 	}
 
@@ -418,7 +427,7 @@ if (! isset($_GET['delete'])) {
 	echo '</select></td></tr><tr><td>'; */
 	echo '<tr><td>';
 	if (isset($_POST['StockType']) and $_POST['StockType']=='L') {
-		echo  _('Labour Efficiency Variance GL Code');
+		echo  _('Other Capitalized Goods P/L Code');
 	} else {
 		echo  _('Sale of Asset account');
 	}
