@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.1 $ */
+/* $Revision: 1.2 $ */
 
 $PageSecurity = 2;
 include('includes/session.inc');
@@ -168,7 +168,7 @@ if (DB_num_rows($result)==0){
 	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	header('Pragma: public');
 
-	$pdf->Stream();
+	$pdf->Output('TopItems.pdf', 'I');
 }
 
 
