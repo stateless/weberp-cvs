@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.112 $ */
+/* $Revision: 1.113 $ */
 
 include('includes/DefineCartClass.php');
 $PageSecurity = 1;
@@ -604,7 +604,7 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 	OR $_SESSION['Items'.$identifier]->DebtorNo=='') {
 	
 
-	echo '<p class="page_title_text"><img src="'.$rootpath.'/css/'.$theme.'/images/magnifier.png" title="' . _('Search') . '" alt="">' . 
+	echo '<p class="page_title_text"><img src="'.$rootpath.'/css/'.$theme.'/images/magnifier.png" title="' . _('Search') . '" alt="">' .
 	' ' . _('Enter an Order or Quotation') . ' : ' . _('Search for the Customer Branch.') . '</p>';
 	echo '<div class="page_help_text">' . _('Orders/Quotations are placed against the Customer Branch. A Customer may have several Branches.') . '</div>';
 	?>
@@ -732,12 +732,12 @@ if ($_SESSION['RequireCustomerSelection'] ==1
 		echo '<p class="page_title_text"><img src="'.$rootpath.'/css/'.$theme.'/images/inventory.png" title="' . _('Order') . '" alt="">' . ' ';
 
 		if ($_SESSION['Items'.$identifier]->Quotation==1){
-			echo _('Quotation for') . ' ';
+			echo _('Quotation for customer') . ' ';
 		} else {
-			echo _('Order for') . ' ';
+			echo _('Order for customer') . ' ';
 		}
 
-		echo _('Customer') . ':<b> ' . $_SESSION['Items'.$identifier]->DebtorNo;
+		echo ':<b> ' . $_SESSION['Items'.$identifier]->DebtorNo;
 		echo '</b>&nbsp;' . _('Customer Name') . ': ' . $_SESSION['Items'.$identifier]->CustomerName;
 		echo '</b><div class="page_help_text">' . '<b>' . _('Default Options (can be modified during order):') . '</b><br>' . _('Deliver To') . ':<b> ' . $_SESSION['Items'.$identifier]->DeliverTo;
 		echo '</b>&nbsp;' . _('From Location') . ':<b> ' . $_SESSION['Items'.$identifier]->LocationName;
@@ -1496,10 +1496,10 @@ $WoRow = db_fetch_row($WoResult);
 		?>
 
 		</select></td>
-		<td><b><?php echo _('Enter partial'); ?> <?php echo _('Description'); ?>:</b>
+		<td><b><?php echo _('Enter partial Description'); ?>:</b>
 		<input tabindex=2 type="Text" name="Keywords" size=20 maxlength=25 value="<?php if (isset($_POST['Keywords'])) echo $_POST['Keywords']; ?>"></td>
-		
-		<td align="right"><b><?php echo _('OR'); ?> </b><b><?php echo _('Enter partial'); ?> <?php echo _('Stock Code'); ?>:</b>
+
+		<td align="right"><b><?php echo _('OR'); ?> </b><b><?php echo _('Enter extract of the Stock Code'); ?>:</b>
 		<input tabindex=3 type="Text" name="StockCode" size=15 maxlength=18 value="<?php if (isset($_POST['StockCode'])) echo $_POST['StockCode']; ?>"></td>
 		
 		</tr><tr>	
