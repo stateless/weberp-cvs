@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.26 $ */
+/* $Revision: 1.27 $ */
 
 $PageSecurity = 2;
 include('includes/session.inc');
@@ -175,7 +175,7 @@ if (isset($MakePDFThenDisplayIt) or isset($MakePDFThenEmailIt)) {
 
 		while ($POLine=DB_fetch_array($result)){
 
-			$sql = "SELECT supplierdescription 
+			/*$sql = "SELECT supplierdescription 
 				FROM purchdata 
 				WHERE stockid='" . $POLine['itemcode'] . "' 
 				AND supplierno ='" . $POHeader['supplierno'] . "'";
@@ -193,7 +193,7 @@ if (isset($MakePDFThenDisplayIt) or isset($MakePDFThenEmailIt)) {
 			}
 			if (strlen($ItemDescription)<2){
 				$ItemDescription = $POLine['itemdescription'];
-			}
+			}*/
 
 			$DisplayQty = number_format($POLine['quantityord'],$POLine['decimalplaces']);
 			if ($_POST['ShowAmounts']=='Yes'){
@@ -207,16 +207,31 @@ if (isset($MakePDFThenDisplayIt) or isset($MakePDFThenEmailIt)) {
 			} else {
 				$DisplayLineTotal = "----";
 			}
-
+			
+			//check the supplier code from code item 
+			$sqlsupp = "SELECT supplierdescription 
+				FROM purchdata 
+				WHERE stockid='" . $POLine['itemcode'] . "' 
+				AND supplierno ='" . $POHeader['supplierno'] . "'
+				AND price='".$POLine['unitprice']."'";
+				
+			$SuppResult = DB_query($sqlsupp,$db);
+			$SuppDescRow = DB_fetch_row($SuppResult);	
+			if($SuppDescRow[0]==""){
+				$Desc=$POLine[itemdescription];
+			}else{
+				$Desc="".$SuppDescRow['0']." - ".$POLine['itemdescription']."";
+			}
 			$OrderTotal += ($POLine['unitprice']*$POLine['quantityord']);
 
 			$LeftOvers = $pdf->addTextWrap($Left_Margin+1,$YPos,94,$FontSize,$POLine['itemcode'], 'left');
-			$LeftOvers = $pdf->addTextWrap($Left_Margin+1+94+270,$YPos,85,$FontSize,$DisplayQty, 'right');
+			$LeftOvers = $pdf->addTextWrap($Left_Margin+1+94,$YPos,270,$FontSize,$Desc, 'left');
+			$LeftOvers = $pdf->addTextWrap($Left_Margin+1+94+260,$YPos,85,$FontSize,$DisplayQty, 'right');
 			$LeftOvers = $pdf->addTextWrap($Left_Margin+1+94+270+85+3,$YPos,37,$FontSize,$POLine['units'], 'left');
 			$LeftOvers = $pdf->addTextWrap($Left_Margin+1+94+270+85+3+37,$YPos,60,$FontSize,$DisplayDelDate, 'left');
 			$LeftOvers = $pdf->addTextWrap($Left_Margin+1+94+270+85+40+60,$YPos,85,$FontSize,$DisplayPrice, 'right');
 			$LeftOvers = $pdf->addTextWrap($Left_Margin+1+94+270+85+40+60+85,$YPos,85,$FontSize,$DisplayLineTotal, 'right');
-			$LeftOvers = $pdf->addTextWrap($Left_Margin+1+94,$YPos,270,$FontSize,$ItemDescription, 'left');
+			
 			if (strlen($LeftOvers)>1){
 				$LeftOvers = $pdf->addTextWrap($Left_Margin+1+94,$YPos-$line_height,270,$FontSize,$LeftOvers, 'left');
 				$YPos-=$line_height;
@@ -264,7 +279,7 @@ if (isset($MakePDFThenDisplayIt) or isset($MakePDFThenEmailIt)) {
     	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
     	header('Pragma: public');
 
-    	$pdf->stream();
+    	$pdf->Output('PurchOrder.pdf','I');
 
     } else { /* must be MakingPDF to email it */
 
