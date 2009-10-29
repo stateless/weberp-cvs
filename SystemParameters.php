@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.57 $ */
+/* $Revision: 1.58 $ */
 
 $PageSecurity =15;
 
@@ -175,6 +175,10 @@ if (isset($_POST['submit'])) {
 		}
 		if ($_SESSION['MaxImageSize'] != $_POST['X_MaxImageSize'] ) {
 			$sql[] = "UPDATE config SET confvalue = '".$_POST['X_MaxImageSize']."' WHERE confname = 'MaxImageSize'";
+		}
+//new number must be shown
+		if ($_SESSION['NumberOfMonthMustBeShown'] != $_POST['X_NumberOfMonthMustBeShown'] ) {
+			$sql[] = "UPDATE config SET confvalue = '".$_POST['X_NumberOfMonthMustBeShown']."' WHERE confname = 'NumberOfMonthMustBeShown'";
 		}
 		if ($_SESSION['part_pics_dir'] != $_POST['X_part_pics_dir'] ) {
 			$sql[] = "UPDATE config SET confvalue = 'companies/" . $_SESSION['DatabaseName'] . '/' . $_POST['X_part_pics_dir']."' WHERE confname = 'part_pics_dir'";
@@ -621,10 +625,25 @@ echo '<tr><td>' . _('Maximum Size in KB of uploaded images') . ':</td>
 	<td><input type="text" class="number" name="X_MaxImageSize" size=4 maxlength=3 value="' . $_SESSION['MaxImageSize'] . '"></td>
 	<td>' . _('Picture files of items can be uploaded to the server. The system will check that files uploaded are less than this size (in KB) before they will be allowed to be uploaded. Large pictures will make the system slow and will be difficult to view in the stock maintenance screen.') .'</td>
 </tr>';
+//NumberOfMonthMustBeShown
+$sql = 'SELECT confvalue 
+		FROM `config` 
+		WHERE confname ="numberOfMonthMustBeShown"';
+
+$ErrMsg = _('Could not load the Number Of Month Must be Shown');
+$result = DB_query($sql,$db,$ErrMsg);
+$row = DB_fetch_array($result);
+$_SESSION['NumberOfMonthMustBeShown'] == $row['confvalue'];
+
+echo '<tr><td>' . _('Number Of Month Must Be Shown') . ':</td>
+		  <td><input type="text" class="number" name="X_NumberOfMonthMustBeShown" size=4 maxlength=3 value="' . $_SESSION['NumberOfMonthMustBeShown'] . '"></td>	
+		  <td>' . _('Number of month must be shown on report can be changed with this parameters ex: in CustomerInquiry.php ') .'</td>
+      </tr>';
 
 //$part_pics_dir
 echo '<tr><td>' . _('The directory where images are stored') . ':</td>
-	<td><select name="X_part_pics_dir">';
+	 <td><select name="X_part_pics_dir">';
+
 
 $CompanyDirectory = 'companies/' . $_SESSION['DatabaseName'] . '/';
 $DirHandle = dir($CompanyDirectory);
