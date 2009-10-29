@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.4 $ */
+/* $Revision: 1.5 $ */
 // Add, Edit, Delete, and List MRP demand records. Table is mrpdemands.
 // Have separate functions for each routine. Use pass-by-reference - (&$db,&$StockID) -
 // to pass values of $db and $StockID to functions. - when just used $db as variable,
@@ -185,7 +185,7 @@ function submit(&$db,&$StockID,&$DemandID)  //####SUBMIT_SUBMIT_SUBMIT_SUBMIT_SU
 
     if (DB_num_rows($result) > 0){
 		$InputError = 1;
-		prnMsg(_('Record alread exists for part number/demand type/date'),'error');
+		prnMsg(_('Record already exists for part number/demand type/date'),'error');
 	}
 	
     if ($InputError !=1){	
