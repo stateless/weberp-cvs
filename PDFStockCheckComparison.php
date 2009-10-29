@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.16 $ */
+/* $Revision: 1.17 $ */
 $PageSecurity = 2;
 include('includes/session.inc');
 
@@ -340,7 +340,7 @@ If (isset($_POST['PrintPDF']) AND isset($_POST['ReportOrClose'])){
 
 } else { /*The option to print PDF was not hit */
 
-	$title= _('Inventory Comparison Comparison Report');
+	$title= _('Inventory Comparison Report');
 	include('includes/header.inc');
 
 	echo '<form action="' . $_SERVER['PHP_SELF'] . '" method="POST"><table>';
