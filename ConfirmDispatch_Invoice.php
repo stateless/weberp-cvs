@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.65 $ */
+/* $Revision: 1.66 $ */
 
 /* Session started in session.inc for password checking and authorisation level check */
 include('includes/DefineCartClass.php');
@@ -963,8 +963,9 @@ DB_Txn_Begin($db);
 							 " . -$AssParts['quantity'] * $OrderLine->QtyDispatched . ",
 							 " . $AssParts['standard'] . ",
 							 0,
-							 " . ($QtyOnHandPrior -($AssParts['quantity'] * $OrderLine->QtyDispatched)) . "
+							 newqoh-" . ($AssParts['quantity'] * $OrderLine->QtyDispatched) . "
 						)";
+					echo $sql;
 					$ErrMsg = _('CRITICAL ERROR') . '! ' . _('NOTE DOWN THIS ERROR AND SEEK ASSISTANCE') . ': ' . _('Stock movement records for the assembly components of'). ' '. $OrderLine->StockID . ' ' . _('could not be inserted because');
 					$DbgMsg = _('The following SQL to insert the assembly components stock movement records was used');
 					$Result = DB_query($SQL,$db,$ErrMsg,$DbgMsg,true);
