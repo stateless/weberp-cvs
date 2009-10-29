@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.17 $ */
+/* $Revision: 1.18 $ */
 
 $PageSecurity = 2;
 
@@ -170,7 +170,7 @@ for ($i=1;$i<=2;$i++){  /*Print it out twice one copy for customer and one for o
 
 } /*end for loop to print the whole lot twice */
 
-$pdfcode = $pdf->output();
+$pdfcode = $pdf->output('PrintCustOrder.pdf', 'I');
 $len = strlen($pdfcode);
 if ($len<=20){
         $title = _('Print Packing Slip Error');
@@ -188,7 +188,7 @@ if ($len<=20){
 	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	header('Pragma: public');
 //echo 'here';
-	$pdf->Stream();
+	$pdf->Stream('PrintCustOrder.pdf', 'I');
 
 	$sql = "UPDATE salesorders SET printedpackingslip=1, datepackingslipprinted='" . Date('Y-m-d') . "' WHERE salesorders.orderno=" .$_GET['TransNo'];
 	$result = DB_query($sql,$db);
