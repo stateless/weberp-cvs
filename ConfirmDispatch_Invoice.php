@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.66 $ */
+/* $Revision: 1.67 $ */
 
 /* Session started in session.inc for password checking and authorisation level check */
 include('includes/DefineCartClass.php');
@@ -1461,7 +1461,7 @@ DB_Txn_Begin($db);
 	$j++;
 	echo '<tr>
 		<td>'._('Action For Balance'). ':</td>
-		<td><select tabindex='.$j.' name=BOPolicy><option selected Value="BO">'._('Automatically put balance on back order').'<option Value="CAN">'._('Cancel any quantites not delivered').'</select></td>
+		<td><select tabindex='.$j.' name=BOPolicy><option selected Value="BO">'._('Automatically put balance on back order').'<option Value="CAN">'._('Cancel any quantities not delivered').'</select></td>
 	</tr>';
 	$j++;
 	echo '<tr>
