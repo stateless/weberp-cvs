@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.27 $ */
+/* $Revision: 1.28 $ */
 
 $PageSecurity = 2;
 include('includes/session.inc');
@@ -118,7 +118,7 @@ if (isset($OrderNo) && $OrderNo != "" && $OrderNo > 0){
 				_('has previously been printed') . '. ' . _('It was printed on'). ' ' .
 				ConvertSQLDate($POHeader['dateprinted']) . '<br>'.
 				_('To re-print the order it must be modified to allow a reprint'). '<br>'.
-				_('This check is there to ensure that duplicate purchase orders are not sent to the supplier	resulting in several deliveries of the same supplies'), 'warn');
+				_('This check is there to ensure that duplicate purchase orders are not sent to the supplier resulting in several deliveries of the same supplies'), 'warn');
            echo '<br><table class="table_index">
                 <tr><td class="menu_group_item">
  					 <LI><a href="' . $rootpath . '/PO_PDFPurchOrder.php?' . SID . 'OrderNo=' . $OrderNo . '&ViewingOnly=1">'.
