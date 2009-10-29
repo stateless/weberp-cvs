@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.17 $ */
+/* $Revision: 1.18 $ */
 
 $PageSecurity = 2;
 
@@ -405,7 +405,7 @@ If (isset($_POST['PrintPDF']) && isset($_POST['FromCust']) && $_POST['FromCust']
 	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	header('Pragma: public');
 
-	$pdf->Stream();
+	$pdf->Output('CustStatements.pdf', 'I');
 
 	} else {
 		$title = _('Print Statements') . ' - ' . _('No Statements Found');
