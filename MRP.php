@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.6 $ */
+/* $Revision: 1.7 $ */
 
 $PageSecurity=9;
 
@@ -15,7 +15,7 @@ if (isset($_POST['submit'])) {
 	
 	// MRP - Create levels table based on bom
 	echo '</br>'  ._('Start time') . ': ' . date('h:i:s') . '</br>';
-	echo '</br>' . _('Initializing tables .....') . '</br>';
+	echo '</br>' . _('Initialising tables .....') . '</br>';
 	flush();
 	$result = DB_query('DROP TABLE IF EXISTS tempbom',$db);
 	$result = DB_query('DROP TABLE IF EXISTS passbom',$db);
