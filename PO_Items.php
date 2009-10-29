@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.40 $ */
+/* $Revision: 1.41 $ */
 
 $PageSecurity = 4;
 
@@ -81,7 +81,7 @@ if (isset($_POST['Commit'])){ /*User wishes to commit the order to the database 
  */
 	$InputError=0; /*Start off assuming the best */
 	if ($_SESSION['PO'.$identifier]->DelAdd1=='' or strlen($_SESSION['PO'.$identifier]->DelAdd1)<3){
-		prnMsg( _('The purchase order can not be committed to the database because there is no delivery steet address specified'),'error');
+		prnMsg( _('The purchase order can not be committed to the database because there is no delivery street address specified'),'error');
 		$InputError=1;
 	} elseif ($_SESSION['PO'.$identifier]->Location=='' or ! isset($_SESSION['PO'.$identifier]->Location)){
 		prnMsg( _('The purchase order can not be committed to the database because there is no location specified to book any stock items into'),'error');
