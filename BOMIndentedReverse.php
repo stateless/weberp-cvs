@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.3 $ */
+/* $Revision: 1.4 $ */
 // BOMIndented.php - Reverse Indented Bill of Materials - From lowest level component to top level
 // assembly
 $PageSecurity = 2;
@@ -11,7 +11,7 @@ if (isset($_POST['PrintPDF'])) {
 
 	$FontSize=9;
 	$pdf->addinfo('Title',_('Indented BOM Listing'));
-	$pdf->addinfo('Subject',_('Indentedd BOM Listing'));
+	$pdf->addinfo('Subject',_('Indented BOM Listing'));
 
 	$PageNumber=1;
 	$line_height=12;

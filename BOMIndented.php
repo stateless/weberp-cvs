@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.3 $ */
+/* $Revision: 1.4 $ */
 // BOMIndented.php - Indented Bill of Materials
 $PageSecurity = 2;
 include('includes/session.inc');
@@ -10,7 +10,7 @@ If (isset($_POST['PrintPDF'])) {
 
 	$FontSize=9;
 	$pdf->addinfo('Title',_('Indented BOM Listing'));
-	$pdf->addinfo('Subject',_('Indentedd BOM Listing'));
+	$pdf->addinfo('Subject',_('Indented BOM Listing'));
 
 	$PageNumber=1;
 	$line_height=12;
