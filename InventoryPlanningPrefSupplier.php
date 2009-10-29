@@ -442,7 +442,7 @@ if (isset($_POST['PrintPDF'])){
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('Pragma: public');
 
-		$pdf->Stream();
+		$pdf->Output('InventoryPlanningPrefSupplier.pdf', 'I');
 
 	}
 	exit;
