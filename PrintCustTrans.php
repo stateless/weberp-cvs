@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.50 $ */
+/* $Revision: 1.51 $ */
 
 $PageSecurity = 1;
 
@@ -554,7 +554,7 @@ while ($row=DB_fetch_array($result)){
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('Pragma: public');
 
-		$pdf->Stream();
+		$pdf->Output('PrintCustTrans.pdf', 'I');
 	}
 
 } else { /*The option to print PDF was not hit */
