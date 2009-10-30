@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.86 $ */
+/* $Revision: 1.87 $ */
 
 
 $PageSecurity = 1;
@@ -433,7 +433,7 @@ if (count($_SESSION['AllowedPageSecurityTokens'])==1){
 							</tr>
 							<tr>
 							<td class="menu_group_item">
-								<?php echo "<a href='" . $rootpath . '/PO_Header.php?&NewOrder=Yes' . SID . "'><LI>" . _('Add A Purchase Order') . '</LI></a>'; ?>
+								<?php echo "<a href='" . $rootpath . '/PO_Header.php?&NewOrder=Yes' . SID . "'><LI>" . _('Add Purchase Order') . '</LI></a>'; ?>
 							</td>
 							</tr>
 							<tr>
