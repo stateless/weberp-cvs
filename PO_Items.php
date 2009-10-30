@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.41 $ */
+/* $Revision: 1.42 $ */
 
 $PageSecurity = 4;
 
@@ -210,7 +210,7 @@ if (isset($_POST['Commit'])){ /*User wishes to commit the order to the database 
 				}
 			} /* end of the loop round the detail line items on the order */
 			echo '<p>';
-			prnMsg(_('Purchase order') . ' ' . $_SESSION['PO'.$identifier]->OrderNo . ' ' . _('on') . ' ' . 
+			prnMsg(_('Purchase Order') . ' ' . $_SESSION['PO'.$identifier]->OrderNo . ' ' . _('on') . ' ' . 
 		     	$_SESSION['PO'.$identifier]->SupplierName . ' ' . _('has been created'),'success');
 			echo '<p class="page_title_text"><img src="'.$rootpath.'/css/'.$theme.'/images/printer.png" title="' . 
 				_('Print') . '" alt="">' . ' ' . _('Print Purchase Order') . '';
@@ -355,7 +355,7 @@ if (isset($_POST['Commit'])){ /*User wishes to commit the order to the database 
 				$result =DB_query($sql,$db,$ErrMsg,$DbgMsg,true);
 		     } /* end of the loop round the detail line items on the order */
 		     echo '<br><br>';
-		     prnMsg(_('Purchase order') . ' ' . $_SESSION['PO'.$identifier]->OrderNo . ' ' . _('has been updated'),'success');
+		     prnMsg(_('Purchase Order') . ' ' . $_SESSION['PO'.$identifier]->OrderNo . ' ' . _('has been updated'),'success');
 		     if ($_SESSION['PO'.$identifier]->AllowPrintPO==1){
 			 //    echo '<br><a target="_blank" href="'.$rootpath.'/PO_PDFPurchOrder.php?' . SID . '&OrderNo=' . $_SESSION['PO'.$identifier]->OrderNo . '">' . _('Print Purchase Order') . '</a>';
 		     }
@@ -938,7 +938,7 @@ if (count($_SESSION['PO'.$identifier]->LineItems)>0 and !isset($_GET['Edit'])){
 
 
 if (isset($_POST['NonStockOrder'])) {
-	echo '<br><table><tr><td>'._('Description of Item').'</td>';
+	echo '<br><table><tr><td>'._('Item Description').'</td>';
 	echo '<td><input type=text name=ItemDescription size=40></td></tr>';
 	echo '<tr><td>'._('General Ledger Code').'</td>';
 	echo '<td><select name="GLCode">';
