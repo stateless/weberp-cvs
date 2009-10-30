@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.1 $ */
+/* $Revision: 1.2 $ */
 
 $PageSecurity = 11;
 
@@ -19,7 +19,7 @@ if (isset($_GET['StockID'])){
 }
 
 if (isset($StockID)) {
-	$sql = "SELECT COUNT(stockid) FROM stockmaster WHERE stockid='".$StockID."'";
+	$sql = "SELECT COUNT(stockid) FROM assetmanager WHERE stockid='".$StockID."'";
 	$result = DB_query($sql,$db);
 	$myrow = DB_fetch_row($result);
 	if ($myrow[0]==0) {
@@ -27,9 +27,6 @@ if (isset($StockID)) {
 	}
 }
 
-?>
-
-<?php
 echo '<a href="' . $rootpath . '/SelectProduct.php?' . SID . '">' . _('Back to Items') . '</a><br>' . "\n";
 
 
@@ -333,7 +330,7 @@ if (isset($_POST['submit'])) {
 									$db);
 
 				//now insert any item properties
-				for ($i=0;$i<$_POST['PropertyCounter'];$i++){
+				for ($i=0;$i<=$_POST['PropertyCounter'];$i++){
 
 					if ($_POST['PropType' . $i] ==2){
 						if ($_POST['PropValue' . $i]=='on'){
@@ -407,7 +404,7 @@ if (isset($_POST['submit'])) {
 				$DbgMsg = _('The SQL that was used to add the item failed was');
 				$result = DB_query($sql,$db, $ErrMsg, $DbgMsg);
 				//now insert any item properties
-				for ($i=0;$i<$_POST['PropertyCounter'];$i++){
+				for ($i=0;$i<=$_POST['PropertyCounter'];$i++){
 
 					if ($_POST['PropType' . $i] ==2){
 						if ($_POST['PropValue' . $i]=='on'){
@@ -416,22 +413,22 @@ if (isset($_POST['submit'])) {
 							$_POST['PropValue' . $i]=0;
 						}
 					}
-					$result = DB_query("INSERT INTO stockitemproperties (stockid,
+					$sql="INSERT INTO stockitemproperties (stockid,
 																			stkcatpropid,
 																			value)
 														VALUES ('" . $StockID . "',
 																" . $_POST['PropID' . $i] . ",
-																'" . $_POST['PropValue' . $i] . "')",
-										$db);
+																'" . $_POST['PropValue' . $i] . "')";
+					$result = DB_query($sql,$db);
 				} //end of loop around properties defined for the category
 				if (DB_error_no($db) ==0) {
 
 					$sql = "INSERT INTO locstock (loccode,
 													stockid)
-										SELECT fixedassetlocations.locationid,
+										SELECT locations.loccode,
 										'" . $StockID . "'
-										FROM fixedassetlocations";
-
+										FROM locations";
+					
 					$ErrMsg =  _('The locations for the item') . ' ' . $StockID .  ' ' . _('could not be added because');
 					$DbgMsg = _('NB Locations records can be added by opening the utility page') . ' <i>Z_MakeStockLocns.php</i> ' . _('The SQL that was used to add the location records that failed was');
 					$InsResult = DB_query($sql,$db,$ErrMsg,$DbgMsg);
