@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.6 $ */
+/* $Revision: 1.7 $ */
 // BOMExtendedQty.php - Quantiy Extended Bill of Materials
 $PageSecurity = 2;
 include('includes/session.inc');
@@ -271,7 +271,7 @@ If (isset($_POST['PrintPDF'])) {
 	
 } else { /*The option to print PDF was not hit so display form */
 
-	$title=_('Extended Quantity BOM Listing');
+	$title=_('Quantity Extended BOM Listing');
 	include('includes/header.inc');
 
 	echo '</br></br><form action=' . $_SERVER['PHP_SELF'] . " method='post'><table>";
