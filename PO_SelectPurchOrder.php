@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.13 $ */
+/* $Revision: 1.14 $ */
 
 $PageSecurity = 2;
 
@@ -130,7 +130,7 @@ ouststanding orders
 
 if ($OrderNumber=="" OR !isset($OrderNumber)){
 
-	echo _('order number') . ': <input type=text name="OrderNumber" MAXLENGTH =8 size=9> ' . _('Into Stock Location') . ':<select name="StockLocation"> ';
+	echo _('Order Number') . ': <input type=text name="OrderNumber" MAXLENGTH =8 size=9> ' . _('Into Stock Location') . ':<select name="StockLocation"> ';
 	$sql = "SELECT loccode, locationname FROM locations";
 	$resultStkLocs = DB_query($sql,$db);
 	while ($myrow=DB_fetch_array($resultStkLocs)){
