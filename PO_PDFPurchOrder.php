@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.28 $ */
+/* $Revision: 1.29 $ */
 
 $PageSecurity = 2;
 include('includes/session.inc');
@@ -114,7 +114,7 @@ if (isset($OrderNo) && $OrderNo != "" && $OrderNo > 0){
 			  $title = _('Purchase Order Already Printed');
 			  include('includes/header.inc');
 			  echo '<p>';
-			  prnMsg( _('Purchase order number').' ' . $OrderNo . ' '.
+			  prnMsg( _('Purchase Order Number').' ' . $OrderNo . ' '.
 				_('has previously been printed') . '. ' . _('It was printed on'). ' ' .
 				ConvertSQLDate($POHeader['dateprinted']) . '<br>'.
 				_('To re-print the order it must be modified to allow a reprint'). '<br>'.
@@ -300,7 +300,7 @@ if (isset($MakePDFThenDisplayIt) or isset($MakePDFThenEmailIt)) {
 	if ($result==1){
 		$failed = false;
 		echo '<p>';
-		prnMsg( _('Purchase order'). ' ' . $OrderNo.' ' . _('has been emailed to') .' ' . $_POST['EmailTo'] . ' ' . _('as directed'), 'success');
+		prnMsg( _('Purchase Order'). ' ' . $OrderNo.' ' . _('has been emailed to') .' ' . $_POST['EmailTo'] . ' ' . _('as directed'), 'success');
 	} else {
 		$failed = true;
 		echo '<p>';
