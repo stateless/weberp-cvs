@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.51 $ */
+/* $Revision: 1.52 $ */
 
 $PageSecurity = 1;
 
@@ -278,14 +278,26 @@ If (isset($PrintPDF) or isset($_GET['PrintPDF'])
 
 		        while ($myrow2=DB_fetch_array($result)){
 
-				$DisplayPrice = number_format($myrow2['fxprice'],2);
-				$DisplayQty = number_format($myrow2['quantity'],2);
-				$DisplayNet = number_format($myrow2['fxnet'],2);
+				/*search the unit price*/
+				$sql='SELECT 	salesorderdetails.unitprice
+					  FROM   	salesorderdetails, 
+								debtortrans 
+					  WHERE 	debtortrans.transno = ' . $FromTransNo . '
+					  AND 		debtortrans.order_ = salesorderdetails.orderno
+					  AND 		salesorderdetails.stkcode = "'.$myrow2['stockid'].'"';
+					  
+				$resultp=DB_query($sql,$db);
+				$myrow3=DB_fetch_array($resultp);
+				
+				/*check the price after discount*/
 
 				if ($myrow2['discountpercent']==0){
 					$DisplayDiscount ='';
+					$DisplayNet=number_format(($myrow3['unitprice'] * $myrow2['Quantity']),2);
 				} else {
 					$DisplayDiscount = number_format($myrow2['discountpercent']*100,2) . '%';
+					$DiscountPrice=$myrow2['discountpercent'] * $myrow3['unitprice'];
+					$DisplayNet=number_format((($myrow3['unitprice'] - $DiscountPrice) * $myrow2['Quantity']),2);
 				}
 
 				$LeftOvers = $pdf->addTextWrap($Left_Margin+3,$YPos,95,$FontSize,$myrow2['stockid']);
