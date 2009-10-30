@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.7 $ */
+/* $Revision: 1.8 $ */
 // MRPCreateDemands.php - Create mrpdemands based on sales order history
 
 $PageSecurity=9;
@@ -93,6 +93,7 @@ if (strpos($FormatedDistdate,"/")) {
 } else if (strpos($FormatedDistdate,".")) {
     list($yyyy,$mm,$dd) = explode(".",$FormatedDistdate);
 }
+
 $datearray[0] = $FormatedDistdate;
 // Set first date to valid manufacturing date
 $calendarsql = "SELECT COUNT(*),cal2.calendardate 
@@ -225,13 +226,13 @@ prnMsg( $totalrecords . ' ' . _('records have been created'),'success');
 	echo "<option value='monthly'>" . _('Monthly');
 	echo '</select></td></tr>';
 	echo '<tr><td>' . _('Number of Periods') . 
-	     ":</td><td><input type ='text' name='PeriodNumber' size='4' value='1'>";
+	     ":</td><td><input type ='text' class=number name='PeriodNumber' size='4' value='1'>";
 	echo '<tr><td>' . _('Exclude Total Quantity Less Than') . 
-	     ":</td><td><input type ='text' name='Excludeqty' size='4' value='1'>";
+	     ":</td><td><input type ='text' class=number name='Excludeqty' size='4' value='1'>";
 	echo '<tr><td>' . _('Exclude Total Dollars Less Than') . 
-	     ":</td><td><input type ='text' name='Excludeamt' size='8' value='0'>";
+	     ":</td><td><input type ='text' class=number name='Excludeamt' size='8' value='0'>";
 	echo '<tr><td>' . _('Multiplier') . 
-	     ":</td><td><input type ='text' name='Multiplier' size='2'><tr><td></td></tr>";
+	     ":</td><td><input type ='text' class=number name='Multiplier' size='2'><tr><td></td></tr>";
 	echo "<tr><td></td></tr><tr><td></td><td><input type=submit name='submit' value='" . _('Submit') . 
 	     "'></td></tr></table>";
 
