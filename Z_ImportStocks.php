@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.4 $ */
+/* $Revision: 1.5 $ */
 /* Script to make stock locations for all parts that do not have stock location records set up*/
 
 $PageSecurity = 15;
@@ -35,7 +35,7 @@ $headers = array(
 if ($_FILES['userfile']['name']) { //start file processing
 
 	//initialize
-	$allowType='application/csv';
+	$allowType='text/csv';
 	$fieldTarget = 18;
 	$InputError = 0;
 
