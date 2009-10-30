@@ -1,5 +1,5 @@
 <?php
-/* $Revision: 1.43 $ */
+/* $Revision: 1.44 $ */
 
 $PageSecurity = 11;
 
@@ -538,7 +538,7 @@ if ($SomethingReceived==0 AND isset($_POST['ProcessGoodsReceived'])){ /*Then don
 												'',
 												".$Item->BundleQty*$OrderLine->Price.",
 												0,'".
-												$_POST['DefaultReceivedDate']."')";
+												$_POST['DefaultReceivedDate']."',0)";
 									$ErrMsg =  _('CRITICAL ERROR') . '! ' . _('NOTE DOWN THIS ERROR AND SEEK ASSISTANCE') . ': ' . _('The serial stock item record could not be inserted because');
 									$DbgMsg =  _('The following SQL to insert the serial stock item records was used');
 									$Result = DB_query($SQL, $db, $ErrMsg, $DbgMsg, true);
