@@ -25,3 +25,6 @@ ALTER TABLE `currencies` ADD COLUMN `decimalplaces` tinyint(3) NOT NULL DEFAULT 
 ALTER TABLE `fixedassetlocations` ADD COLUMN `parentlocationid` char(6) DEFAULT '';
 ALTER TABLE `assetmanager` ADD COLUMN `disposalvalue` int(11) NOT NULL DEFAULT 0;
 INSERT INTO `config` (`confname`, `confvalue`) VALUES ('NumberOfMonthMustBeShown', '6');
+
+ALTER TABLE `holdreasons` DROP INDEX `ReasonCode`;
+ALTER TABLE `chartmaster` DROP INDEX `AccountCode`;
