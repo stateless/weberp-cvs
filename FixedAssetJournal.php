@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.1 $ */
+/* $Revision: 1.2 $ */
 
 include('includes/DefineJournalClass.php');
 
@@ -99,6 +99,9 @@ if (!isset($_SESSION['JournalDetail']) or isset($_POST['update'])){
 				($assetarray[$i]['cost']-$assetarray[$i]['depn']),2);
 		}
 
+		if (($TotalDepnAmount+$assetarray[$i]['disposalvalue'])>$assetarray[$i]['cost']) {
+			$TotalDepnAmount=$assetarray[$i]['cost']-$assetarray[$i]['disposalvalue'];
+		}
 		$assetarray[$i]['narrative']='Depreciation Journal - '.$assetarray[$i]['stockid'].
 			' - '.$assetarray[$i]['serialno'].' - '.$assetarray[$i]['locationdescription'];
 
@@ -119,8 +122,6 @@ if (!isset($_SESSION['JournalDetail']) or isset($_POST['update'])){
 			$assetarray[$i]['id']);
 		$i++;
 	}
-
-
 }
 
 if (isset($_POST['JournalProcessDate'])){
