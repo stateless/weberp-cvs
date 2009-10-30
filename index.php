@@ -1,6 +1,6 @@
 <?php
 
-/* $Revision: 1.87 $ */
+/* $Revision: 1.88 $ */
 
 
 $PageSecurity = 1;
@@ -149,7 +149,7 @@ if (count($_SESSION['AllowedPageSecurityTokens'])==1){
 							</tr>
 							<tr>
 							<td class="menu_group_item">
-								<?php echo "<a href='" . $rootpath . '/PDFOrderStatus.php?' . SID . "'><LI>" . _('Order Status Reports (Print)') . '</LI></a>'; ?>
+								<?php echo "<a href='" . $rootpath . '/PDFOrderStatus.php?' . SID . "'><LI>" . _('Order Status Report') . '</LI></a>'; ?>
 							</td>
 							</tr>
 							<tr>
