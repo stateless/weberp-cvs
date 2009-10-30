@@ -125,4 +125,3 @@ SET FOREIGN_KEY_CHECKS=0;
   ALTER TABLE workorders ADD CONSTRAINT `worksorders_ibfk_1` FOREIGN KEY (`loccode`) REFERENCES `locations` (`loccode`);
   ALTER TABLE www_users ADD CONSTRAINT `www_users_ibfk_1` FOREIGN KEY (`defaultlocation`) REFERENCES `locations` (`loccode`);
   SET FOREIGN_KEY_CHECKS=1;
-ALTER TABLE `www_users` CHANGE COLUMN `language` `language` varchar(10) NOT NULL DEFAULT 'en_GB';
