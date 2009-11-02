@@ -1,9 +1,13 @@
 <?php
 
-/* $Revision: 1.1 $ */
+/* $Revision: 1.2 $ */
 
 $PageSecurity = 2;
 include('includes/session.inc');
+
+if (isset($_GET['SelectedSupplier'])) {
+	$_POST['supplierid']=$_GET['SelectedSupplier'];
+}
 
 if (isset($_POST['PrintPDF'])) {
 
@@ -190,14 +194,14 @@ if (isset($_POST['PrintPDF'])) {
 	echo '<p class="page_title_text"><img src="'.$rootpath.'/css/'.$theme.'/images/inventory.png" title="' . _('Purchase') . '" alt="">' . ' ' . _('Supplier Price List') . '';
 	echo '<div class="page_help_text">' . _('View the Price List from supplier') . '</div><br>';
 
-	echo '<br/><br/><form action=' . $_SERVER['PHP_SELF'] . " method='post'><table>";
+	echo '<br/><form action=' . $_SERVER['PHP_SELF'] . " method='post'><table>";
 	
 	$sql = "SELECT supplierid,suppname FROM `suppliers`";
 	$result = DB_query($sql,$db);
 	echo '<table>';
 	echo '<tr><td>' . _('Supplier') . ':</td><td><select name="supplier"> ';
 	while ($myrow=DB_fetch_array($result)){
-		if ($myrow['supplierid'] == $_POST['supplierid']){
+		if (isset($_POST['supplierid']) and ($myrow['supplierid'] == $_POST['supplierid'])) {
 			 echo '<option selected Value="' . $myrow['supplierid'] . '">' . $myrow['supplierid'].' - '.$myrow['suppname'];
 		} else {
 			 echo '<option Value="' . $myrow['supplierid'] . '">' . $myrow['supplierid'].' - '.$myrow['suppname'];
@@ -210,7 +214,7 @@ if (isset($_POST['PrintPDF'])) {
 	echo '<tr><td>' . _('Category') . ':</td><td><select name="category"> ';
 		echo '<option Value="all">' ._('ALL').'';
 	while ($myrow=DB_fetch_array($result)){
-		if ($myrow['categoryid'] == $_POST['categoryid']){
+		if (isset($_POST['categoryid']) and ($myrow['categoryid'] == $_POST['categoryid'])) {
 			 echo '<option selected Value="' . $myrow['categoryid'] . '">' . $myrow['categoryid']-$myrow['categorydescription'];
 		} else {
 			 echo '<option Value="' . $myrow['categoryid'] . '">' .$myrow['categoryid'].' - '. $myrow['categorydescription'];
@@ -224,7 +228,7 @@ if (isset($_POST['PrintPDF'])) {
 	echo '</select></td></tr>';
 	
 			
-	echo "</table><br/><br/><br/><div class='centre'><input type=submit name='PrintPDF' value='" . _('Print PDF') . "'></div>";
+	echo "</table><br/><div class='centre'><input type=submit name='PrintPDF' value='" . _('Print PDF') . "'></div>";
 
 	include('includes/footer.inc');
 
